@@ -96,9 +96,9 @@ export const services: Service[] = [
 
 export const nav = [
   { label: "Accueil", href: "/" },
-  { label: "Accompagnements", href: "/services" },
-  { label: "Ma méthode", href: "/#methode" },
   { label: "À propos", href: "/a-propos" },
+  { label: "Services", href: "/services" },
   { label: "Avis", href: "/#avis" },
+  { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/contact" },
 ];

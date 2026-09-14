@@ -22,9 +22,16 @@ export default function Hero() {
 
       <div className="min-h-screen-mobile mx-auto flex max-w-6xl flex-col justify-center px-5 pb-16 pt-28 md:pt-32">
         <div className="max-w-2xl">
-          <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur">
-            Éducateur canin à {site.area}
-          </span>
+          <div className="flex items-center gap-3 text-white/90">
+            <div className="flex text-brand">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <StarIcon key={i} className="h-5 w-5" />
+              ))}
+            </div>
+            <p className="text-sm font-medium">
+              {site.google.rating.toFixed(1)}/5 sur Google · {site.google.count} avis clients
+            </p>
+          </div>
 
           <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
             Rééduquez votre chien grâce aux <span className="text-sand">activités de flair.</span>
@@ -54,16 +61,9 @@ export default function Hero() {
             </Link>
           </div>
 
-          <div className="mt-10 flex items-center gap-3 text-white/90">
-            <div className="flex text-brand">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <StarIcon key={i} className="h-5 w-5" />
-              ))}
-            </div>
-            <p className="text-sm font-medium">
-              {site.google.rating.toFixed(1)}/5 sur Google · {site.google.count} avis clients
-            </p>
-          </div>
+          <span className="mt-10 inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur">
+            Éducateur canin à {site.area}
+          </span>
         </div>
       </div>
     </section>
