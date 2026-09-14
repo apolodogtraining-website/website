@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
@@ -38,8 +39,18 @@ export default function PartenairesPage() {
                 key={partner.name}
                 className="flex flex-col rounded-3xl border border-brand-light p-7 shadow-soft"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-light text-lg font-bold text-brand-darker">
-                  {partner.name.charAt(0)}
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-brand-light text-lg font-bold text-brand-darker">
+                  {partner.logo ? (
+                    <Image
+                      src={partner.logo}
+                      alt={partner.name}
+                      width={56}
+                      height={56}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    partner.name.charAt(0)
+                  )}
                 </div>
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">

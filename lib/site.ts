@@ -114,6 +114,7 @@ export type Partner = {
   location: string;
   description: string;
   url: string;
+  logo?: string;
 };
 
 export const partners: Partner[] = [
@@ -124,6 +125,7 @@ export const partners: Partner[] = [
     description:
       "Centre de formation pour devenir éducateur comportementaliste canin. Alternance théorie à distance et mises en situation réelles, avec une pédagogie fondée sur les méthodes positives.",
     url: "https://cynotrust.fr/formation-educateur-comportementaliste-canin/",
+    logo: "/partners/cynotrust.png",
   },
   {
     name: "ActivCanin",
@@ -140,6 +142,7 @@ export const partners: Partner[] = [
     description:
       "Éducatrice canine à Toulouse spécialisée en accompagnement relationnel, mantrailing et nutrition. Intervient sur tous les âges et toutes les races.",
     url: "https://www.animacanis-dogtraining.com/partenaires/",
+    logo: "/partners/anima-canis.png",
   },
   {
     name: "Zoomalia",
