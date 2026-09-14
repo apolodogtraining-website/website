@@ -16,7 +16,14 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export default function Reviews({ data }: { data: ReviewsData }) {
+type ReviewsProps = {
+  data: ReviewsData;
+  /** Niveau de titre : `h1` sur la page dédiée /avis, `h2` en section d'accueil. */
+  as?: "h1" | "h2";
+  heading?: string;
+};
+
+export default function Reviews({ data, as: Heading = "h2", heading }: ReviewsProps) {
   return (
     <section id="avis" className="bg-white py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5">
@@ -24,15 +31,15 @@ export default function Reviews({ data }: { data: ReviewsData }) {
           <span className="text-sm font-semibold uppercase tracking-wider text-brand">
             Ils m&apos;ont fait confiance
           </span>
-          <h2 className="max-w-xl text-balance text-3xl font-bold uppercase text-ink md:text-4xl">
-            Ce que disent les maîtres
-          </h2>
+          <Heading className="max-w-xl text-balance text-3xl font-bold uppercase text-ink md:text-4xl">
+            {heading ?? "Ce que disent les maîtres"}
+          </Heading>
 
           <div className="inline-flex items-center gap-4 rounded-2xl border border-brand-light bg-brand-tint px-6 py-4">
             <GoogleIcon className="h-8 w-8" />
             <div className="text-left">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-extrabold text-ink">
+                <span className="text-2xl font-bold text-ink">
                   {data.rating.toFixed(1)}
                 </span>
                 <Stars rating={data.rating} />

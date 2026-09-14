@@ -1,6 +1,7 @@
 import { services, site } from "@/lib/site";
 import { ArrowIcon, ServiceIcon } from "./icons";
 import Reveal from "./Reveal";
+import Link from "next/link";
 
 export default function Services() {
   return (
@@ -33,9 +34,9 @@ export default function Services() {
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                 {s.description}
               </p>
-              <a href={`/services/${s.slug}`} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-darker transition-colors hover:text-brand">
+              <Link href={`/services/${s.slug}`} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-darker transition-colors hover:text-brand">
                 En savoir plus <ArrowIcon className="h-4 w-4" />
-              </a>
+              </Link>
             </Reveal>
           ))}
 
@@ -50,12 +51,12 @@ export default function Services() {
               Parlons de votre chien et construisons ensemble le programme qui
               lui correspond.
             </p>
-            <a
+            <Link
               href="/contact"
               className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-brand-darker transition-transform hover:-translate-y-0.5"
             >
               Réserver une étude
-            </a>
+            </Link>
             <p className="mt-4 text-xs text-white/70">
               {site.role} · {site.area}
             </p>

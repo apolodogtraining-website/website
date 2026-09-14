@@ -50,7 +50,7 @@ export default function Header() {
 
         <nav className="hidden items-center gap-8 md:flex">
           {nav.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className={`text-sm font-medium transition-colors ${
@@ -60,7 +60,7 @@ export default function Header() {
               }`}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
           <Link
             href="/contact"
@@ -108,14 +108,14 @@ export default function Header() {
       >
         <nav className="flex flex-col gap-1 px-5 py-4">
           {nav.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base font-medium text-ink transition-colors hover:bg-brand-light hover:text-brand"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
           <Link
             href="/contact"

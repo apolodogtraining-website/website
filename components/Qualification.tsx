@@ -1,5 +1,6 @@
 import { ArrowIcon } from "./icons";
 import Reveal from "./Reveal";
+import Link from "next/link";
 
 const situations = [
   "Les promenades sont devenues tendues : tirage, aboiements ou réactions imprévisibles.",
@@ -16,7 +17,7 @@ export default function Qualification() {
           <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">Pour qui ?</span>
           <h2 className="mt-3 text-balance text-3xl font-semibold leading-tight text-ink md:text-4xl">Vous ne devriez pas avoir à choisir entre aimer votre chien et subir votre quotidien.</h2>
           <p className="mt-5 max-w-md leading-relaxed text-ink-soft">Chaque chien communique à sa manière. Le point de départ est de comprendre ce qui se joue, sans étiquette ni solution toute faite.</p>
-          <a href="/contact" className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-brand-darker hover:text-brand">Parler de votre situation <ArrowIcon className="h-4 w-4" /></a>
+          <Link href="/contact" className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-brand-darker hover:text-brand">Parler de votre situation <ArrowIcon className="h-4 w-4" /></Link>
         </Reveal>
         <div className="grid gap-3 sm:grid-cols-2">
           {situations.map((s, i) => (

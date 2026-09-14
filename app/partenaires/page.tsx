@@ -5,11 +5,13 @@ import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
 import { partners } from "@/lib/site";
 import { ArrowIcon, MapPinIcon } from "@/components/icons";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Mes partenaires",
   description:
     "Le réseau de professionnels que Frédéric recommande pour tout besoin hors de ses compétences : formation, agility, nutrition, animalerie.",
+  alternates: { canonical: "/partenaires" },
 };
 
 export default function PartenairesPage() {
@@ -96,12 +98,12 @@ export default function PartenairesPage() {
                 Contactez-moi, je vous orienterai vers le bon professionnel
                 selon votre situation.
               </p>
-              <a
+              <Link
                 href="/contact"
                 className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 font-semibold text-brand-darker shadow-soft transition-transform hover:-translate-y-0.5"
               >
                 Me contacter
-              </a>
+              </Link>
             </div>
           </div>
         </section>

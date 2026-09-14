@@ -57,6 +57,16 @@ body {
   transform: none;
 }
 
+/* Garde-fou : sans JavaScript, l'IntersectionObserver ne tourne jamais et la
+   page resterait entièrement invisible. Certains crawlers et les captures
+   d'aperçu automatiques sont dans ce cas. */
+@media (scripting: none) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Halo pulsant du bouton d'appel flottant */
 @keyframes sticky-call-pulse {
   0% {

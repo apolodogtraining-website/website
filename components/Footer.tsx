@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { nav, site } from "@/lib/site";
+import { legalNav, nav, site } from "@/lib/site";
 import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "./icons";
 
 export default function Footer() {
@@ -21,6 +21,14 @@ export default function Footer() {
           <p className="mt-4 max-w-xs text-sm leading-relaxed">
             {site.role} à {site.area}. {site.slogan}
           </p>
+          {/* NAP : doit rester strictement identique à la fiche Google et aux annuaires. */}
+          <address className="mt-4 max-w-xs text-sm not-italic leading-relaxed">
+            {site.address.locality} ({site.address.postalCode}), {site.address.region}
+            <br />
+            Interventions à {site.area}
+            <br />
+            <span className="text-white/50">SIREN {site.siren}</span>
+          </address>
         </div>
 
         <div>
@@ -30,12 +38,12 @@ export default function Footer() {
           <ul className="mt-4 space-y-2 text-sm">
             {nav.map((item) => (
               <li key={item.href}>
-                <a
+                <Link
                   href={item.href}
                   className="transition-colors hover:text-brand"
                 >
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -95,6 +103,15 @@ export default function Footer() {
           <p>
             © {year} {site.name}. Tous droits réservés.
           </p>
+          <ul className="flex flex-wrap items-center gap-x-5 gap-y-1">
+            {legalNav.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="transition-colors hover:text-brand">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
           <p>
             Site créé par{" "}
             <span className="font-semibold text-white">STUDIO APOLO</span>

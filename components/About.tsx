@@ -17,7 +17,13 @@ const values = [
   },
 ];
 
-export default function About() {
+type AboutProps = {
+  /** Niveau de titre : `h1` sur la page dédiée /a-propos, `h2` en section d'accueil. */
+  as?: "h1" | "h2";
+  heading?: string;
+};
+
+export default function About({ as: Heading = "h2", heading }: AboutProps) {
   return (
     <section id="a-propos" className="bg-white py-20 md:py-28">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-2 lg:gap-16">
@@ -32,7 +38,7 @@ export default function About() {
             />
           </div>
           <div className="absolute -bottom-6 -right-4 hidden rounded-2xl bg-brand px-6 py-5 text-white shadow-brand sm:block lg:-right-6">
-            <p className="text-3xl font-extrabold leading-none">100%</p>
+            <p className="text-3xl font-bold leading-none">100%</p>
             <p className="mt-1 text-sm font-medium text-white/90">
               méthodes
               <br />
@@ -45,9 +51,9 @@ export default function About() {
           <span className="text-sm font-semibold uppercase tracking-wider text-brand">
             À propos
           </span>
-          <h2 className="mt-3 text-balance break-words text-3xl font-bold uppercase text-ink lg:text-4xl">
-            {site.trainer}, votre éducateur &amp; comportementaliste canin
-          </h2>
+          <Heading className="mt-3 text-balance break-words text-3xl font-bold uppercase text-ink lg:text-4xl">
+            {heading ?? `${site.trainer}, votre éducateur & comportementaliste canin`}
+          </Heading>
           <div className="mt-5 space-y-4 text-base leading-relaxed text-ink-soft">
             <p>
               Passionné par la relation entre l&apos;humain et le chien, j&apos;accompagne

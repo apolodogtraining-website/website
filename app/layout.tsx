@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -30,7 +30,9 @@ export const metadata: Metadata = {
     "Apolo Dog Training",
   ],
   authors: [{ name: site.name }],
-  alternates: { canonical: "/" },
+  // ⚠️ Ne PAS déclarer `alternates.canonical` ici : dans l'App Router, les métadonnées
+  // du layout racine sont héritées par toutes les pages enfants qui ne les redéfinissent
+  // pas. Chaque page déclare donc sa propre canonique.
   openGraph: {
     type: "website",
     locale: "fr_FR",

@@ -8,15 +8,24 @@ import Method from "@/components/Method";
 import Faq from "@/components/Faq";
 import StickyCall from "@/components/StickyCall";
 import Footer from "@/components/Footer";
+import type { Metadata } from "next";
 import { getReviews } from "@/lib/reviews";
-import { services, site } from "@/lib/site";
+import { serviceAreas, services, site } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function Home() {
   const reviews = await getReviews();
 
+  // ⚠️ Pas d'`aggregateRating` ici : Google n'accepte pas les extraits d'avis
+  // auto-référencés (une entreprise qui balise sa propre note sur son propre site).
+  // Les étoiles affichées dans les résultats viennent de la fiche Google Business Profile.
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": ["LocalBusiness", "ProfessionalService"],
+    "@id": `${site.url}/#business`,
     name: site.name,
     description: `${site.role} à ${site.area}.`,
     url: site.url,
@@ -24,22 +33,37 @@ export default async function Home() {
     telephone: site.phoneIntl,
     image: `${site.url}/photos/hero.jpg`,
     logo: `${site.url}/logo/logo-full.png`,
+    priceRange: "120€ – 699€",
+    currenciesAccepted: "EUR",
+    knowsLanguage: ["fr", "es"],
+    founder: {
+      "@type": "Person",
+      name: site.trainer,
+      jobTitle: "Éducateur et comportementaliste canin",
+    },
+    identifier: { "@type": "PropertyValue", name: "SIREN", value: site.siren },
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Bordeaux",
-      addressRegion: "Nouvelle-Aquitaine",
-      addressCountry: "FR",
+      // TODO SEO local : ajouter `streetAddress` si vous recevez à l'adresse.
+      // Si vous travaillez en zone d'intervention uniquement, laissez-le vide
+      // et configurez la fiche Google en « zone de service », adresse masquée.
+      postalCode: site.address.postalCode,
+      addressLocality: site.address.locality,
+      addressRegion: site.address.region,
+      addressCountry: site.address.country,
     },
-    areaServed: site.areaLong,
-    sameAs: [site.instagram.url, site.facebook.url],
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: reviews.rating,
-      reviewCount: reviews.total,
-    },
+    // TODO SEO local : ajouter `geo` (GeoCoordinates), `openingHoursSpecification`
+    // et `hasMap` (lien Maps de la fiche) une fois les valeurs exactes confirmées.
+    areaServed: serviceAreas.map((city) => ({ "@type": "City", name: city })),
+    // `sameAs` relie explicitement le site et l'établissement dans le graphe de Google.
+    sameAs: [site.instagram.url, site.facebook.url, site.google.url],
     makesOffer: services.map((s) => ({
       "@type": "Offer",
-      itemOffered: { "@type": "Service", name: s.title },
+      itemOffered: {
+        "@type": "Service",
+        name: s.title,
+        url: `${site.url}/services/${s.slug}`,
+      },
     })),
   };
 
