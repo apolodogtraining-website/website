@@ -58,6 +58,25 @@ body {
   transform: none;
 }
 
+/* Halo pulsant du bouton d'appel flottant */
+@keyframes sticky-call-pulse {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+.sticky-call-ring {
+  animation: sticky-call-pulse 2.2s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -66,5 +85,8 @@ body {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+  .sticky-call-ring {
+    animation: none;
   }
 }
