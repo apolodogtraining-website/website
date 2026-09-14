@@ -51,13 +51,13 @@ export default async function Home() {
       />
       <Header />
       <main className="flex-1">
-        <Hero />
+        <Hero rating={reviews.rating} total={reviews.total} />
         <Qualification />
         <Services />
         <Method />
         <Reviews data={reviews} />
         <Faq />
-        <Contact />
+        <Contact rating={reviews.rating} total={reviews.total} />
       </main>
       <Footer />
       <StickyCall />

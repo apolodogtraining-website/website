@@ -9,7 +9,15 @@ import {
 } from "./icons";
 import Reveal from "./Reveal";
 
-export default function Contact() {
+type ContactProps = {
+  rating?: number;
+  total?: number;
+};
+
+export default function Contact({
+  rating = site.google.rating,
+  total = site.google.count,
+}: ContactProps) {
   return (
     <section id="contact" className="bg-white py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5">
@@ -36,7 +44,7 @@ export default function Contact() {
                   ))}
                 </div>
                 <span className="text-sm">
-                  {site.google.rating}/5 · {site.google.count} avis Google
+                  {rating.toFixed(1)}/5 · {total} avis Google
                 </span>
               </div>
             </div>

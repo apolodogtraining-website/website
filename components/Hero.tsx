@@ -3,7 +3,15 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { ArrowIcon, StarIcon } from "./icons";
 
-export default function Hero() {
+type HeroProps = {
+  rating?: number;
+  total?: number;
+};
+
+export default function Hero({
+  rating = site.google.rating,
+  total = site.google.count,
+}: HeroProps) {
   return (
     <section id="accueil" className="relative isolate overflow-hidden">
       {/* Background image + overlay */}
@@ -29,7 +37,7 @@ export default function Hero() {
               ))}
             </div>
             <p className="text-sm font-medium">
-              {site.google.rating.toFixed(1)}/5 sur Google · {site.google.count} avis clients
+              {rating.toFixed(1)}/5 sur Google · {total} avis clients
             </p>
           </div>
 
