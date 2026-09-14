@@ -6,7 +6,7 @@ export default function StickyCall() {
     <a
       href={`tel:${site.phoneIntl}`}
       aria-label="Appeler nous"
-      className="group fixed bottom-5 right-5 z-40 flex h-[78px] w-[78px] items-center justify-center"
+      className="group fixed right-5 top-[66%] z-40 flex h-[78px] w-[78px] -translate-y-1/2 items-center justify-center"
     >
       <span
         aria-hidden
