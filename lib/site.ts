@@ -99,6 +99,50 @@ export const nav = [
   { label: "À propos", href: "/a-propos" },
   { label: "Services", href: "/services" },
   { label: "Avis", href: "/#avis" },
+  { label: "Partenaires", href: "/partenaires" },
   { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/contact" },
+];
+
+export type Partner = {
+  name: string;
+  tag: string;
+  location: string;
+  description: string;
+  url: string;
+};
+
+export const partners: Partner[] = [
+  {
+    name: "CynoTrust",
+    tag: "Formation pro canine",
+    location: "Charente",
+    description:
+      "Centre de formation pour devenir éducateur comportementaliste canin. Alternance théorie à distance et mises en situation réelles, avec une pédagogie fondée sur les méthodes positives.",
+    url: "#",
+  },
+  {
+    name: "ActivCanin",
+    tag: "Agility & hoopers",
+    location: "Cestas (33)",
+    description:
+      "Éducatrice canine à Cestas spécialisée en agility, hoopers et école du chiot. Séances individuelles ou collectives pour tous niveaux, dans une approche bienveillante.",
+    url: "#",
+  },
+  {
+    name: "Anima Canis Dog Training",
+    tag: "Mantrailing & nutrition",
+    location: "Escalquens (31)",
+    description:
+      "Éducatrice canine à Toulouse spécialisée en accompagnement relationnel, mantrailing et nutrition. Intervient sur tous les âges et toutes les races.",
+    url: "#",
+  },
+  {
+    name: "Zoomalia",
+    tag: "Animalerie",
+    location: "Latresne (33)",
+    description:
+      "Animalerie en ligne avec plus de 845 000 références : alimentation, accessoires et produits de santé pour chiens. Magasin physique disponible en Gironde.",
+    url: "#",
+  },
 ];
