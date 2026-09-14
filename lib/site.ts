@@ -119,30 +119,30 @@ export const partners: Partner[] = [
     location: "Charente",
     description:
       "Centre de formation pour devenir éducateur comportementaliste canin. Alternance théorie à distance et mises en situation réelles, avec une pédagogie fondée sur les méthodes positives.",
-    url: "#",
+    url: "https://cynotrust.fr/formation-educateur-comportementaliste-canin/",
   },
   {
     name: "ActivCanin",
-    tag: "Agility & hoopers",
+    tag: "Agility, hooper",
     location: "Cestas (33)",
     description:
       "Éducatrice canine à Cestas spécialisée en agility, hoopers et école du chiot. Séances individuelles ou collectives pour tous niveaux, dans une approche bienveillante.",
-    url: "#",
+    url: "https://activcanin.com/",
   },
   {
     name: "Anima Canis Dog Training",
-    tag: "Mantrailing & nutrition",
-    location: "Escalquens (31)",
+    tag: "Nutrition, mantrailing",
+    location: "Toulouse — Haute-Garonne (31)",
     description:
       "Éducatrice canine à Toulouse spécialisée en accompagnement relationnel, mantrailing et nutrition. Intervient sur tous les âges et toutes les races.",
-    url: "#",
+    url: "https://www.animacanis-dogtraining.com/partenaires/",
   },
   {
     name: "Zoomalia",
     tag: "Animalerie",
-    location: "Latresne (33)",
+    location: "Lastrene (33)",
     description:
       "Animalerie en ligne avec plus de 845 000 références : alimentation, accessoires et produits de santé pour chiens. Magasin physique disponible en Gironde.",
-    url: "#",
+    url: "https://www.zoomalia.com/",
   },
 ];
