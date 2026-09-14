@@ -3,6 +3,7 @@ import {
   PhoneIcon,
   MailIcon,
   InstagramIcon,
+  FacebookIcon,
   MapPinIcon,
   StarIcon,
 } from "./icons";
@@ -90,6 +91,25 @@ export default function Contact() {
                   </span>
                   <span className="block text-lg font-semibold text-ink">
                     {site.instagram.handle}
+                  </span>
+                </span>
+              </a>
+
+              <a
+                href={site.facebook.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 rounded-2xl bg-white p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand sm:h-12 sm:w-12">
+                  <FacebookIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                </span>
+                <span>
+                  <span className="block text-xs font-medium uppercase tracking-wide text-ink-soft">
+                    Facebook
+                  </span>
+                  <span className="block text-lg font-semibold text-ink">
+                    {site.facebook.handle}
                   </span>
                 </span>
               </a>

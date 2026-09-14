@@ -12,8 +12,12 @@ export const site = {
   phone: "06 23 80 76 59",
   phoneIntl: "+33623807659",
   instagram: {
-    handle: "@apolo.dogtraining",
-    url: "https://www.instagram.com/apolo.dogtraining",
+    handle: "@apolodog.training",
+    url: "https://www.instagram.com/apolodog.training",
+  },
+  facebook: {
+    handle: "Apolo Dog Training",
+    url: "https://www.facebook.com/apolodogtraining/",
   },
   google: {
     // Lien vers la fiche Google (bouton « voir tous les avis »)

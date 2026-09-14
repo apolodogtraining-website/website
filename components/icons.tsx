@@ -126,6 +126,14 @@ export function InstagramIcon(p: IconProps) {
   );
 }
 
+export function FacebookIcon(p: IconProps) {
+  return (
+    <svg {...base} fill="currentColor" stroke="none" {...p}>
+      <path d="M14.5 21v-7.5H17l.5-3.5h-3V7.8c0-1 .3-1.7 1.7-1.7H17.6V3.1C17.3 3 16.4 3 15.3 3c-2.3 0-3.8 1.4-3.8 4v2.9H9v3.6h2.5V21h3Z" />
+    </svg>
+  );
+}
+
 export function MapPinIcon(p: IconProps) {
   return (
     <svg {...base} {...p}>

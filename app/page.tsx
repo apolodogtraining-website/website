@@ -31,7 +31,7 @@ export default async function Home() {
       addressCountry: "FR",
     },
     areaServed: site.areaLong,
-    sameAs: [site.instagram.url],
+    sameAs: [site.instagram.url, site.facebook.url],
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: reviews.rating,

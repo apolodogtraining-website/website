@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { nav, site } from "@/lib/site";
-import { InstagramIcon, MailIcon, PhoneIcon } from "./icons";
+import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "./icons";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -70,6 +70,17 @@ export default function Footer() {
               >
                 <InstagramIcon className="h-4 w-4" />
                 {site.instagram.handle}
+              </a>
+            </li>
+            <li>
+              <a
+                href={site.facebook.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 transition-colors hover:text-brand"
+              >
+                <FacebookIcon className="h-4 w-4" />
+                {site.facebook.handle}
               </a>
             </li>
           </ul>
