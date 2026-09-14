@@ -12,7 +12,7 @@ export default function Method() {
     <section id="methode" className="bg-ink py-20 text-white md:py-28">
       <div className="mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-20">
         <Reveal className="relative min-h-80 overflow-hidden rounded-[2rem]">
-          <Image src="/photos/about.jpg" alt="Frédéric accompagne un chien lors d'une séance" fill sizes="(max-width: 1024px) 100vw, 45vw" className="object-cover" />
+          <Image src="/photos/methode.jpg" alt="Frédéric accompagne un chien lors d'une séance" fill sizes="(max-width: 1024px) 100vw, 45vw" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent" />
           <p className="absolute bottom-6 left-6 max-w-xs text-lg font-medium">Une approche sur mesure, dans le respect du rythme de votre chien.</p>
         </Reveal>
