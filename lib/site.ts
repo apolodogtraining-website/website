@@ -27,6 +27,24 @@ export const site = {
   },
 } as const;
 
+export const serviceAreas: string[] = [
+  "Bordeaux",
+  "Bassens",
+  "Cenon",
+  "Lormont",
+  "Floirac",
+  "Bouliac",
+  "Carbon-Blanc",
+  "Bruges",
+  "Mérignac",
+  "Talence",
+  "Pessac",
+  "Bègles",
+  "Le Bouscat",
+  "Eysines",
+  "Saint-Loubès",
+];
+
 export type Service = {
   title: string;
   slug: string;

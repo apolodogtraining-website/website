@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { ArrowIcon, StarIcon } from "./icons";
+import ZoneModal from "./ZoneModal";
 
 type HeroProps = {
   rating?: number;
@@ -69,9 +70,7 @@ export default function Hero({
             </Link>
           </div>
 
-          <span className="mt-10 inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur">
-            Éducateur canin à {site.area}
-          </span>
+          <ZoneModal variant="badge" />
         </div>
       </div>
     </section>
