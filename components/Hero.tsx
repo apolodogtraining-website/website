@@ -42,7 +42,7 @@ export default function Hero() {
             <strong className="font-semibold text-white">
               dès les premières séances et retrouvez un chien plus calme
             </strong>
-            , concentré et épanoui en quelques semaines grâce au Tracking, à la détection sportive, au Hunting Game et à l&apos;obéissance fonctionnelle.
+            , concentré et épanoui en quelques semaines grâce à l&apos;obéissance fonctionnelle, au Tracking, à la détection sportive, au Hunting Game.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
