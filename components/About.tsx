@@ -24,7 +24,7 @@ export default function About() {
         <Reveal className="relative">
           <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-soft lg:aspect-[4/5]">
             <Image
-              src="/photos/about.jpg"
+              src="/photos/a-propos.jpg"
               alt={`${site.trainer}, ${site.role}`}
               fill
               sizes="(max-width: 1024px) 100vw, 45vw"
