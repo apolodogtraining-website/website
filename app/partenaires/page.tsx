@@ -39,17 +39,19 @@ export default function PartenairesPage() {
                 key={partner.name}
                 className="flex flex-col rounded-3xl border border-brand-light p-7 shadow-soft"
               >
-                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-brand-light bg-white p-2 text-lg font-bold text-brand-darker">
+                <div className="flex h-20 w-20 items-center justify-center">
                   {partner.logo ? (
                     <Image
                       src={partner.logo}
                       alt={partner.name}
-                      width={56}
-                      height={56}
+                      width={80}
+                      height={80}
                       className="h-full w-full object-contain"
                     />
                   ) : (
-                    partner.name.charAt(0)
+                    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-light text-lg font-bold text-brand-darker">
+                      {partner.name.charAt(0)}
+                    </span>
                   )}
                 </div>
 
