@@ -20,12 +20,12 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:h-20">
         <Link href="/" className="flex items-center" aria-label={site.name}>
           <Image
-            src="/logo/picto-cropped.png"
+            src="/logo/logo.png"
             alt={site.name}
-            width={64}
-            height={64}
+            width={200}
+            height={142}
             priority
-            className="h-12 w-auto md:h-16"
+            className="h-10 w-auto md:h-14"
           />
         </Link>
 

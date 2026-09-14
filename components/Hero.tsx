@@ -27,11 +27,15 @@ export default function Hero() {
           </span>
 
           <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
-            Votre chien peut redevenir un compagnon <span className="text-sand">serein au quotidien.</span>
+            Rééduquez votre chien grâce aux <span className="text-sand">activités de flair.</span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/90 md:text-xl">
-            Réactivité, anxiété, excitation ou besoin de se dépenser&nbsp;: j&apos;observe votre chien et construis avec vous un accompagnement sur mesure, respectueux et concret.
+            Observez les premiers changements{" "}
+            <strong className="font-semibold text-white">
+              dès les premières séances et retrouvez un chien plus calme
+            </strong>
+            , concentré et épanoui en quelques semaines grâce au Tracking, à la détection sportive, au Hunting Game et à l&apos;obéissance fonctionnelle.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
