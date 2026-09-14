@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/lib/site";
+import { services, site } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+  const pages: MetadataRoute.Sitemap = [
     {
       url: site.url,
       lastModified: new Date(),
@@ -10,4 +10,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
   ];
+  const staticPages = ["/services", "/a-propos", "/contact"].map((path) => ({
+    url: `${site.url}${path}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+  const servicePages = services.map((service) => ({
+    url: `${site.url}/services/${service.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+  return [...pages, ...staticPages, ...servicePages];
 }

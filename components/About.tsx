@@ -50,14 +50,14 @@ export default function About() {
           </h2>
           <div className="mt-5 space-y-4 text-base leading-relaxed text-ink-soft">
             <p>
-              Passionné par la relation entre l'humain et le chien, j'accompagne
+              Passionné par la relation entre l&apos;humain et le chien, j&apos;accompagne
               les propriétaires de la métropole bordelaise pour construire une
               complicité durable et un chien épanoui, équilibré et bien dans ses
               pattes.
             </p>
             <p>
               Chaque chien est unique&nbsp;: plutôt que des recettes toutes
-              faites, je m'appuie sur l'observation, la compréhension de ses
+              faites, je m&apos;appuie sur l&apos;observation, la compréhension de ses
               besoins et de ses instincts naturels pour proposer un travail sur
               mesure, dans le respect de son rythme.
             </p>
@@ -69,7 +69,7 @@ export default function About() {
                 key={v.title}
                 className="rounded-2xl border border-brand-light bg-brand-tint p-4"
               >
-                <p className="font-semibold text-brand-darker">{v.title}</p>
+              <p className="font-semibold text-brand-darker">{v.title}</p>
                 <p className="mt-1 text-sm leading-snug text-ink-soft">
                   {v.text}
                 </p>

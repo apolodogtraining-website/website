@@ -10,18 +10,16 @@ import Reveal from "./Reveal";
 
 export default function Contact() {
   return (
-    <section id="contact" className="bg-brand-tint py-20 md:py-28">
+    <section id="contact" className="bg-white py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5">
         <Reveal className="overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand to-brand-darker shadow-brand">
           <div className="grid gap-10 p-6 sm:p-8 lg:grid-cols-2 lg:p-14">
             <div className="text-white">
               <h2 className="text-balance text-3xl font-bold uppercase lg:text-4xl">
-                Réservons la première séance
+                Parlons de votre chien
               </h2>
               <p className="mt-4 max-w-md leading-relaxed text-white/85">
-                Une étude, une séance ou un entraînement&nbsp;? Contactez-moi
-                dès maintenant. Réponse rapide, échange sans engagement pour
-                parler de votre chien.
+                Décrivez-moi brièvement votre situation ou votre objectif. Je vous réponds rapidement pour vous orienter vers l&apos;accompagnement le plus pertinent.
               </p>
 
               <div className="mt-8 flex items-center gap-3 text-white/90">

@@ -1,9 +1,12 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import About from "@/components/About";
 import Services from "@/components/Services";
 import Reviews from "@/components/Reviews";
 import Contact from "@/components/Contact";
+import Qualification from "@/components/Qualification";
+import Method from "@/components/Method";
+import Faq from "@/components/Faq";
+import StickyCall from "@/components/StickyCall";
 import Footer from "@/components/Footer";
 import { getReviews } from "@/lib/reviews";
 import { services, site } from "@/lib/site";
@@ -49,12 +52,15 @@ export default async function Home() {
       <Header />
       <main className="flex-1">
         <Hero />
-        <About />
+        <Qualification />
         <Services />
+        <Method />
         <Reviews data={reviews} />
+        <Faq />
         <Contact />
       </main>
       <Footer />
+      <StickyCall />
     </>
   );
 }

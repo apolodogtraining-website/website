@@ -1,23 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #36a9e1;
-  --color-brand-dark: #1f8ec4;
-  --color-brand-darker: #12729f;
-  --color-brand-light: #e8f6fd;
-  --color-brand-tint: #f4fbfe;
-  --color-ink: #14242e;
-  --color-ink-soft: #46606d;
+  --color-brand: #3f6654;
+  --color-brand-dark: #2d4e3e;
+  --color-brand-darker: #1d382c;
+  --color-brand-light: #dfe9df;
+  --color-brand-tint: #f5f6f0;
+  --color-sand: #e9dfcf;
+  --color-ink: #1c2b24;
+  --color-ink-soft: #607067;
 
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-soft: 0 10px 40px -12px rgba(20, 36, 46, 0.18);
-  --shadow-brand: 0 14px 40px -10px rgba(54, 169, 225, 0.45);
+  --shadow-soft: 0 18px 50px -24px rgba(28, 43, 36, 0.27);
+  --shadow-brand: 0 18px 42px -18px rgba(45, 78, 62, 0.48);
 }
 
 :root {
   --background: #ffffff;
-  --foreground: #14242e;
+  --foreground: #1c2b24;
 }
 
 html {
@@ -30,7 +31,12 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden; /* garde-fou anti-débordement horizontal mobile */
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #dfe9df;
+  color: #1d382c;
 }
 
 /* Hauteur plein écran avec repli pour navigateurs sans unité svh */

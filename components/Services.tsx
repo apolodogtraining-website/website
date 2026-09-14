@@ -1,5 +1,5 @@
 import { services, site } from "@/lib/site";
-import { ServiceIcon } from "./icons";
+import { ArrowIcon, ServiceIcon } from "./icons";
 import Reveal from "./Reveal";
 
 export default function Services() {
@@ -14,8 +14,7 @@ export default function Services() {
             Révélez le super pouvoir de votre chien
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-ink-soft">
-            De l'éducation de base aux sports canins, un accompagnement complet
-            adapté à votre chien et à vos objectifs.
+            Un accompagnement pensé pour votre quotidien, les besoins de votre chien et vos objectifs communs.
           </p>
         </Reveal>
 
@@ -34,6 +33,9 @@ export default function Services() {
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                 {s.description}
               </p>
+              <a href={`/services/${s.slug}`} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-darker transition-colors hover:text-brand">
+                En savoir plus <ArrowIcon className="h-4 w-4" />
+              </a>
             </Reveal>
           ))}
 
@@ -49,7 +51,7 @@ export default function Services() {
               lui correspond.
             </p>
             <a
-              href="#contact"
+              href="/contact"
               className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-brand-darker transition-transform hover:-translate-y-0.5"
             >
               Réserver une étude

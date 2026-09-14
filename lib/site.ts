@@ -25,6 +25,7 @@ export const site = {
 
 export type Service = {
   title: string;
+  slug: string;
   tag?: string;
   description: string;
   icon:
@@ -40,24 +41,28 @@ export type Service = {
 export const services: Service[] = [
   {
     title: "Éducation & obéissance fonctionnelle",
+    slug: "education-canine-bordeaux",
     description:
       "Les bases d'une relation sereine au quotidien : rappel, marche en laisse, autocontrôle et gestion des situations de la vie de tous les jours.",
     icon: "obedience",
   },
   {
     title: "Étude de comportement",
+    slug: "bilan-comportemental-chien-bordeaux",
     description:
       "Analyse fine des comportements gênants (peurs, réactivité, agressivité, anxiété) pour comprendre leur origine et mettre en place un vrai plan d'action.",
     icon: "behaviour",
   },
   {
     title: "Balades éducatives & collectives",
+    slug: "balades-educatives-bordeaux",
     description:
       "Apprendre en s'amusant, au contact d'autres chiens : socialisation, communication canine et travail en conditions réelles, en pleine nature.",
     icon: "walk",
   },
   {
     title: "Mantrailing (recherche de personnes)",
+    slug: "mantrailing-bordeaux",
     tag: "Mantrailing",
     description:
       "Votre chien suit une piste odorante pour retrouver une personne. Une activité qui canalise l'énergie et renforce votre complicité.",
@@ -65,6 +70,7 @@ export const services: Service[] = [
   },
   {
     title: "Tracking (pistage)",
+    slug: "tracking-chien-bordeaux",
     tag: "Tracking",
     description:
       "Le pistage sportif : suivre une trace au sol, marquer les objets, développer la concentration et l'autonomie de votre chien.",
@@ -72,6 +78,7 @@ export const services: Service[] = [
   },
   {
     title: "Nosework (détection sportive)",
+    slug: "nosework-bordeaux",
     tag: "Nosework",
     description:
       "Le sport du flair : votre chien apprend à détecter et signaler des odeurs cibles. Idéal pour la confiance en soi et la stimulation mentale.",
@@ -79,6 +86,7 @@ export const services: Service[] = [
   },
   {
     title: "Hunting games (jeux de chasse)",
+    slug: "jeux-de-chasse-chien-bordeaux",
     tag: "Hunting games",
     description:
       "Des jeux qui répondent aux instincts naturels du chien de façon canalisée et sécurisée, pour un chien épanoui et équilibré.",
@@ -87,9 +95,10 @@ export const services: Service[] = [
 ];
 
 export const nav = [
-  { label: "Accueil", href: "#accueil" },
-  { label: "À propos", href: "#a-propos" },
-  { label: "Services", href: "#services" },
-  { label: "Avis", href: "#avis" },
-  { label: "Contact", href: "#contact" },
+  { label: "Accueil", href: "/" },
+  { label: "Accompagnements", href: "/services" },
+  { label: "Ma méthode", href: "/#methode" },
+  { label: "À propos", href: "/a-propos" },
+  { label: "Avis", href: "/#avis" },
+  { label: "Contact", href: "/contact" },
 ];
