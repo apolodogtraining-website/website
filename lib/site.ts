@@ -134,6 +134,7 @@ export const partners: Partner[] = [
     description:
       "Éducatrice canine à Cestas spécialisée en agility, hoopers et école du chiot. Séances individuelles ou collectives pour tous niveaux, dans une approche bienveillante.",
     url: "https://activcanin.com/",
+    logo: "/partners/activcanin.png",
   },
   {
     name: "Anima Canis Dog Training",
@@ -151,5 +152,6 @@ export const partners: Partner[] = [
     description:
       "Animalerie en ligne avec plus de 845 000 références : alimentation, accessoires et produits de santé pour chiens. Magasin physique disponible en Gironde.",
     url: "https://www.zoomalia.com/",
+    logo: "/partners/zoomalia.png",
   },
 ];
