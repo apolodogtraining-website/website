@@ -34,7 +34,7 @@ export default function Hero() {
           </div>
 
           <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
-            Rééduquez votre chien grâce aux <span className="text-sand">activités de flair.</span>
+            Rééduquez votre chien grâce aux <span className="text-brand">activités de flair.</span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/90 md:text-xl">
