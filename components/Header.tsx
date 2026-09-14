@@ -3,10 +3,15 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { nav, site } from "@/lib/site";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const transparent = isHome && !scrolled;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -15,8 +20,22 @@ export default function Header() {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!isHome) return;
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
+
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-brand-light/70 bg-white/95 shadow-[0_4px_20px_-12px_rgba(28,43,36,0.18)] backdrop-blur-md">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        transparent
+          ? "bg-transparent"
+          : "border-b border-brand-light/70 bg-white/95 shadow-[0_4px_20px_-12px_rgba(28,43,36,0.18)] backdrop-blur-md"
+      }`}
+    >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:h-20">
         <Link href="/" className="flex items-center" aria-label={site.name}>
           <Image
@@ -25,7 +44,7 @@ export default function Header() {
             width={200}
             height={142}
             priority
-            className="h-12 w-auto md:h-16"
+            className="h-14 w-auto md:h-20"
           />
         </Link>
 
@@ -34,7 +53,11 @@ export default function Header() {
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-ink/80 transition-colors hover:text-brand"
+              className={`text-sm font-medium transition-colors ${
+                transparent
+                  ? "text-white/90 hover:text-white"
+                  : "text-ink/80 hover:text-brand"
+              }`}
             >
               {item.label}
             </a>
@@ -50,7 +73,9 @@ export default function Header() {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="relative z-50 flex h-10 w-10 items-center justify-center rounded-lg text-ink transition-colors md:hidden"
+          className={`relative z-50 flex h-10 w-10 items-center justify-center rounded-lg transition-colors md:hidden ${
+            transparent && !open ? "text-white" : "text-ink"
+          }`}
           aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={open}
         >

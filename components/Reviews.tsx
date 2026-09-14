@@ -5,7 +5,7 @@ import Reveal from "./Reveal";
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <div className="flex text-amber-400" aria-label={`${rating} sur 5`}>
+    <div className="flex text-[#fbbc05]" aria-label={`${rating} sur 5`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <StarIcon
           key={i}

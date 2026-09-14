@@ -29,7 +29,7 @@ export default function Contact() {
                 </span>
               </div>
               <div className="mt-3 flex items-center gap-3 text-white/90">
-                <div className="flex text-amber-300">
+                <div className="flex text-[#fbbc05]">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <StarIcon key={i} className="h-4 w-4" />
                   ))}
