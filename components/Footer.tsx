@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { nav, site } from "@/lib/site";
 import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "./icons";
 
@@ -8,13 +9,15 @@ export default function Footer() {
     <footer className="bg-ink text-white/70">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-3">
         <div>
-          <Image
-            src="/logo/logo-white.png"
-            alt={site.name}
-            width={160}
-            height={56}
-            className="h-12 w-auto"
-          />
+          <Link href="/" className="inline-flex" aria-label={`${site.name} — retour à l'accueil`}>
+            <Image
+              src="/logo/logo-white.png"
+              alt={site.name}
+              width={160}
+              height={56}
+              className="h-12 w-auto"
+            />
+          </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed">
             {site.role} à {site.area}. {site.slogan}
           </p>

@@ -17,10 +17,10 @@ export default function Method() {
           <p className="absolute bottom-6 left-6 max-w-xs text-lg font-medium">Une approche sur mesure, dans le respect du rythme de votre chien.</p>
         </Reveal>
         <Reveal delay={100}>
-          <span className="text-sm font-semibold uppercase tracking-[0.14em] text-sand">La méthode Apolo</span>
+          <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">La méthode Apolo</span>
           <h2 className="mt-3 text-balance text-3xl font-semibold leading-tight md:text-4xl">Comprendre avant d&apos;agir. Avancer ensemble.</h2>
           <div className="mt-9 divide-y divide-white/15">
-            {steps.map(([number, title, text]) => <div key={number} className="grid grid-cols-[3rem_1fr] gap-3 py-5"><span className="text-sm font-semibold text-sand">{number}</span><div><h3 className="text-lg font-semibold">{title}</h3><p className="mt-2 leading-relaxed text-white/70">{text}</p></div></div>)}
+            {steps.map(([number, title, text]) => <div key={number} className="grid grid-cols-[3rem_1fr] gap-3 py-5"><span className="text-sm font-semibold text-brand">{number}</span><div><h3 className="text-lg font-semibold">{title}</h3><p className="mt-2 leading-relaxed text-white/70">{text}</p></div></div>)}
           </div>
         </Reveal>
       </div>

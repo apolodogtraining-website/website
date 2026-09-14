@@ -6,19 +6,18 @@
   --color-brand-darker: #0e5f82;
   --color-brand-light: #d5e6ed;
   --color-brand-tint: #f3f7f9;
-  --color-sand: #e9dfcf;
-  --color-ink: #1c2b24;
-  --color-ink-soft: #607067;
+  --color-ink: #16232c;
+  --color-ink-soft: #5c6f7a;
 
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-soft: 0 18px 50px -24px rgba(28, 43, 36, 0.27);
-  --shadow-brand: 0 18px 42px -18px rgba(45, 78, 62, 0.48);
+  --shadow-soft: 0 18px 50px -24px rgba(22, 35, 44, 0.27);
+  --shadow-brand: 0 18px 42px -18px rgba(14, 95, 130, 0.48);
 }
 
 :root {
   --background: #ffffff;
-  --foreground: #1c2b24;
+  --foreground: #16232c;
 }
 
 html {
@@ -35,8 +34,8 @@ body {
 }
 
 ::selection {
-  background: #dfe9df;
-  color: #1d382c;
+  background: var(--color-brand-light);
+  color: var(--color-brand-darker);
 }
 
 /* Hauteur plein écran avec repli pour navigateurs sans unité svh */

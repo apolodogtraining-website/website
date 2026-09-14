@@ -102,9 +102,9 @@ export const nav = [
   { label: "Accueil", href: "/" },
   { label: "À propos", href: "/a-propos" },
   { label: "Services", href: "/services" },
-  { label: "Avis", href: "/#avis" },
+  { label: "Avis", href: "/avis" },
   { label: "Partenaires", href: "/partenaires" },
-  { label: "FAQ", href: "/#faq" },
+  { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];
 
