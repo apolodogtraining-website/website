@@ -62,7 +62,10 @@ export default function ConfidentialitePage() {
               body: [
                 "Ce site ne dépose aucun cookie publicitaire et n'utilise aucun traceur à des fins de ciblage.",
                 "Les polices de caractères sont servies depuis le site lui-même, sans appel à un service tiers lors de votre visite.",
-                "À compléter si une mesure d'audience est mise en place : nom de l'outil, données collectées, durée de conservation, et bandeau de consentement si l'outil utilise des cookies.",
+                // ⚠️ À réécrire AVANT de mettre en service un outil de mesure d'audience :
+                // nom de l'outil, données collectées, durée de conservation, et bandeau
+                // de consentement si l'outil dépose des cookies.
+                "Aucune mesure d'audience n'est en place à ce jour. Cette page sera mise à jour avant la mise en service d'un tel outil.",
               ],
             },
             {

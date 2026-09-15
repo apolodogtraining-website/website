@@ -62,13 +62,12 @@ export default function MentionsLegalesPage() {
             },
             {
               heading: "Médiation de la consommation",
-              body: site.legal.mediatorName
-                ? [
-                    `Conformément à l'article L.616-1 du code de la consommation, tout consommateur peut recourir gratuitement au médiateur suivant : ${site.legal.mediatorName} — ${site.legal.mediatorUrl}`,
-                  ]
-                : [
-                    "À compléter avant mise en ligne : coordonnées du médiateur de la consommation auquel l'entreprise a adhéré (obligatoire pour toute prestation de service à destination de consommateurs).",
-                  ],
+              body: [
+                "Conformément à l'article L.616-1 du code de la consommation, tout client particulier peut recourir gratuitement, en cas de litige, au médiateur de la consommation auquel l'entreprise a adhéré :",
+                `${site.legal.mediatorName} — ${site.legal.mediatorAddress}`,
+                "La saisine n'est recevable qu'après une réclamation écrite adressée au préalable à l'entreprise, et dans un délai d'un an à compter de cette réclamation.",
+              ],
+              link: { href: site.legal.mediatorUrl, label: "Saisir le CMAP" },
             },
             {
               heading: "Données personnelles",

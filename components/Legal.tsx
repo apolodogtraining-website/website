@@ -47,12 +47,23 @@ export default function Legal({ title, intro, updatedAt, sections }: LegalProps)
                 ))}
               </div>
               {section.link ? (
-                <Link
-                  href={section.link.href}
-                  className="mt-3 inline-flex text-sm font-semibold text-brand-darker hover:text-brand"
-                >
-                  {section.link.label}
-                </Link>
+                section.link.href.startsWith("http") ? (
+                  <a
+                    href={section.link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex text-sm font-semibold text-brand-darker hover:text-brand"
+                  >
+                    {section.link.label}
+                  </a>
+                ) : (
+                  <Link
+                    href={section.link.href}
+                    className="mt-3 inline-flex text-sm font-semibold text-brand-darker hover:text-brand"
+                  >
+                    {section.link.label}
+                  </Link>
+                )
               ) : null}
             </div>
           ))}

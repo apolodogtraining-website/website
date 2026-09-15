@@ -33,9 +33,9 @@ export const site = {
     handle: "Apolo Dog Training",
     url: "https://www.facebook.com/apolodogtraining/",
   },
-  // Informations des pages légales. ⚠️ Les champs marqués TODO doivent être
-  // complétés avant mise en ligne : la LCEN impose l'identité de l'éditeur,
-  // du directeur de publication et de l'hébergeur.
+  // Informations des pages légales : identité de l'éditeur, directeur de
+  // publication, hébergeur (LCEN) et médiateur de la consommation.
+  // Toute modification ici se répercute sur /mentions-legales et /confidentialite.
   legal: {
     publisherStatus: "Entrepreneur individuel",
     /** Nom d'usage, celui employé dans les textes du site. */
@@ -46,12 +46,10 @@ export const site = {
     hostName: "Vercel Inc.",
     hostAddress: "440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
     hostContact: "vercel.com",
-    // TODO : médiateur de la consommation — obligatoire pour toute prestation
-    // de service à destination de consommateurs (art. L.616-1 du code de la
-    // consommation). Il faut adhérer à un médiateur agréé, puis renseigner son
-    // nom et l'adresse de son site ici.
-    mediatorName: "",
-    mediatorUrl: "",
+    // Médiateur de la consommation (art. L.616-1 du code de la consommation).
+    mediatorName: "CMAP — Centre de Médiation et d'Arbitrage de Paris",
+    mediatorAddress: "39 avenue Franklin D. Roosevelt, 75008 Paris",
+    mediatorUrl: "https://www.cmap.fr/saisir-cmap-mediation-consommation/",
     lastUpdated: "15 septembre 2026",
   },
   google: {
