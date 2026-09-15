@@ -22,21 +22,23 @@ export default function MentionsLegalesPage() {
             {
               heading: "Éditeur du site",
               body: [
-                `Le site ${site.url.replace("https://", "")} est édité par ${site.legal.publisherFullName}, exerçant sous l'enseigne ${site.name}.`,
-                `Statut : ${site.legal.publisherStatus}. SIREN : ${site.siren}.`,
-                `Siège : ${site.address.locality} (${site.address.postalCode}), ${site.address.region}, France.`,
+                `Le site ${site.url.replace("https://", "")} est édité par ${site.legal.publisherLegalName}, exerçant sous l'enseigne ${site.name}.`,
+                `Statut : ${site.legal.publisherStatus}. SIREN : ${site.siren} — SIRET : ${site.siret} — Code APE : ${site.legal.ape}`,
+                `Siège : ${site.address.street}, ${site.address.postalCode} ${site.address.locality}, France.`,
                 `Téléphone : ${site.phone} — Courriel : ${site.email}`,
               ],
             },
             {
               heading: "Directeur de la publication",
-              body: [site.legal.publisherFullName],
+              body: [site.legal.publisherLegalName],
             },
             {
               heading: "Hébergement",
-              body: site.legal.hostName
-                ? [site.legal.hostName, site.legal.hostAddress, site.legal.hostContact].filter(Boolean)
-                : ["À compléter avant mise en ligne : dénomination, adresse et téléphone de l'hébergeur du site."],
+              body: [
+                "Le site est hébergé par :",
+                `${site.legal.hostName}, ${site.legal.hostAddress}`,
+                `Site : ${site.legal.hostContact}`,
+              ],
             },
             {
               heading: "Activité",

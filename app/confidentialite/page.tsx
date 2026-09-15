@@ -23,7 +23,7 @@ export default function ConfidentialitePage() {
             {
               heading: "Responsable du traitement",
               body: [
-                `${site.legal.publisherFullName}, exerçant sous l'enseigne ${site.name}, SIREN ${site.siren}, ${site.address.locality} (${site.address.postalCode}).`,
+                `${site.legal.publisherLegalName}, exerçant sous l'enseigne ${site.name}, SIREN ${site.siren}, ${site.address.street}, ${site.address.postalCode} ${site.address.locality}.`,
                 `Contact : ${site.email} — ${site.phone}`,
               ],
             },

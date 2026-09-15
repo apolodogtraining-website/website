@@ -10,9 +10,13 @@ export const site = {
   url: "https://apolodogtraining.com",
   // Hôte secondaire redirigé en 301 vers `url` — voir next.config.ts
   altHost: "www.apolodogtraining.com",
-  siren: "821785177",
-  // NAP : doit rester strictement identique au site, à la fiche Google et aux annuaires
+  siren: "821 785 177",
+  siret: "821 785 177 00022",
+  // NAP : doit rester strictement identique au site, à la fiche Google et aux annuaires.
+  // `street` n'est affiché que dans les mentions légales (obligation LCEN) et
+  // dans le JSON-LD ; le footer se limite à la commune.
   address: {
+    street: "17 chemin du Grand Camé",
     locality: "Bassens",
     postalCode: "33530",
     region: "Nouvelle-Aquitaine",
@@ -33,19 +37,22 @@ export const site = {
   // complétés avant mise en ligne : la LCEN impose l'identité de l'éditeur,
   // du directeur de publication et de l'hébergeur.
   legal: {
-    publisherStatus: "Entreprise individuelle",
-    // TODO : nom et prénom tels qu'ils figurent à l'INSEE
-    publisherFullName: "Frédéric",
-    // TODO : dénomination, raison sociale et adresse de l'hébergeur
-    // (Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA — à confirmer)
-    hostName: "",
-    hostAddress: "",
-    hostContact: "",
+    publisherStatus: "Entrepreneur individuel",
+    /** Nom d'usage, celui employé dans les textes du site. */
+    publisherFullName: "Jean-Frédéric Gateau",
+    /** Identité telle qu'enregistrée au répertoire SIRENE. */
+    publisherLegalName: "GATEAU Jean-Frédéric Nicolas",
+    ape: "96.09Z — Autres services personnels n.c.a.",
+    hostName: "Vercel Inc.",
+    hostAddress: "440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
+    hostContact: "vercel.com",
     // TODO : médiateur de la consommation — obligatoire pour toute prestation
-    // de service à destination de consommateurs (art. L.616-1 code de la consommation)
+    // de service à destination de consommateurs (art. L.616-1 du code de la
+    // consommation). Il faut adhérer à un médiateur agréé, puis renseigner son
+    // nom et l'adresse de son site ici.
     mediatorName: "",
     mediatorUrl: "",
-    lastUpdated: "14 septembre 2026",
+    lastUpdated: "15 septembre 2026",
   },
   google: {
     // Lien court de la fiche Google Business Profile (bouton « Partager »).

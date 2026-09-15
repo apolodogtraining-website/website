@@ -44,9 +44,7 @@ export default async function Home() {
     identifier: { "@type": "PropertyValue", name: "SIREN", value: site.siren },
     address: {
       "@type": "PostalAddress",
-      // TODO SEO local : ajouter `streetAddress` si vous recevez à l'adresse.
-      // Si vous travaillez en zone d'intervention uniquement, laissez-le vide
-      // et configurez la fiche Google en « zone de service », adresse masquée.
+      streetAddress: site.address.street,
       postalCode: site.address.postalCode,
       addressLocality: site.address.locality,
       addressRegion: site.address.region,
