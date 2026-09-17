@@ -2,12 +2,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { legalNav, nav, site } from "@/lib/site";
 import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "./icons";
+import Reveal from "./Reveal";
 
 export default function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="bg-ink text-white/70">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-3">
+    <footer className="relative overflow-hidden bg-ink text-white/70">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-12 -top-16 h-56 w-56 rounded-full bg-brand opacity-40 blur-[70px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-12 bottom-0 h-56 w-56 rounded-full bg-brand-darker opacity-50 blur-[70px]"
+      />
+
+      <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-5 py-14">
+        <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
         <div>
           <Link href="/" className="inline-flex" aria-label={`${site.name} — retour à l'accueil`}>
             <Image
@@ -29,24 +40,6 @@ export default function Footer() {
             <br />
             <span className="text-white/50">SIREN {site.siren}</span>
           </address>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
-            Navigation
-          </h3>
-          <ul className="mt-4 space-y-2 text-sm">
-            {nav.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="transition-colors hover:text-brand"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
 
         <div>
@@ -96,9 +89,27 @@ export default function Footer() {
             </li>
           </ul>
         </div>
+        </div>
+
+        <Reveal className="reveal-fade-only flex justify-center">
+          <nav
+            aria-label="Pied de page"
+            className="footer-capsule flex flex-wrap justify-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-2.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:px-4"
+          >
+            {nav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-full px-3.5 py-2 text-sm font-medium text-white/85 transition-colors hover:bg-white/15 hover:text-white"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </Reveal>
       </div>
 
-      <div className="border-t border-white/10">
+      <div className="relative border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-5 py-6 text-xs sm:flex-row">
           <p>
             © {year} {site.name}. Tous droits réservés.
