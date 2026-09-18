@@ -1,7 +1,6 @@
 import { site } from "@/lib/site";
 import type { ReviewsData } from "@/lib/reviews";
 import { StarIcon, GoogleIcon, ArrowIcon } from "./icons";
-import Parallax from "./Parallax";
 import Reveal from "./Reveal";
 
 function Stars({ rating }: { rating: number }) {
@@ -54,29 +53,28 @@ export default function Reviews({ data, as: Heading = "h2", heading }: ReviewsPr
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {data.reviews.slice(0, 3).map((r, i) => (
-            <Parallax key={i} speed={i === 1 ? 0.09 : -0.07}>
-              <Reveal
-                as="article"
-                delay={(i % 3) * 90}
-                className="flex h-full flex-col rounded-3xl border border-brand-light bg-white p-7 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)]"
-              >
-                <Stars rating={r.rating} />
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-ink-soft">
-                  “{r.text}”
-                </p>
-                <div className="mt-6 flex items-center gap-3 border-t border-brand-light pt-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
-                    {r.author.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-ink">{r.author}</p>
-                    {r.relativeTime && (
-                      <p className="text-xs text-ink-soft">{r.relativeTime}</p>
-                    )}
-                  </div>
+            <Reveal
+              as="article"
+              key={i}
+              delay={(i % 3) * 90}
+              className="flex h-full flex-col rounded-3xl border border-brand-light bg-white p-7 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)]"
+            >
+              <Stars rating={r.rating} />
+              <p className="mt-4 flex-1 text-sm leading-relaxed text-ink-soft">
+                “{r.text}”
+              </p>
+              <div className="mt-6 flex items-center gap-3 border-t border-brand-light pt-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
+                  {r.author.charAt(0).toUpperCase()}
                 </div>
-              </Reveal>
-            </Parallax>
+                <div>
+                  <p className="text-sm font-semibold text-ink">{r.author}</p>
+                  {r.relativeTime && (
+                    <p className="text-xs text-ink-soft">{r.relativeTime}</p>
+                  )}
+                </div>
+              </div>
+            </Reveal>
           ))}
         </div>
 

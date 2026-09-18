@@ -1,5 +1,4 @@
 import { ArrowIcon } from "./icons";
-import Parallax from "./Parallax";
 import Reveal from "./Reveal";
 import Link from "next/link";
 
@@ -22,12 +21,10 @@ export default function Qualification() {
         </Reveal>
         <div className="grid gap-3 sm:grid-cols-2">
           {situations.map((s, i) => (
-            <Parallax key={s} speed={i % 2 === 0 ? 0.07 : -0.07}>
-              <Reveal delay={i * 80} className="rounded-3xl border border-brand-light bg-brand-tint p-6">
-                <span className="text-sm font-semibold text-brand">0{i + 1}</span>
-                <p className="mt-6 text-base leading-relaxed text-ink">{s}</p>
-              </Reveal>
-            </Parallax>
+            <Reveal key={s} delay={i * 80} className="rounded-3xl border border-brand-light bg-brand-tint p-6">
+              <span className="text-sm font-semibold text-brand">0{i + 1}</span>
+              <p className="mt-6 text-base leading-relaxed text-ink">{s}</p>
+            </Reveal>
           ))}
         </div>
       </div>
