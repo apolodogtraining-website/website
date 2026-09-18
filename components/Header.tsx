@@ -15,8 +15,8 @@ export default function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   // Verre visible dès qu'on quitte le haut du hero de l'accueil (comme le
-  // template Evasion, piloté par isScrolled) — sur les autres pages, qui
-  // n'ont pas de photo en fond, le verre reste toujours visible.
+  // template Evasion, piloté par isScrolled), ou dès que le menu mobile est
+  // ouvert (il a besoin d'un fond lisible quel que soit le défilement).
   const glass = !isHome || scrolled || open;
 
   useEffect(() => {
@@ -36,57 +36,67 @@ export default function Header() {
 
   return (
     <header
-      className={`${inter.className} fixed left-1/2 top-4 z-50 w-[92%] max-w-4xl -translate-x-1/2 transition-all duration-300 md:top-5 md:w-fit md:max-w-[94vw] ${
-        glass ? "rounded-full bg-white/60 backdrop-blur-md" : "bg-transparent"
-      }`}
-      style={{
-        boxShadow: glass
-          ? "rgba(14,95,130,.06) 0px 0px 0px 1px, rgba(22,35,44,.05) 0px 1px 1px -0.5px, rgba(22,35,44,.05) 0px 3px 3px -1.5px, rgba(22,35,44,.05) 0px 6px 6px -3px, rgba(14,95,130,.05) 0px 12px 12px -6px, rgba(14,95,130,.05) 0px 24px 24px -12px"
-          : "none",
-      }}
+      className={`${inter.className} fixed left-1/2 top-4 z-50 w-[92%] max-w-4xl -translate-x-1/2 md:top-5 md:w-fit md:max-w-[94vw]`}
     >
-      <div className="flex items-center justify-between gap-5 px-2 pl-5 py-2 md:justify-start">
-        <Link
-          href="/"
-          className={`shrink-0 text-lg font-medium tracking-tight transition-colors duration-300 ${
-            glass ? "text-ink" : "text-white"
-          }`}
-          aria-label={site.name}
-        >
-          APOLO
-        </Link>
+      {/* Le fond/flou/ombre "verre" vit sur CE bandeau (hauteur fixe, ~52px),
+          jamais sur <header> lui-même : si on l'y met, dès que le panneau
+          mobile s'ouvre en dessous, la boîte <header> devient très haute et
+          `rounded-full` (border-radius: 9999px, plafonné à la moitié de la
+          plus petite dimension) se transforme en capsule/ovale géant au lieu
+          d'une pilule normale — c'était le bug du menu mobile "en boule". */}
+      <div
+        className={`transition-all duration-300 ${
+          glass ? "rounded-full bg-white/60 backdrop-blur-md" : "bg-transparent"
+        }`}
+        style={{
+          boxShadow: glass
+            ? "rgba(14,95,130,.06) 0px 0px 0px 1px, rgba(22,35,44,.05) 0px 1px 1px -0.5px, rgba(22,35,44,.05) 0px 3px 3px -1.5px, rgba(22,35,44,.05) 0px 6px 6px -3px, rgba(14,95,130,.05) 0px 12px 12px -6px, rgba(14,95,130,.05) 0px 24px 24px -12px"
+            : "none",
+        }}
+      >
+        <div className="flex items-center justify-between gap-5 px-2 pl-5 py-2 md:justify-start">
+          <Link
+            href="/"
+            className={`shrink-0 text-lg font-medium tracking-tight transition-colors duration-300 ${
+              glass ? "text-ink" : "text-white"
+            }`}
+            aria-label={site.name}
+          >
+            APOLO
+          </Link>
 
-        <nav className="hidden shrink-0 flex-nowrap items-center gap-5 md:flex">
-          {nav.map((item) => (
+          <nav className="hidden shrink-0 flex-nowrap items-center gap-5 md:flex">
+            {nav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`shrink-0 whitespace-nowrap text-sm transition-colors ${
+                  glass ? "text-ink-soft hover:text-ink" : "text-white/70 hover:text-white"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
             <Link
-              key={item.href}
-              href={item.href}
-              className={`shrink-0 whitespace-nowrap text-sm transition-colors ${
-                glass ? "text-ink-soft hover:text-ink" : "text-white/70 hover:text-white"
+              href="/contact"
+              className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-85 ${
+                glass ? "bg-brand text-white" : "bg-white text-brand"
               }`}
             >
-              {item.label}
+              Réserver
             </Link>
-          ))}
-          <Link
-            href="/contact"
-            className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-85 ${
-              glass ? "bg-brand text-white" : "bg-white text-brand"
-            }`}
-          >
-            Réserver
-          </Link>
-        </nav>
+          </nav>
 
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className={`transition-colors md:hidden ${glass ? "text-ink" : "text-white"}`}
-          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-expanded={open}
-        >
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className={`transition-colors md:hidden ${glass ? "text-ink" : "text-white"}`}
+            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={open}
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {open && (
