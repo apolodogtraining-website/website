@@ -32,8 +32,10 @@ export default function Header() {
   }, [isHome]);
 
   return (
-    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 md:top-6 md:px-5">
-      <div className="relative w-full max-w-4xl">
+    <header className="fixed inset-x-0 top-4 z-50 md:top-6">
+      {/* Même conteneur que le Hero (max-w-6xl px-5) : le logo tombe exactement
+          à l'aplomb du titre. */}
+      <div className="relative mx-auto max-w-6xl px-5">
         {/* Fond verre liquide : invisible en haut du hero, apparaît en douceur au défilement */}
         <div
           aria-hidden
@@ -41,27 +43,29 @@ export default function Header() {
             open ? "rounded-[28px]" : "rounded-full"
           } ${
             glass
-              ? "translate-y-0 scale-100 border-white/60 bg-gradient-to-b from-white/70 to-white/50 opacity-100 shadow-[inset_0_1px_0_rgba(255,255,255,.6),inset_0_-1px_0_rgba(14,95,130,.06),0_22px_45px_-20px_rgba(14,95,130,.32),0_2px_10px_rgba(14,95,130,.12)] backdrop-blur-[28px] backdrop-saturate-[1.8]"
+              ? "translate-y-0 scale-100 border-white/35 bg-gradient-to-b from-white/35 to-white/18 opacity-100 shadow-[inset_0_1px_0_rgba(255,255,255,.35),inset_0_-1px_0_rgba(14,95,130,.05),0_22px_45px_-20px_rgba(14,95,130,.28),0_2px_10px_rgba(14,95,130,.1)] backdrop-blur-[28px] backdrop-saturate-[1.8]"
               : "-translate-y-2 scale-[0.97] border-transparent bg-transparent opacity-0 shadow-none backdrop-blur-none backdrop-saturate-100"
           }`}
         />
 
-        <div className="relative flex items-center justify-between gap-3 px-4 py-2.5 md:px-6 md:py-3">
+        <div className="relative flex items-center justify-between gap-3 px-3 py-3 md:px-4">
           <Link
             href="/"
             className="relative flex h-9 w-[128px] shrink-0 items-center md:h-10 md:w-[150px]"
             aria-label={site.name}
           >
+            {/* Haut du hero : le même logo, en silhouette gris/noir translucide */}
             <Image
-              src="/logo/logo-white.png"
+              src="/logo/logo.png"
               alt=""
               width={200}
               height={71}
               aria-hidden
-              className={`absolute inset-0 h-9 w-auto object-contain object-left transition-opacity duration-500 md:h-10 ${
-                glass ? "opacity-0" : "opacity-100"
+              className={`absolute inset-0 h-9 w-auto object-contain object-left brightness-0 transition-opacity duration-500 md:h-10 ${
+                glass ? "opacity-0" : "opacity-55"
               }`}
             />
+            {/* Défilé : le logo en couleur */}
             <Image
               src="/logo/logo.png"
               alt={site.name}
@@ -79,8 +83,8 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors duration-500 hover:opacity-70 ${
-                  glass ? "text-ink" : "text-white"
+                className={`text-sm font-medium transition-colors duration-500 ${
+                  glass ? "text-ink/75 hover:text-ink" : "text-white/85 hover:text-white"
                 }`}
               >
                 {item.label}
@@ -126,31 +130,40 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Menu mobile : la capsule s'étire pour révéler les liens */}
+        {/* Menu mobile : la capsule s'étire pour révéler les liens. Technique
+            grid-template-rows (0fr → 1fr) plutôt que max-height : l'animation
+            suit la vraie hauteur du contenu, sans à-coup ni troncature quel
+            que soit le nombre de liens. */}
         <div
-          className={`relative overflow-hidden transition-[max-height] duration-300 md:hidden ${
-            open ? "max-h-96" : "max-h-0"
+          className={`relative grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden ${
+            open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
           }`}
         >
-          <nav className="flex flex-col gap-1 px-5 pb-5 pt-1">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="rounded-2xl px-3 py-3 text-base font-medium text-ink transition-colors hover:bg-brand-light/60"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Link
-              href="/contact"
-              onClick={() => setOpen(false)}
-              className="mt-2 rounded-full bg-brand px-5 py-3 text-center text-base font-semibold text-white"
+          <div className="overflow-hidden">
+            <nav
+              className={`flex flex-col gap-1 px-5 pb-5 pt-1 transition-opacity duration-300 ${
+                open ? "opacity-100 delay-150" : "opacity-0"
+              }`}
             >
-              Réserver une séance
-            </Link>
-          </nav>
+              {nav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-2xl px-3 py-3 text-base font-medium text-ink transition-colors hover:bg-brand-light/60"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Link
+                href="/contact"
+                onClick={() => setOpen(false)}
+                className="mt-2 rounded-full bg-brand px-5 py-3 text-center text-base font-semibold text-white"
+              >
+                Réserver une séance
+              </Link>
+            </nav>
+          </div>
         </div>
       </div>
     </header>
