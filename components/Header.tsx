@@ -36,7 +36,7 @@ export default function Header() {
 
   return (
     <header
-      className={`${inter.className} fixed left-1/2 top-4 z-50 w-[92%] max-w-4xl -translate-x-1/2 transition-all duration-300 md:top-5 ${
+      className={`${inter.className} fixed left-1/2 top-4 z-50 w-[92%] max-w-4xl -translate-x-1/2 transition-all duration-300 md:top-5 md:w-fit md:max-w-[94vw] ${
         glass ? "rounded-full bg-white/60 backdrop-blur-md" : "bg-transparent"
       }`}
       style={{
@@ -45,7 +45,7 @@ export default function Header() {
           : "none",
       }}
     >
-      <div className="flex items-center justify-between gap-3 px-2 pl-5 py-2">
+      <div className="flex items-center justify-between gap-5 px-2 pl-5 py-2 md:justify-start">
         <Link
           href="/"
           className={`shrink-0 text-lg font-medium tracking-tight transition-colors duration-300 ${
@@ -56,7 +56,7 @@ export default function Header() {
           APOLO
         </Link>
 
-        <nav className="hidden shrink-0 flex-nowrap items-center gap-4 md:flex lg:gap-5">
+        <nav className="hidden shrink-0 flex-nowrap items-center gap-5 md:flex">
           {nav.map((item) => (
             <Link
               key={item.href}
