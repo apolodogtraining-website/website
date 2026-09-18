@@ -3,18 +3,22 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { Inter } from "next/font/google";
 import { nav, site } from "@/lib/site";
+
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
-  // Verre visible dès qu'on n'est plus en haut du hero de l'accueil, ou que le
-  // menu mobile est ouvert (il a alors besoin d'un fond lisible quel que soit
-  // le défilement).
-  const glass = !isHome || scrolled || open;
+  // Verre visible dès qu'on quitte le haut du hero de l'accueil (comme le
+  // template Evasion, piloté par isScrolled) — sur les autres pages, qui
+  // n'ont pas de photo en fond, le verre reste toujours visible.
+  const glass = !isHome || scrolled;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -25,147 +29,109 @@ export default function Header() {
 
   useEffect(() => {
     if (!isHome) return;
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 50);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
   return (
-    <header className="fixed inset-x-0 top-4 z-50 md:top-6">
-      {/* Même conteneur que le Hero (max-w-6xl px-5) : le logo tombe exactement
-          à l'aplomb du titre. */}
-      <div className="relative mx-auto max-w-6xl px-5">
-        {/* Fond verre liquide : invisible en haut du hero, apparaît en douceur au défilement */}
-        <div
-          aria-hidden
-          className={`absolute inset-0 border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:rounded-full ${
-            open ? "rounded-[28px]" : "rounded-full"
-          } ${
-            glass
-              ? "translate-y-0 scale-100 border-white/20 bg-gradient-to-b from-white/20 to-white/8 opacity-100 shadow-[inset_0_1px_0_rgba(255,255,255,.25),inset_0_-1px_0_rgba(14,95,130,.04),0_25px_50px_-22px_rgba(14,95,130,.24),0_2px_10px_rgba(14,95,130,.08)] backdrop-blur-[28px] backdrop-saturate-[1.8]"
-              : "-translate-y-2 scale-[0.97] border-transparent bg-transparent opacity-0 shadow-none backdrop-blur-none backdrop-saturate-100"
-          }`}
-        />
+    <header
+      className={`${inter.className} fixed left-1/2 top-4 z-50 w-[92%] max-w-3xl -translate-x-1/2 transition-all duration-300 md:top-5 ${
+        glass ? "rounded-full bg-white/60 backdrop-blur-md" : "bg-transparent"
+      }`}
+      style={{
+        boxShadow: glass
+          ? "rgba(14,95,130,.06) 0px 0px 0px 1px, rgba(22,35,44,.05) 0px 1px 1px -0.5px, rgba(22,35,44,.05) 0px 3px 3px -1.5px, rgba(22,35,44,.05) 0px 6px 6px -3px, rgba(14,95,130,.05) 0px 12px 12px -6px, rgba(14,95,130,.05) 0px 24px 24px -12px"
+          : "none",
+      }}
+    >
+      <div className="flex items-center justify-between gap-3 px-2 pl-5 py-2">
+        <Link
+          href="/"
+          className="relative flex h-12 w-[160px] shrink-0 items-center md:h-14 md:w-[190px]"
+          aria-label={site.name}
+        >
+          {/* Haut du hero : silhouette gris/noir translucide sur la photo */}
+          <Image
+            src="/logo/logo.png"
+            alt=""
+            fill
+            sizes="190px"
+            aria-hidden
+            className={`object-contain object-left brightness-0 transition-opacity duration-300 ${
+              glass ? "opacity-0" : "opacity-60"
+            }`}
+          />
+          {/* Défilé / pages intérieures : logo en couleur */}
+          <Image
+            src="/logo/logo.png"
+            alt={site.name}
+            fill
+            sizes="190px"
+            priority
+            className={`object-contain object-left transition-opacity duration-300 ${
+              glass ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        </Link>
 
-        <div className="relative flex items-center justify-between gap-4 py-2 pl-4 pr-2 md:gap-5 md:py-2.5 md:pl-5 md:pr-2.5">
+        <nav className="hidden items-center gap-6 md:flex lg:gap-7">
+          {nav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`text-sm transition-colors ${
+                glass ? "text-ink-soft hover:text-ink" : "text-white/70 hover:text-white"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
           <Link
-            href="/"
-            className="relative flex h-11 w-[148px] shrink-0 items-center md:h-12 md:w-[172px]"
-            aria-label={site.name}
+            href="/contact"
+            className={`rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-85 ${
+              glass ? "bg-brand text-white" : "bg-white text-brand"
+            }`}
           >
-            {/* Haut du hero : le même logo, en silhouette gris/noir translucide */}
-            <Image
-              src="/logo/logo.png"
-              alt=""
-              width={200}
-              height={71}
-              aria-hidden
-              className={`absolute inset-0 h-11 w-auto object-contain object-left brightness-0 transition-opacity duration-500 md:h-12 ${
-                glass ? "opacity-0" : "opacity-55"
-              }`}
-            />
-            {/* Défilé : le logo en couleur */}
-            <Image
-              src="/logo/logo.png"
-              alt={site.name}
-              width={200}
-              height={71}
-              priority
-              className={`absolute inset-0 h-11 w-auto object-contain object-left transition-opacity duration-500 md:h-12 ${
-                glass ? "opacity-100" : "opacity-0"
-              }`}
-            />
+            Réserver
           </Link>
+        </nav>
 
-          <nav className="hidden items-center gap-5 md:flex lg:gap-6">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className={`transition-colors md:hidden ${glass ? "text-ink" : "text-white"}`}
+          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={open}
+        >
+          {open ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {open && (
+        <div className="rounded-b-2xl border-t border-ink/10 bg-white px-6 py-8 md:hidden">
+          <nav className="flex flex-col gap-6">
             {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-normal transition-colors duration-500 ${
-                  glass ? "text-ink/75 hover:text-ink" : "text-white/85 hover:text-white"
-                }`}
+                onClick={() => setOpen(false)}
+                className="text-lg text-ink"
               >
                 {item.label}
               </Link>
             ))}
             <Link
               href="/contact"
-              className={`rounded-full px-5 py-2.5 text-sm font-medium transition-colors duration-500 hover:opacity-80 ${
-                glass ? "bg-brand text-white" : "bg-white text-brand"
-              }`}
+              onClick={() => setOpen(false)}
+              className="mt-2 rounded-full bg-brand px-5 py-3 text-center text-sm font-semibold text-white"
             >
-              Réserver
+              Réserver une séance
             </Link>
           </nav>
-
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full transition-colors md:hidden ${
-              glass ? "text-ink" : "text-white"
-            }`}
-            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-            aria-expanded={open}
-          >
-            <span className="sr-only">Menu</span>
-            <div className="flex w-5 flex-col gap-1.5">
-              <span
-                className={`h-0.5 w-full rounded bg-current transition-all ${
-                  open ? "translate-y-2 rotate-45" : ""
-                }`}
-              />
-              <span
-                className={`h-0.5 w-full rounded bg-current transition-all ${
-                  open ? "opacity-0" : ""
-                }`}
-              />
-              <span
-                className={`h-0.5 w-full rounded bg-current transition-all ${
-                  open ? "-translate-y-2 -rotate-45" : ""
-                }`}
-              />
-            </div>
-          </button>
         </div>
-
-        {/* Menu mobile : la capsule s'étire pour révéler les liens. Technique
-            grid-template-rows (0fr → 1fr) plutôt que max-height : l'animation
-            suit la vraie hauteur du contenu, sans à-coup ni troncature quel
-            que soit le nombre de liens. */}
-        <div
-          className={`relative grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden ${
-            open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-          }`}
-        >
-          <div className="overflow-hidden">
-            <nav
-              className={`flex flex-col gap-1 px-5 pb-5 pt-1 transition-opacity duration-300 ${
-                open ? "opacity-100 delay-150" : "opacity-0"
-              }`}
-            >
-              {nav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-2xl px-3 py-3 text-base font-medium text-ink transition-colors hover:bg-brand-light/60"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <Link
-                href="/contact"
-                onClick={() => setOpen(false)}
-                className="mt-2 rounded-full bg-brand px-5 py-3 text-center text-base font-semibold text-white"
-              >
-                Réserver une séance
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </div>
+      )}
     </header>
   );
 }
