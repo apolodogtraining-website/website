@@ -37,7 +37,7 @@ export default function Header() {
 
   return (
     <header
-      className={`${inter.className} fixed left-1/2 top-4 z-50 w-[92%] max-w-3xl -translate-x-1/2 transition-all duration-300 md:top-5 ${
+      className={`${inter.className} fixed left-1/2 top-4 z-50 w-[92%] max-w-4xl -translate-x-1/2 transition-all duration-300 md:top-5 ${
         glass ? "rounded-full bg-white/60 backdrop-blur-md" : "bg-transparent"
       }`}
       style={{
@@ -76,12 +76,12 @@ export default function Header() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex lg:gap-7">
+        <nav className="hidden shrink-0 flex-nowrap items-center gap-4 md:flex lg:gap-5">
           {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`text-sm transition-colors ${
+              className={`shrink-0 whitespace-nowrap text-sm transition-colors ${
                 glass ? "text-ink-soft hover:text-ink" : "text-white/70 hover:text-white"
               }`}
             >
@@ -90,7 +90,7 @@ export default function Header() {
           ))}
           <Link
             href="/contact"
-            className={`rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-85 ${
+            className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-85 ${
               glass ? "bg-brand text-white" : "bg-white text-brand"
             }`}
           >
