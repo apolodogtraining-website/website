@@ -361,6 +361,9 @@ export const headerNav = nav.filter(
   (item) => item.href !== "/faq" && item.href !== "/contact"
 );
 
+/** Menu du footer : `nav` complet + Zone d'intervention (pas dans le header). */
+export const footerNav = [...nav, { label: "Zone d'intervention", href: "/zone-intervention" }];
+
 /** Pages légales : hors menu principal, mais liées depuis le footer et présentes dans le sitemap. */
 export const legalNav = [
   { label: "Mentions légales", href: "/mentions-legales" },

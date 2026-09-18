@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { legalNav, nav, services, site } from "@/lib/site";
+import { footerNav, legalNav, services, site } from "@/lib/site";
 
 /**
  * Dates de dernière modification éditoriale.
@@ -26,10 +26,11 @@ const PRIORITY: Record<string, number> = {
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Dérivé de `nav` : toute page ajoutée au menu entre automatiquement dans le
-  // sitemap. C'est l'oubli de cette étape qui avait laissé /avis, /faq et
-  // /partenaires hors du sitemap.
-  const pages = nav.map(({ href }) => ({
+  // Dérivé de `footerNav` (nav + Zone d'intervention) : toute page ajoutée à
+  // l'un des deux menus entre automatiquement dans le sitemap. C'est l'oubli
+  // de cette étape qui avait laissé /avis, /faq et /partenaires hors du
+  // sitemap.
+  const pages = footerNav.map(({ href }) => ({
     url: `${site.url}${href === "/" ? "" : href}`,
     lastModified: lastModified(href),
     changeFrequency: "monthly" as const,

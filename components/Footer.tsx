@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { legalNav, nav, site } from "@/lib/site";
+import { footerNav, legalNav, site } from "@/lib/site";
 import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "./icons";
 
 export default function Footer() {
@@ -36,7 +36,7 @@ export default function Footer() {
             Navigation
           </h3>
           <ul className="mt-4 space-y-2 text-sm">
-            {nav.map((item) => (
+            {footerNav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
