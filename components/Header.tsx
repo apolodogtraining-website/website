@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -57,12 +58,31 @@ export default function Header() {
         <div className="flex items-center justify-between gap-5 px-2 pl-5 py-2 md:justify-start">
           <Link
             href="/"
-            className={`shrink-0 text-lg font-medium tracking-tight transition-colors duration-300 ${
-              glass ? "text-ink" : "text-white"
-            }`}
+            className="relative h-7 w-[82px] shrink-0"
             aria-label={site.name}
           >
-            APOLO
+            {/* Recadrés au plus juste (public/logo/logo-header.png) pour ne
+                pas agrandir le bandeau : 28px de haut, comme demandé. */}
+            <Image
+              src="/logo/logo-white.png"
+              alt=""
+              fill
+              aria-hidden
+              sizes="82px"
+              className={`object-contain transition-opacity duration-300 ${
+                glass ? "opacity-0" : "opacity-100"
+              }`}
+            />
+            <Image
+              src="/logo/logo-header.png"
+              alt={site.name}
+              fill
+              priority
+              sizes="82px"
+              className={`object-contain transition-opacity duration-300 ${
+                glass ? "opacity-100" : "opacity-0"
+              }`}
+            />
           </Link>
 
           <nav className="hidden shrink-0 flex-nowrap items-center gap-5 md:flex">
