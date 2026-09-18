@@ -15,6 +15,7 @@ export default function Footer() {
               alt={site.name}
               width={160}
               height={56}
+              sizes="160px"
               className="h-12 w-auto"
             />
           </Link>

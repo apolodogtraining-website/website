@@ -5,10 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { Inter } from "next/font/google";
 import { headerNav, site } from "@/lib/site";
-
-const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -37,7 +34,7 @@ export default function Header() {
 
   return (
     <header
-      className={`${inter.className} fixed left-1/2 top-4 z-50 w-[92%] max-w-4xl -translate-x-1/2 md:top-5 md:w-fit md:max-w-[94vw]`}
+      className="fixed left-1/2 top-4 z-50 w-[92%] max-w-4xl -translate-x-1/2 md:top-5 md:w-fit md:max-w-[94vw]"
     >
       {/* Le fond/flou/ombre "verre" vit sur CE bandeau (hauteur fixe, ~52px),
           jamais sur <header> lui-même : si on l'y met, dès que le panneau
@@ -62,12 +59,20 @@ export default function Header() {
             aria-label={site.name}
           >
             {/* Recadrés au plus juste (public/logo/logo-header.png) pour ne
-                pas agrandir le bandeau : 28px de haut, comme demandé. */}
+                pas agrandir le bandeau : 28px de haut, comme demandé.
+
+                Les deux logos sont superposés et alternés en opacité. `priority`
+                doit suivre celui qui est RÉELLEMENT visible au chargement :
+                le blanc sur le hero transparent de l'accueil, le sombre partout
+                ailleurs (où `glass` est vrai dès le premier rendu). Sans ça, on
+                précharge un logo invisible pendant que celui qu'on voit part en
+                `loading="lazy"`. */}
             <Image
               src="/logo/logo-white.png"
               alt=""
               fill
               aria-hidden
+              priority={isHome}
               sizes="82px"
               className={`object-contain transition-opacity duration-300 ${
                 glass ? "opacity-0" : "opacity-100"
@@ -77,7 +82,7 @@ export default function Header() {
               src="/logo/logo-header.png"
               alt={site.name}
               fill
-              priority
+              priority={!isHome}
               sizes="82px"
               className={`object-contain transition-opacity duration-300 ${
                 glass ? "opacity-100" : "opacity-0"

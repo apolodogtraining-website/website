@@ -33,21 +33,37 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          // Interdit l'affichage du site dans une iframe tierce (clickjacking,
+          // et réaffichage du site sous une autre marque).
+          { key: "X-Frame-Options", value: "DENY" },
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
           },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+            // `interest-cohort` visait FLoC, abandonné : la directive n'est plus
+            // reconnue et génère un avertissement en console. Topics l'a remplacé.
+            value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
           },
         ],
       },
       {
-        // Les fichiers de public/ sont versionnés par leur nom : cache long.
+        // ⚠️ Contrairement aux fichiers de /_next/static, ceux de public/ ne
+        // portent PAS de hash dans leur nom : `hero.jpg` reste `hero.jpg` d'un
+        // déploiement à l'autre. Un `max-age=31536000, immutable` gèlerait donc
+        // l'ancienne version chez tout visiteur déjà venu, pendant un an, sans
+        // qu'aucun déploiement puisse la déloger.
+        // Une heure de cache + revalidation en arrière-plan : le coût réseau
+        // reste nul en pratique (les photos passent par /_next/image, dont le
+        // cache est géré par `minimumCacheTTL`) et un remplacement de fichier
+        // se propage en une heure.
         source: "/:all*(svg|jpg|jpeg|png|webp|avif|ico|woff2)",
         headers: [
-          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, stale-while-revalidate=86400",
+          },
         ],
       },
     ];

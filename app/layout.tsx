@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site } from "@/lib/site";
 
 const poppins = Poppins({
@@ -40,7 +41,11 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — Éducateur & comportementaliste canin à Bordeaux`,
     description,
-    images: [{ url: "/photos/hero.jpg", width: 1200, height: 630, alt: site.name }],
+    // Dimensions RÉELLES du fichier. Facebook, LinkedIn et WhatsApp réservent
+    // l'espace de l'aperçu d'après ces valeurs : les annoncer fausses produit un
+    // recadrage approximatif. À terme, une image OG dédiée en 1200×630 (logo +
+    // accroche) se partagerait mieux que cette photo en 2,6:1.
+    images: [{ url: "/photos/hero.jpg", width: 2000, height: 769, alt: site.name }],
   },
   twitter: {
     card: "summary_large_image",
@@ -74,6 +79,10 @@ export default function RootLayout({
     <html lang="fr" className={`${poppins.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-white text-ink">
         {children}
+        {/* Core Web Vitals mesurés chez les vrais visiteurs (LCP / INP / CLS),
+            remontés dans le tableau de bord Vercel. Sans cookie : ni bandeau de
+            consentement, ni ligne supplémentaire dans /confidentialite. */}
+        <SpeedInsights />
       </body>
     </html>
   );

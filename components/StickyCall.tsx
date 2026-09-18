@@ -19,11 +19,17 @@ export default function StickyCall() {
         Appeler nous
       </span>
       <span className="relative flex h-full w-full items-center justify-center rounded-full bg-brand shadow-brand transition-transform hover:-translate-y-0.5 hover:bg-brand-dark">
+        {/* width/height décrivent la TAILLE D'AFFICHAGE (42 % d'un bouton de
+            78 px), pas celle du fichier source : ce sont elles qui déterminent
+            le srcset généré. Avec les dimensions du fichier (1152×1350) et sans
+            `sizes`, le navigateur téléchargeait la variante 1280 px pour une
+            patte affichée en 33 px. */}
         <Image
           src="/logo/paw-white.png"
           alt=""
-          width={1152}
-          height={1350}
+          width={28}
+          height={33}
+          sizes="28px"
           className="h-[42%] w-auto"
         />
       </span>
