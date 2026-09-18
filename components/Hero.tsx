@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { ArrowIcon, StarIcon } from "./icons";
+import Parallax from "./Parallax";
 import ZoneModal from "./ZoneModal";
 
 type HeroProps = {
@@ -16,15 +17,19 @@ export default function Hero({
   return (
     <section id="accueil" className="relative isolate overflow-hidden">
       {/* Background image + overlay */}
-      <div className="absolute inset-0 -z-10">
-        <Image
-          src="/photos/hero.jpg"
-          alt="Frédéric et son chien Malinois en séance de travail face à l'océan"
-          fill
-          priority
-          sizes="100vw"
-          className="-scale-x-100 object-cover object-center"
-        />
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        {/* Le cadre déborde de 10% en haut/bas pour que le parallax puisse
+            décaler l'image sans jamais laisser apparaître de bord vide. */}
+        <Parallax speed={0.16} className="absolute -inset-y-16 inset-x-0">
+          <Image
+            src="/photos/hero.jpg"
+            alt="Frédéric et son chien Malinois en séance de travail face à l'océan"
+            fill
+            priority
+            sizes="100vw"
+            className="-scale-x-100 object-cover object-center"
+          />
+        </Parallax>
         {/* Assombrissement léger (40%) validé par Frédéric — juste de quoi
             garder le texte lisible, sans écraser la photo. */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/15 to-ink/60" />
