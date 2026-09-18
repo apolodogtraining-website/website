@@ -43,15 +43,15 @@ export default function Header() {
             open ? "rounded-[28px]" : "rounded-full"
           } ${
             glass
-              ? "translate-y-0 scale-100 border-white/35 bg-gradient-to-b from-white/35 to-white/18 opacity-100 shadow-[inset_0_1px_0_rgba(255,255,255,.35),inset_0_-1px_0_rgba(14,95,130,.05),0_22px_45px_-20px_rgba(14,95,130,.28),0_2px_10px_rgba(14,95,130,.1)] backdrop-blur-[28px] backdrop-saturate-[1.8]"
+              ? "translate-y-0 scale-100 border-white/20 bg-gradient-to-b from-white/20 to-white/8 opacity-100 shadow-[inset_0_1px_0_rgba(255,255,255,.25),inset_0_-1px_0_rgba(14,95,130,.04),0_25px_50px_-22px_rgba(14,95,130,.24),0_2px_10px_rgba(14,95,130,.08)] backdrop-blur-[28px] backdrop-saturate-[1.8]"
               : "-translate-y-2 scale-[0.97] border-transparent bg-transparent opacity-0 shadow-none backdrop-blur-none backdrop-saturate-100"
           }`}
         />
 
-        <div className="relative flex items-center justify-between gap-3 px-3 py-3 md:px-4">
+        <div className="relative flex items-center justify-between gap-4 py-2 pl-4 pr-2 md:gap-5 md:py-2.5 md:pl-5 md:pr-2.5">
           <Link
             href="/"
-            className="relative flex h-9 w-[128px] shrink-0 items-center md:h-10 md:w-[150px]"
+            className="relative flex h-11 w-[148px] shrink-0 items-center md:h-12 md:w-[172px]"
             aria-label={site.name}
           >
             {/* Haut du hero : le même logo, en silhouette gris/noir translucide */}
@@ -61,7 +61,7 @@ export default function Header() {
               width={200}
               height={71}
               aria-hidden
-              className={`absolute inset-0 h-9 w-auto object-contain object-left brightness-0 transition-opacity duration-500 md:h-10 ${
+              className={`absolute inset-0 h-11 w-auto object-contain object-left brightness-0 transition-opacity duration-500 md:h-12 ${
                 glass ? "opacity-0" : "opacity-55"
               }`}
             />
@@ -72,18 +72,18 @@ export default function Header() {
               width={200}
               height={71}
               priority
-              className={`absolute inset-0 h-9 w-auto object-contain object-left transition-opacity duration-500 md:h-10 ${
+              className={`absolute inset-0 h-11 w-auto object-contain object-left transition-opacity duration-500 md:h-12 ${
                 glass ? "opacity-100" : "opacity-0"
               }`}
             />
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex lg:gap-7">
+          <nav className="hidden items-center gap-5 md:flex lg:gap-6">
             {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors duration-500 ${
+                className={`text-sm font-normal transition-colors duration-500 ${
                   glass ? "text-ink/75 hover:text-ink" : "text-white/85 hover:text-white"
                 }`}
               >
@@ -92,7 +92,7 @@ export default function Header() {
             ))}
             <Link
               href="/contact"
-              className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-500 hover:opacity-80 ${
+              className={`rounded-full px-5 py-2.5 text-sm font-medium transition-colors duration-500 hover:opacity-80 ${
                 glass ? "bg-brand text-white" : "bg-white text-brand"
               }`}
             >
