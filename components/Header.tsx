@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -49,31 +48,12 @@ export default function Header() {
       <div className="flex items-center justify-between gap-3 px-2 pl-5 py-2">
         <Link
           href="/"
-          className="relative flex h-12 w-[160px] shrink-0 items-center md:h-14 md:w-[190px]"
+          className={`shrink-0 text-lg font-medium tracking-tight transition-colors duration-300 ${
+            glass ? "text-ink" : "text-white"
+          }`}
           aria-label={site.name}
         >
-          {/* Haut du hero : silhouette gris/noir translucide sur la photo */}
-          <Image
-            src="/logo/logo.png"
-            alt=""
-            fill
-            sizes="190px"
-            aria-hidden
-            className={`object-contain object-left brightness-0 transition-opacity duration-300 ${
-              glass ? "opacity-0" : "opacity-60"
-            }`}
-          />
-          {/* Défilé / pages intérieures : logo en couleur */}
-          <Image
-            src="/logo/logo.png"
-            alt={site.name}
-            fill
-            sizes="190px"
-            priority
-            className={`object-contain object-left transition-opacity duration-300 ${
-              glass ? "opacity-100" : "opacity-0"
-            }`}
-          />
+          APOLO
         </Link>
 
         <nav className="hidden shrink-0 flex-nowrap items-center gap-4 md:flex lg:gap-5">
