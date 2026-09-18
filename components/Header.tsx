@@ -17,7 +17,7 @@ export default function Header() {
   // Verre visible dès qu'on quitte le haut du hero de l'accueil (comme le
   // template Evasion, piloté par isScrolled) — sur les autres pages, qui
   // n'ont pas de photo en fond, le verre reste toujours visible.
-  const glass = !isHome || scrolled;
+  const glass = !isHome || scrolled || open;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -90,7 +90,7 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="rounded-b-2xl border-t border-ink/10 bg-white px-6 py-8 md:hidden">
+        <div className="mt-2 overflow-hidden rounded-[28px] border border-white/25 bg-gradient-to-b from-white/70 to-white/45 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,.4),inset_0_-1px_0_rgba(14,95,130,.05),0_25px_50px_-22px_rgba(14,95,130,.28)] backdrop-blur-[28px] backdrop-saturate-[1.6] md:hidden">
           <nav className="flex flex-col gap-6">
             {nav.map((item) => (
               <Link
