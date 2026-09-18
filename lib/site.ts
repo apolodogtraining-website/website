@@ -356,6 +356,11 @@ export const nav = [
   { label: "Contact", href: "/contact" },
 ];
 
+/** Menu du header : identique à `nav`, sans FAQ ni Contact (gardés dans le footer). */
+export const headerNav = nav.filter(
+  (item) => item.href !== "/faq" && item.href !== "/contact"
+);
+
 /** Pages légales : hors menu principal, mais liées depuis le footer et présentes dans le sitemap. */
 export const legalNav = [
   { label: "Mentions légales", href: "/mentions-legales" },

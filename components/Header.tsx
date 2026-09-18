@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Inter } from "next/font/google";
-import { nav, site } from "@/lib/site";
+import { headerNav, site } from "@/lib/site";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] });
 
@@ -55,7 +55,7 @@ export default function Header() {
             : "none",
         }}
       >
-        <div className="flex items-center justify-between gap-5 px-2 pl-5 py-2 md:justify-start">
+        <div className="flex items-center justify-between gap-8 px-2 pl-5 py-2 md:justify-start">
           <Link
             href="/"
             className="relative h-7 w-[82px] shrink-0"
@@ -85,8 +85,8 @@ export default function Header() {
             />
           </Link>
 
-          <nav className="hidden shrink-0 flex-nowrap items-center gap-5 md:flex">
-            {nav.map((item) => (
+          <nav className="hidden shrink-0 flex-nowrap items-center gap-8 md:flex">
+            {headerNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -121,8 +121,8 @@ export default function Header() {
 
       {open && (
         <div className="mt-2 overflow-hidden rounded-[28px] border border-white/25 bg-gradient-to-b from-white/70 to-white/45 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,.4),inset_0_-1px_0_rgba(14,95,130,.05),0_25px_50px_-22px_rgba(14,95,130,.28)] backdrop-blur-[28px] backdrop-saturate-[1.6] md:hidden">
-          <nav className="flex flex-col gap-6">
-            {nav.map((item) => (
+          <nav className="flex flex-col gap-7">
+            {headerNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
