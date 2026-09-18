@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import type { Metadata } from "next";
 import { getReviews } from "@/lib/reviews";
 import { serviceAreas, services, site } from "@/lib/site";
+import { jsonLdScript } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -69,7 +70,7 @@ export default async function Home() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <Header />
       <main className="flex-1">

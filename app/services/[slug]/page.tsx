@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
 import { serviceAreas, services, site, type Service } from "@/lib/site";
 import { ArrowIcon, CheckIcon, ServiceIcon } from "@/components/icons";
+import { jsonLdScript } from "@/lib/jsonld";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -79,7 +80,7 @@ export default async function ServicePage({ params }: Props) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(service)) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(buildJsonLd(service)) }}
       />
       <Header />
       <main className="pt-28">

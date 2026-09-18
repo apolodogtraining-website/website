@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
 import { getReviews } from "@/lib/reviews";
 import Link from "next/link";
+import { breadcrumb, graph, jsonLdScript } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Avis Google",
@@ -12,10 +13,16 @@ export const metadata: Metadata = {
   alternates: { canonical: "/avis" },
 };
 
+const jsonLd = graph(breadcrumb([{ name: "Avis", path: "/avis" }]));
+
 export default async function AvisPage() {
   const reviews = await getReviews();
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
+      />
       <Header />
       <main className="pt-20">
         <Reviews data={reviews} as="h1" heading="Avis clients d'Apolo Dog Training à Bordeaux" />

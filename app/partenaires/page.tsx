@@ -6,6 +6,7 @@ import StickyCall from "@/components/StickyCall";
 import { partners } from "@/lib/site";
 import { ArrowIcon, MapPinIcon } from "@/components/icons";
 import Link from "next/link";
+import { breadcrumb, graph, jsonLdScript } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Mes partenaires",
@@ -14,9 +15,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/partenaires" },
 };
 
+const jsonLd = graph(breadcrumb([{ name: "Partenaires", path: "/partenaires" }]));
+
 export default function PartenairesPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
+      />
       <Header />
       <main className="pt-28">
         <section className="bg-brand-tint py-16 md:py-24">

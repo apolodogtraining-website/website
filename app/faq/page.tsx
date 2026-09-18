@@ -4,6 +4,8 @@ import Faq from "@/components/Faq";
 import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
 import Link from "next/link";
+import { faqGeneral, site } from "@/lib/site";
+import { breadcrumb, faqPage, graph, jsonLdScript } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Questions fréquentes",
@@ -11,9 +13,18 @@ export const metadata: Metadata = {
   alternates: { canonical: "/faq" },
 };
 
+const jsonLd = graph(
+  faqPage(faqGeneral, `${site.url}/faq#faq`),
+  breadcrumb([{ name: "Questions fréquentes", path: "/faq" }])
+);
+
 export default function FaqPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
+      />
       <Header />
       <main className="pt-20">
         <Faq as="h1" heading="Vos questions sur l'éducation canine et les activités de flair" />

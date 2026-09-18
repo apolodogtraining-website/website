@@ -8,6 +8,17 @@ import type { NextConfig } from "next";
 const CANONICAL_HOST = "apolodogtraining.com";
 const REDIRECTED_HOSTS = ["www.apolodogtraining.com"];
 
+/**
+ * Anciennes URL encore indexées par Google, qui renverraient 404.
+ * Sans redirection, le lien entrant est perdu et le visiteur avec.
+ *
+ * Pour compléter cette liste : Search Console → Pages → « Introuvable (404) ».
+ * Chaque URL qui y apparaît et qui a un équivalent actuel mérite une ligne ici.
+ */
+const LEGACY_PATHS: Record<string, string> = {
+  "/services/hunting-games": "/services/jeux-de-chasse-chien-bordeaux",
+};
+
 const nextConfig: NextConfig = {
   // Formats modernes : ~40 % de poids en moins sur les photos servies.
   images: {
@@ -18,12 +29,19 @@ const nextConfig: NextConfig = {
 
   // Un seul hôte indexable : le capital de liens ne se disperse plus sur deux domaines.
   async redirects() {
-    return REDIRECTED_HOSTS.map((host) => ({
-      source: "/:path*",
-      has: [{ type: "host" as const, value: host }],
-      destination: `https://${CANONICAL_HOST}/:path*`,
-      permanent: true,
-    }));
+    return [
+      ...REDIRECTED_HOSTS.map((host) => ({
+        source: "/:path*",
+        has: [{ type: "host" as const, value: host }],
+        destination: `https://${CANONICAL_HOST}/:path*`,
+        permanent: true,
+      })),
+      ...Object.entries(LEGACY_PATHS).map(([source, destination]) => ({
+        source,
+        destination,
+        permanent: true,
+      })),
+    ];
   },
 
   async headers() {
@@ -54,15 +72,19 @@ const nextConfig: NextConfig = {
         // déploiement à l'autre. Un `max-age=31536000, immutable` gèlerait donc
         // l'ancienne version chez tout visiteur déjà venu, pendant un an, sans
         // qu'aucun déploiement puisse la déloger.
-        // Une heure de cache + revalidation en arrière-plan : le coût réseau
-        // reste nul en pratique (les photos passent par /_next/image, dont le
-        // cache est géré par `minimumCacheTTL`) et un remplacement de fichier
-        // se propage en une heure.
+        // ⚠️ Vérifié en production : les réponses de /_next/image reprennent
+        // CETTE valeur, pas `minimumCacheTTL`. Une heure de cache signifiait
+        // donc que chaque visiteur revalidait toutes les photos du site dans la
+        // journée. Sept jours + revalidation en arrière-plan est le compromis :
+        // une photo remplacée se propage en une semaine au pire.
+        // Pour revenir à un cache d'un an sans cet inconvénient, il faut
+        // versionner les noms de fichiers (`hero-2026-09.jpg`) et changer le nom
+        // à chaque remplacement.
         source: "/:all*(svg|jpg|jpeg|png|webp|avif|ico|woff2)",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=3600, stale-while-revalidate=86400",
+            value: "public, max-age=604800, stale-while-revalidate=2592000",
           },
         ],
       },

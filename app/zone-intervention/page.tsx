@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
 import { MapPinIcon } from "@/components/icons";
 import { serviceAreas, site } from "@/lib/site";
+import { jsonLdScript } from "@/lib/jsonld";
 
 const url = `${site.url}/zone-intervention`;
 
@@ -103,7 +104,7 @@ export default function ZoneInterventionPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd()) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd()) }}
       />
       <Header />
       <main className="pt-20">

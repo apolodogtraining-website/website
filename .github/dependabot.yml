@@ -1,0 +1,27 @@
+# Surveillance automatique des dépendances.
+# Un site vitrine n'est pas relu toutes les semaines : c'est exactement le cas
+# où l'alerte automatique évite de découvrir une faille critique six mois trop
+# tard, comme l'exécution de code à distance de Next 16.2.10 en septembre 2026.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: [dependencies]
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # Un seul lot pour les mises à jour mineures et correctives : une PR par
+      # semaine plutôt que dix.
+      mineures:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore(ci)"

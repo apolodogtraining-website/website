@@ -96,6 +96,38 @@ export const serviceAreas: string[] = [
 ];
 
 export type ServiceFaq = { q: string; a: string };
+
+/**
+ * FAQ générale : affichée sur l'accueil et sur /faq, et balisée en `FAQPage`
+ * sur la page dédiée. Source unique — le composant et le balisage lisent ici.
+ *
+ * Objectif à terme : 12 à 15 questions reprenant les formulations réellement
+ * tapées dans Google (« combien coûte un éducateur canin à Bordeaux »,
+ * « différence entre éducateur et comportementaliste »), et non seulement des
+ * objections de vente.
+ */
+export const faqGeneral: ServiceFaq[] = [
+  {
+    q: "Mon chien est très réactif : pouvez-vous l'accompagner ?",
+    a: "Oui. L'évaluation comportementale permet de comprendre les déclencheurs, d'évaluer la situation et de proposer un accompagnement progressif, adapté à votre chien.",
+  },
+  {
+    q: "Combien de séances faut-il prévoir ?",
+    a: "Cela dépend de votre objectif, de l'historique de votre chien et de votre disponibilité. Après la première évaluation, vous aurez une recommandation claire et réaliste.",
+  },
+  {
+    q: "Faut-il du matériel particulier ?",
+    a: "Non, pas pour démarrer. Selon l'accompagnement, je vous guide vers le matériel le plus confortable et adapté à votre chien.",
+  },
+  {
+    q: "Utilisez-vous des méthodes coercitives ?",
+    a: "Non. Le travail repose sur l'observation, la coopération et des apprentissages respectueux du chien, sans rapport de force.",
+  },
+  {
+    q: "Toute la famille peut-elle participer ?",
+    a: "Oui. Pour obtenir des repères cohérents au quotidien, l'implication des personnes qui vivent avec le chien est toujours la bienvenue.",
+  },
+];
 export type ServiceStep = { title: string; text: string };
 
 export type Service = {
@@ -146,6 +178,85 @@ export const services: Service[] = [
     description:
       "Analyse fine des comportements gênants (peurs, réactivité, agressivité, anxiété) pour comprendre leur origine et mettre en place un vrai plan d'action.",
     icon: "behaviour",
+    h1: "Bilan comportemental pour chien à Bordeaux : comprendre avant de corriger",
+    metaTitle: "Bilan comportemental chien à Bordeaux",
+    metaDescription:
+      "Votre chien aboie, tire, grogne ou ne supporte pas la solitude ? Le bilan comportemental cherche la cause avant la solution. Bordeaux et rive droite.",
+    intro: [
+      "Un bilan comportemental n'est pas une séance d'éducation. C'est une enquête. On ne cherche pas à faire disparaître un comportement, on cherche à comprendre à quoi il sert — parce qu'un chien ne fait jamais rien sans raison, même quand la raison nous échappe.",
+      "La plupart des maîtres arrivent avec une étiquette : il est dominant, il est têtu, il est jaloux, il le fait exprès. Ces mots décrivent ce qu'on voit, pas ce qui se passe. Un chien qui grogne quand on approche de sa gamelle ne conteste pas votre autorité ; il a peur qu'on lui retire sa nourriture. La nuance n'est pas de la sémantique : elle change complètement ce qu'il faut faire.",
+      "À la fin du bilan, vous repartez avec une hypothèse claire sur l'origine du comportement, un plan d'action écrit et hiérarchisé, et une idée réaliste du temps que cela demandera. Y compris quand la réponse honnête est que le problème ne relève pas de moi.",
+    ],
+    forWhom: [
+      {
+        title: "Le chien qui réagit en laisse",
+        text: "Aboiements, ruées, corps tendu dès qu'un congénère apparaît. C'est le motif de consultation le plus fréquent, et celui où l'écart entre ce que le maître croit voir et ce qui se joue réellement est le plus grand.",
+      },
+      {
+        title: "Le chien qui ne supporte pas la solitude",
+        text: "Destructions, vocalises, malpropreté en votre absence. Derrière ces trois symptômes se cachent des causes très différentes, et le plan d'action n'a rien à voir de l'une à l'autre.",
+      },
+      {
+        title: "Le chien qui grogne, pince ou a mordu",
+        text: "Situation délicate qui demande une évaluation posée, sans précipitation ni jugement. Le grognement est une information précieuse — un chien qui prévient est un chien qui communique encore.",
+      },
+      {
+        title: "Le chien qui a changé",
+        text: "Un comportement qui apparaît ou s'aggrave en quelques semaines mérite toujours d'être pris au sérieux. Un déménagement, un deuil, une douleur : les causes sont rarement là où on les cherche.",
+      },
+    ],
+    sessionFlow: [
+      {
+        title: "L'entretien",
+        text: "Avant d'observer quoi que ce soit, je vous écoute. L'historique du chien, son quotidien, ses journées type, ce qui a changé, ce que vous avez déjà essayé. C'est souvent là que se trouve la moitié de la réponse.",
+      },
+      {
+        title: "L'observation",
+        text: "Sur votre lieu de vie ou en situation réelle, selon le problème. J'observe le chien, mais aussi l'environnement et les interactions. Je ne provoque jamais délibérément le comportement qui pose problème.",
+      },
+      {
+        title: "L'hypothèse",
+        text: "Je vous explique ce que je pense qu'il se passe, en termes concrets, et pourquoi. Vous devez pouvoir contester : si l'explication ne colle pas à ce que vous vivez, c'est qu'elle est incomplète.",
+      },
+      {
+        title: "Le plan et le suivi",
+        text: "Un document écrit avec les priorités dans l'ordre, ce qui se travaille en séance et ce qui se travaille sans moi. Puis un suivi, parce qu'un plan qui ne s'ajuste pas au réel ne sert à rien.",
+      },
+    ],
+    benefits: [
+      "Une explication du comportement, pas seulement une technique pour le masquer",
+      "Des priorités claires : ce qui se règle d'abord, ce qui attendra",
+      "Un plan écrit que toute la famille peut appliquer de la même façon",
+      "Une estimation honnête du temps nécessaire, y compris quand elle déplaît",
+      "Une orientation vers le bon professionnel quand le problème n'est pas de mon ressort",
+    ],
+    faq: [
+      {
+        q: "Quelle différence entre un éducateur canin et un comportementaliste ?",
+        a: "L'éducateur apprend au chien des comportements : le rappel, la marche en laisse, l'autocontrôle. Le comportementaliste cherche pourquoi un comportement existe avant de chercher à le modifier. Les deux métiers se complètent, et la plupart des situations demandent les deux — d'abord comprendre, ensuite entraîner.",
+      },
+      {
+        q: "Mon chien a déjà mordu. Pouvez-vous intervenir ?",
+        a: "Oui, mais avec une précision importante : si la morsure a été déclarée en mairie, la loi impose une évaluation comportementale réalisée par un vétérinaire inscrit sur la liste départementale. Mon bilan ne la remplace pas et n'a aucune valeur légale. Il vient en complément, pour le travail de fond.",
+      },
+      {
+        q: "Faut-il consulter un vétérinaire avant ?",
+        a: "Souvent, oui. La douleur est une cause fréquente et sous-estimée de changement de comportement, en particulier chez le chien qui devient irritable ou qui refuse le contact. Quand un doute existe, je vous demande de faire vérifier avant d'engager un travail comportemental.",
+      },
+      {
+        q: "Combien de temps dure un bilan ?",
+        a: "Comptez entre une heure trente et deux heures pour la rencontre, auxquelles s'ajoute le temps de rédaction du plan. C'est plus long qu'une séance classique, et c'est normal : l'essentiel du travail consiste à observer et à écouter.",
+      },
+      {
+        q: "Est-ce qu'une séance suffit à régler le problème ?",
+        a: "Non, et personne ne devrait vous le promettre. Le bilan pose le diagnostic et le plan ; le changement vient de ce que vous mettez en place ensuite, semaine après semaine. Selon les situations, cela va de quelques semaines à plusieurs mois.",
+      },
+    ],
+    related: [
+      "education-canine-bordeaux",
+      "balades-educatives-bordeaux",
+      "mantrailing-bordeaux",
+    ],
   },
   {
     title: "Balades éducatives & collectives",
@@ -248,6 +359,85 @@ export const services: Service[] = [
     description:
       "Le pistage sportif : suivre une trace au sol, marquer les objets, développer la concentration et l'autonomie de votre chien.",
     icon: "tracking",
+    h1: "Tracking à Bordeaux : le pistage sportif, pas après pas",
+    metaTitle: "Tracking et pistage canin à Bordeaux",
+    metaDescription:
+      "Le pistage sportif à Bordeaux et rive droite : votre chien suit une trace au sol, foulée après foulée, et apprend la concentration. Tous âges, toutes races.",
+    intro: [
+      "En tracking, votre chien suit une trace au sol. Pas une odeur qui flotte dans l'air : la perturbation laissée par les pas d'une personne — végétation écrasée, terre retournée, micro-organismes libérés. Il travaille truffe au sol, lentement, foulée après foulée, sans sauter une étape.",
+      "C'est la différence avec le mantrailing, et elle est plus grande qu'il n'y paraît. En mantrailing le chien suit une personne et s'autorise à couper, contourner, remonter au vent. En tracking il suit un tracé, et l'exercice consiste précisément à ne pas couper. Là où le mantrailing récompense l'initiative, le pistage récompense la méthode.",
+      "Sur le parcours, des objets sont déposés — un bout de cuir, un morceau de bois, un textile. Le chien doit les signaler au passage sans quitter la trace. C'est ce qui transforme une promenade olfactive en discipline : il faut tenir la ligne et rester attentif en même temps.",
+    ],
+    forWhom: [
+      {
+        title: "Le chien qui s'excite trop vite",
+        text: "Le pistage impose un rythme lent et une concentration continue. Pour un chien qui passe de zéro à cent en une seconde, c'est un apprentissage de la régulation bien plus efficace qu'un exercice de calme imposé.",
+      },
+      {
+        title: "Le chien sportif qui cherche une discipline",
+        text: "Le pistage est une épreuve à part entière dans plusieurs disciplines canines officielles. Pour un binôme qui veut progresser sur des critères mesurables, il y a de quoi travailler pendant des années.",
+      },
+      {
+        title: "Le maître qui aime la précision",
+        text: "Ici on mesure : longueur du tracé, nombre d'angles, âge de la piste, objets signalés. Chaque séance se lit et se compare à la précédente. Ceux que le flou du travail comportemental frustre s'y retrouvent.",
+      },
+      {
+        title: "Le binôme qui a besoin de se retrouver",
+        text: "Le chien travaille seul devant, vous suivez derrière sans intervenir. Cette configuration répétée change souvent la relation plus vite que des exercices d'obéissance.",
+      },
+    ],
+    sessionFlow: [
+      {
+        title: "Les premières traces",
+        text: "Courtes, rectilignes, fraîches, sur herbe. On dépose de la nourriture dans chaque empreinte : le chien n'a rien à comprendre, il apprend seulement que suivre les pas vaut le coup.",
+      },
+      {
+        title: "L'espacement",
+        text: "On raréfie progressivement ce qui est déposé, jusqu'à ce que le chien suive la trace elle-même et non la récompense. C'est l'étape la plus délicate, et celle qu'on rate en allant trop vite.",
+      },
+      {
+        title: "Les angles et les objets",
+        text: "Les virages obligent le chien à chercher au lieu de courir tout droit. Les objets lui apprennent à signaler sans perdre la trace. On introduit l'un puis l'autre, jamais les deux le même jour.",
+      },
+      {
+        title: "L'âge et le terrain",
+        text: "On laisse vieillir la piste — trente minutes, une heure, plus — et on change de surface : herbe haute, labour, sous-bois, gravier. Chaque terrain est un nouvel apprentissage.",
+      },
+    ],
+    benefits: [
+      "Une dépense mentale intense pour une dépense physique modérée",
+      "Un apprentissage concret de la concentration dans la durée",
+      "Des progrès mesurables d'une séance à l'autre",
+      "Un travail individuel, sans contact avec d'autres chiens",
+      "Une passerelle vers les épreuves de pistage en compétition",
+    ],
+    faq: [
+      {
+        q: "Quelle différence entre le tracking et le mantrailing ?",
+        a: "Le tracking suit un tracé au sol, foulée après foulée, et le chien ne doit pas couper. Le mantrailing suit l'odeur d'une personne précise telle qu'elle se disperse dans l'environnement, et le chien coupe, contourne, s'adapte au vent. L'un travaille la rigueur, l'autre l'initiative.",
+      },
+      {
+        q: "Faut-il un terrain particulier pour commencer ?",
+        a: "Un pré ou une prairie suffit pour les premières traces. La rive droite et les environs de Bordeaux offrent ce qu'il faut. Les terrains plus difficiles — labour, sous-bois, surfaces dures — arrivent quand le chien est prêt, pas avant.",
+      },
+      {
+        q: "Mon chien renifle partout en balade, est-ce qu'il sera doué ?",
+        a: "Renifler et pister sont deux choses différentes. En balade, le chien butine ce qui l'intéresse ; en pistage, il suit une trace donnée sans se laisser distraire par les autres odeurs. Un chien très olfactif part avec un avantage de motivation, pas de méthode.",
+      },
+      {
+        q: "À quelle fréquence faut-il s'entraîner ?",
+        a: "Deux à trois traces par semaine valent mieux qu'une longue séance mensuelle. Les pistes sont courtes et rapides à poser : une fois la technique acquise, vous travaillez seul entre deux séances, ce qui est d'ailleurs l'objectif.",
+      },
+      {
+        q: "Peut-on concourir en pistage ?",
+        a: "Oui. Le pistage figure au programme de plusieurs disciplines canines officielles, avec des niveaux progressifs. Rien n'oblige à y aller : beaucoup de binômes pratiquent pour le plaisir du travail et n'entrent jamais sur un terrain de concours.",
+      },
+    ],
+    related: [
+      "mantrailing-bordeaux",
+      "nosework-bordeaux",
+      "jeux-de-chasse-chien-bordeaux",
+    ],
   },
   {
     title: "Nosework (détection sportive)",

@@ -11,12 +11,18 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const description = `${site.role} à ${site.area}. ${site.tagline} Éducation, comportement, mantrailing, pistage, nosework et jeux de chasse.`;
+// Google réécrivait le title déclaré (« Apolo Dog Training — Éducateur &
+// comportementaliste canin à Bordeaux ») au profit d'une formulation tournée
+// vers le flair : signe que le title décrivait mal la page. Il est désormais
+// aligné sur le H1 et sur ce que le site raconte réellement.
+const homeTitle = "Éducateur canin à Bordeaux — mantrailing, nosework, pistage";
+
+const description = `${site.role} à ${site.area}. Rééduquez votre chien par les activités de flair : mantrailing, nosework, pistage et jeux de chasse. Évaluation sur mesure.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — Éducateur & comportementaliste canin à Bordeaux`,
+    default: homeTitle,
     template: `%s | ${site.name}`,
   },
   description,
@@ -39,7 +45,7 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: site.url,
     siteName: site.name,
-    title: `${site.name} — Éducateur & comportementaliste canin à Bordeaux`,
+    title: `${site.name} — ${homeTitle}`,
     description,
     // Dimensions RÉELLES du fichier. Facebook, LinkedIn et WhatsApp réservent
     // l'espace de l'aperçu d'après ces valeurs : les annoncer fausses produit un
@@ -49,7 +55,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} — Éducateur & comportementaliste canin à Bordeaux`,
+    title: `${site.name} — ${homeTitle}`,
     description,
     images: ["/photos/hero.jpg"],
   },
