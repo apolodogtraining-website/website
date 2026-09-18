@@ -50,8 +50,8 @@ export const metadata: Metadata = {
     // Dimensions RÉELLES du fichier. Facebook, LinkedIn et WhatsApp réservent
     // l'espace de l'aperçu d'après ces valeurs : les annoncer fausses produit un
     // recadrage approximatif. À terme, une image OG dédiée en 1200×630 (logo +
-    // accroche) se partagerait mieux que cette photo en 2,6:1.
-    images: [{ url: "/photos/hero.jpg", width: 2000, height: 769, alt: site.name }],
+    // accroche) se partagerait mieux que cette photo en 4:3.
+    images: [{ url: "/photos/hero.jpg", width: 1600, height: 1200, alt: site.name }],
   },
   twitter: {
     card: "summary_large_image",

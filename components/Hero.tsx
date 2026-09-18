@@ -19,14 +19,15 @@ export default function Hero({
       <div className="absolute inset-0 -z-10">
         <Image
           src="/photos/hero.jpg"
-          alt="Malinois joyeux courant après un frisbee lors d'une séance d'activité canine"
+          alt="Frédéric et son chien Malinois en séance de travail face à l'océan"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center"
+          className="-scale-x-100 object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/65 via-ink/45 to-ink/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-darker/55 to-transparent" />
+        {/* Assombrissement léger (40%) validé par Frédéric — juste de quoi
+            garder le texte lisible, sans écraser la photo. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/15 to-ink/60" />
       </div>
 
       <div className="min-h-screen-mobile mx-auto flex max-w-6xl flex-col justify-center px-5 pb-16 pt-28 md:pt-32">
