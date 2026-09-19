@@ -118,31 +118,39 @@ export default function ReelPlayer() {
       </button>
 
       {open && (
+        // Mobile : la vidéo occupe tout l'écran (immersif, sans cadre).
+        // Desktop (md+) : popup centré façon "verre liquide", même recette
+        // que le menu mobile du header (bg blanc translucide + backdrop-blur
+        // + backdrop-saturate), posé sur un fond assombri et flouté.
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/85 p-5 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/70 backdrop-blur-md md:p-6"
           onClick={() => setOpen(false)}
         >
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            aria-label="Fermer la vidéo"
-            className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-          <video
-            src={VIDEO_SRC}
-            poster={POSTER_SRC}
-            autoPlay
-            controls
-            playsInline
-            className="max-h-[88vh] w-auto max-w-full rounded-2xl shadow-2xl"
+          <div
             onClick={(e) => e.stopPropagation()}
+            className="relative flex h-full w-full items-center justify-center md:h-auto md:w-auto md:rounded-[32px] md:border md:border-white/25 md:bg-gradient-to-b md:from-white/25 md:to-white/8 md:p-4 md:shadow-[inset_0_1px_0_rgba(255,255,255,.35),inset_0_-1px_0_rgba(14,95,130,.08),0_35px_70px_-25px_rgba(0,0,0,.55)] md:backdrop-blur-[30px] md:backdrop-saturate-[1.7]"
           >
-            <track kind="captions" />
-          </video>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Fermer la vidéo"
+              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:-right-3 md:-top-3 md:bg-white/95 md:text-ink md:hover:bg-white"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+            <video
+              src={VIDEO_SRC}
+              poster={POSTER_SRC}
+              autoPlay
+              controls
+              playsInline
+              className="h-[100dvh] w-full object-contain md:h-[82vh] md:w-auto md:max-w-[85vw] md:rounded-2xl md:shadow-2xl"
+            >
+              <track kind="captions" />
+            </video>
+          </div>
         </div>
       )}
     </>
