@@ -23,7 +23,7 @@ export default function Hero({
           fill
           priority
           sizes="100vw"
-          className="-scale-x-100 object-cover object-center"
+          className="object-cover object-center"
         />
         {/* Assombrissement léger (40%) validé par Frédéric — juste de quoi
             garder le texte lisible, sans écraser la photo. */}
