@@ -5,6 +5,7 @@ import Reviews from "@/components/Reviews";
 import Contact from "@/components/Contact";
 import Qualification from "@/components/Qualification";
 import Method from "@/components/Method";
+import Reel from "@/components/Reel";
 import Faq from "@/components/Faq";
 import StickyCall from "@/components/StickyCall";
 import Footer from "@/components/Footer";
@@ -78,6 +79,7 @@ export default async function Home() {
         <Qualification />
         <Services />
         <Method />
+        <Reel />
         <Reviews data={reviews} />
         <Faq />
         <Contact rating={reviews.rating} total={reviews.total} />

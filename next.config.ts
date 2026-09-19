@@ -80,7 +80,7 @@ const nextConfig: NextConfig = {
         // Pour revenir à un cache d'un an sans cet inconvénient, il faut
         // versionner les noms de fichiers (`hero-2026-09.jpg`) et changer le nom
         // à chaque remplacement.
-        source: "/:all*(svg|jpg|jpeg|png|webp|avif|ico|woff2)",
+        source: "/:all*(svg|jpg|jpeg|png|webp|avif|ico|woff2|mp4)",
         headers: [
           {
             key: "Cache-Control",
