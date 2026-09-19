@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 
 const VIDEO_SRC = "/videos/reel-terrain.mp4";
@@ -74,6 +75,9 @@ export default function ReelPlayer() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // Pas besoin d'un état "mounted" : `open` démarre à false et n'est mis à
+  // true que par un clic (donc déjà côté client) — `document` est alors
+  // toujours disponible au moment du portail.
   return (
     <>
       <button
@@ -117,36 +121,42 @@ export default function ReelPlayer() {
         </div>
       </button>
 
-      {open && (
-        // Lecteur classique : vidéo centrée à l'écran, fond assombri, même
-        // présentation sur mobile et desktop.
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4"
-          onClick={() => setOpen(false)}
-        >
-          <button
-            type="button"
+      {open &&
+        createPortal(
+          // Lecteur classique : vidéo centrée à l'écran, fond assombri, même
+          // présentation sur mobile et desktop. Rendu via un portail dans
+          // <body> : un ancestor avec will-change/transform (ex. Reveal)
+          // transformerait sinon ce `fixed` en position confinée à sa boîte
+          // au lieu du plein écran (bug constaté : pas d'assombrissement
+          // visible, vidéo non centrée sur la page).
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4"
             onClick={() => setOpen(false)}
-            aria-label="Fermer la vidéo"
-            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-          <video
-            src={VIDEO_SRC}
-            poster={POSTER_SRC}
-            autoPlay
-            controls
-            playsInline
-            className="max-h-[90vh] max-w-[95vw] rounded-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <track kind="captions" />
-          </video>
-        </div>
-      )}
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Fermer la vidéo"
+              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+            <video
+              src={VIDEO_SRC}
+              poster={POSTER_SRC}
+              autoPlay
+              controls
+              playsInline
+              className="max-h-[90vh] max-w-[95vw] rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <track kind="captions" />
+            </video>
+          </div>,
+          document.body
+        )}
     </>
   );
 }
