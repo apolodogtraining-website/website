@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { ArrowIcon, StarIcon } from "./icons";
+import HeroTextParallax from "./HeroTextParallax";
 import ZoneModal from "./ZoneModal";
 
 type HeroProps = {
@@ -31,7 +32,7 @@ export default function Hero({
       </div>
 
       <div className="min-h-screen-mobile mx-auto flex max-w-6xl flex-col justify-center px-5 pb-16 pt-28 md:pt-32">
-        <div className="max-w-2xl">
+        <HeroTextParallax className="max-w-2xl">
           <div className="flex items-center gap-3 text-white/90">
             <div className="flex text-[#fbbc05]">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -72,7 +73,7 @@ export default function Hero({
           </div>
 
           <ZoneModal variant="badge" />
-        </div>
+        </HeroTextParallax>
       </div>
     </section>
   );
