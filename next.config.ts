@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [360, 640, 828, 1080, 1280, 1920, 2560],
     minimumCacheTTL: 2678400, // 31 jours
+    // Photos de profil des avis Google (lib/reviews.ts, authorAttribution.photoUri) :
+    // servies depuis plusieurs sous-domaines lh*.googleusercontent.com selon la charge.
+    remotePatterns: [
+      { protocol: "https", hostname: "**.googleusercontent.com" },
+    ],
   },
 
   // Un seul hôte indexable : le capital de liens ne se disperse plus sur deux domaines.

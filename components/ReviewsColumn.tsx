@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Review } from "@/lib/reviews";
 import Stars from "./Stars";
 
@@ -30,9 +31,19 @@ export default function ReviewsColumn({ reviews, duration = 24, className = "" }
           <Stars rating={r.rating} />
           <p className="mt-4 text-sm leading-relaxed text-ink-soft">&ldquo;{r.text}&rdquo;</p>
           <div className="mt-6 flex items-center gap-3 border-t border-brand-light pt-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
-              {r.author.charAt(0).toUpperCase()}
-            </div>
+            {r.profilePhoto ? (
+              <Image
+                src={r.profilePhoto}
+                alt=""
+                width={40}
+                height={40}
+                className="h-10 w-10 shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
+                {r.author.charAt(0).toUpperCase()}
+              </div>
+            )}
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-ink">{r.author}</p>
               {r.relativeTime && <p className="text-xs text-ink-soft">{r.relativeTime}</p>}
