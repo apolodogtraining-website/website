@@ -7,11 +7,14 @@ export default function Reveal({
   className = "",
   delay = 0,
   as: Tag = "div",
+  variant = "fade",
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
   as?: "div" | "li" | "section" | "article";
+  /** "scale" : entrée plus marquée (léger zoom), pour les grilles de cartes. */
+  variant?: "fade" | "scale";
 }) {
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -36,7 +39,7 @@ export default function Reveal({
   return (
     <Component
       ref={ref as React.Ref<HTMLDivElement>}
-      className={`reveal ${visible ? "is-visible" : ""} ${className}`}
+      className={`reveal ${variant === "scale" ? "reveal-scale" : ""} ${visible ? "is-visible" : ""} ${className}`}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}

@@ -20,8 +20,10 @@
   --foreground: #16232c;
 }
 
+/* Le scroll fluide est géré par Lenis (components/SmoothScroll.tsx) ; on ne
+   double pas avec le smooth-scroll natif, qui produirait un ralenti sur
+   ralenti au clic sur un lien d'ancre. */
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 5rem;
 }
 
@@ -57,13 +59,135 @@ body {
   transform: none;
 }
 
+/* Variante plus marquée (léger scale) pour les grilles de cartes. */
+.reveal.reveal-scale {
+  transform: translateY(28px) scale(0.92);
+}
+
 /* Garde-fou : sans JavaScript, l'IntersectionObserver ne tourne jamais et la
    page resterait entièrement invisible. Certains crawlers et les captures
-   d'aperçu automatiques sont dans ce cas. */
+   d'aperçu automatiques sont dans ce cas. Sélecteurs répétés avec la même
+   spécificité que `.reveal-scale` pour être sûr de le neutraliser aussi. */
 @media (scripting: none) {
-  .reveal {
+  .reveal,
+  .reveal.reveal-scale {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Même garde-fou pour les entrées animées par Framer Motion (voir
+   components/HeroIntro.tsx) : l'état "hidden" initial est rendu en HTML
+   même sans JS, donc on le neutralise ici. `!important` est nécessaire car
+   Framer Motion pose ses valeurs en style inline. */
+@media (scripting: none), (prefers-reduced-motion: reduce) {
+  .motion-safe {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Carte 3D au survol (tilt + reflet), voir components/TiltCard.tsx */
+.tilt-card {
+  --tilt-rx: 0deg;
+  --tilt-ry: 0deg;
+  --tilt-glare-x: 50%;
+  --tilt-glare-y: 50%;
+  --tilt-glare-o: 0;
+  --tilt-scale: 1;
+  position: relative;
+  transform: perspective(1200px) rotateX(var(--tilt-rx)) rotateY(var(--tilt-ry))
+    scale(var(--tilt-scale));
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.tilt-card-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--tilt-glare-x) var(--tilt-glare-y),
+    rgba(255, 255, 255, 0.55),
+    transparent 55%
+  );
+  opacity: var(--tilt-glare-o);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+.tilt-card-pop {
+  transform: translateZ(0);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tilt-card:hover .tilt-card-pop {
+  transform: translateZ(36px);
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .tilt-card {
+    transform: none !important;
+    transition: none;
+  }
+  .tilt-card-glare {
+    display: none;
+  }
+  .tilt-card-pop,
+  .tilt-card:hover .tilt-card-pop {
+    transform: none;
+  }
+}
+
+/* Zoom lent façon "Ken Burns" sur la photo du hero. `forwards` : on s'arrête
+   sur l'état zoomé plutôt que de boucler, ce qui serait too much. */
+@keyframes hero-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+.hero-kenburns {
+  animation: hero-kenburns 16s ease-out forwards;
+}
+
+/* Accordéon FAQ (components/Faq.tsx) : on garde le <details>/<summary>
+   natif (fonctionne sans JS, navigable clavier) et on anime juste la
+   hauteur de la réponse via grid-template-rows, en réécrivant l'affichage
+   que le user-agent masque par défaut quand <details> est fermé — sinon pas
+   de transition possible entre "display: none" et son contenu. */
+.faq-a-wrap {
+  display: grid !important;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+details[open] > .faq-a-wrap {
+  grid-template-rows: 1fr;
+}
+.faq-a-inner {
+  overflow: hidden;
+}
+
+/* Dégradé animé du bloc contact : mouvement lent et ambiant (pas une
+   interaction au survol), pour une section qui respire un peu. */
+.contact-gradient {
+  background-image: linear-gradient(
+    120deg,
+    var(--color-brand) 0%,
+    var(--color-brand-darker) 50%,
+    var(--color-brand) 100%
+  );
+  background-size: 200% 200%;
+  animation: contact-gradient-shift 14s ease-in-out infinite;
+}
+@keyframes contact-gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
 }
 
@@ -87,15 +211,23 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  .reveal {
+  .reveal,
+  .reveal.reveal-scale {
     opacity: 1;
     transform: none;
     transition: none;
   }
   .sticky-call-ring {
     animation: none;
+  }
+  .hero-kenburns {
+    animation: none;
+  }
+  .contact-gradient {
+    animation: none;
+    background-position: 0% 50%;
+  }
+  .faq-a-wrap {
+    transition: none;
   }
 }

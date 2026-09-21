@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { serviceAreas, site } from "@/lib/site";
 import { MapPinIcon } from "./icons";
+import useScrollLock from "@/hooks/useScrollLock";
 
 type ZoneModalProps = {
   variant: "badge" | "banner";
@@ -14,17 +15,17 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
 
+  useScrollLock(open);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
     closeRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
     };
   }, [open]);
 
