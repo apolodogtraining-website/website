@@ -22,7 +22,7 @@ export default function Services() {
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((s, i) => (
-            <Reveal key={s.title} delay={(i % 4) * 80} className="h-full">
+            <Reveal key={s.title} delay={(i % 4) * 80} variant="scale" className="h-full">
               <TiltCard
                 as="article"
                 className="group flex h-full flex-col rounded-3xl border border-brand-light bg-white p-7 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)] transition-colors duration-300 hover:border-brand/40 hover:shadow-brand"
@@ -42,7 +42,7 @@ export default function Services() {
           ))}
 
           {/* CTA card */}
-          <Reveal delay={90} className="h-full">
+          <Reveal delay={90} variant="scale" className="h-full">
             <TiltCard
               as="article"
               className="flex h-full flex-col justify-center rounded-3xl bg-brand p-7 text-white shadow-brand"

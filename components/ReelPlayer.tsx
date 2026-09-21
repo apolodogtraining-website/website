@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import useScrollLock from "@/hooks/useScrollLock";
 
 const VIDEO_SRC = "/videos/reel-terrain.mp4";
 const POSTER_SRC = "/photos/reel-poster.jpg";
@@ -58,12 +59,10 @@ export default function ReelPlayer() {
     return () => observer.disconnect();
   }, [loaded, open]);
 
+  useScrollLock(open);
+
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
     if (open) cardVideoRef.current?.pause();
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [open]);
 
   useEffect(() => {

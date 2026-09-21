@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { headerNav, site } from "@/lib/site";
+import useScrollLock from "@/hooks/useScrollLock";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -17,12 +18,7 @@ export default function Header() {
   // ouvert (il a besoin d'un fond lisible quel que soit le défilement).
   const glass = !isHome || scrolled || open;
 
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  useScrollLock(open);
 
   useEffect(() => {
     if (!isHome) return;
