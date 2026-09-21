@@ -191,6 +191,28 @@ details[open] > .faq-a-wrap {
   }
 }
 
+/* Colonnes d'avis défilantes (components/ReviewsColumn.tsx). Pause au
+   survol/focus : un contenu qui défile seul plus de 5s doit pouvoir être
+   arrêté pour le lire (WCAG 2.2.2), pas seulement sous
+   prefers-reduced-motion. */
+@keyframes reviews-scroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+.reviews-marquee {
+  animation-name: reviews-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.reviews-marquee:hover,
+.reviews-marquee:focus-within {
+  animation-play-state: paused;
+}
+
 /* Halo pulsant du bouton d'appel flottant */
 @keyframes sticky-call-pulse {
   0% {
@@ -226,6 +248,9 @@ details[open] > .faq-a-wrap {
   .contact-gradient {
     animation: none;
     background-position: 0% 50%;
+  }
+  .reviews-marquee {
+    animation: none;
   }
   .faq-a-wrap {
     transition: none;

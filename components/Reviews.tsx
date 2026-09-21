@@ -1,20 +1,18 @@
 import { site } from "@/lib/site";
-import type { ReviewsData } from "@/lib/reviews";
-import { StarIcon, GoogleIcon, ArrowIcon } from "./icons";
+import type { Review, ReviewsData } from "@/lib/reviews";
+import { GoogleIcon, ArrowIcon } from "./icons";
 import Reveal from "./Reveal";
 import AnimatedNumber from "./AnimatedNumber";
+import Stars from "./Stars";
+import ReviewsColumn from "./ReviewsColumn";
 
-function Stars({ rating }: { rating: number }) {
-  return (
-    <div className="flex text-[#fbbc05]" aria-label={`${rating} sur 5`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <StarIcon
-          key={i}
-          className={`h-4 w-4 ${i < Math.round(rating) ? "" : "text-ink/15"}`}
-        />
-      ))}
-    </div>
-  );
+/** Répartit les avis en `columns` colonnes (round-robin). En dessous de
+ * `columns` avis dispo (repli sans clé Google, ou fiche toute neuve), chaque
+ * colonne reprend l'ensemble plutôt que de laisser des colonnes vides. */
+function splitColumns(items: Review[], columns: number): Review[][] {
+  if (items.length === 0) return Array.from({ length: columns }, () => []);
+  if (items.length < columns) return Array.from({ length: columns }, () => items);
+  return Array.from({ length: columns }, (_, col) => items.filter((_, i) => i % columns === col));
 }
 
 type ReviewsProps = {
@@ -25,6 +23,13 @@ type ReviewsProps = {
 };
 
 export default function Reviews({ data, as: Heading = "h2", heading }: ReviewsProps) {
+  // On ne met en avant que les avis 5 étoiles. Repli sur l'ensemble des avis
+  // s'il n'y en a aucun (mieux vaut montrer quelque chose que rien) — cas
+  // purement défensif vu la note globale du profil.
+  const fiveStarReviews = data.reviews.filter((r) => r.rating === 5);
+  const featured = fiveStarReviews.length > 0 ? fiveStarReviews : data.reviews;
+  const columns = splitColumns(featured, 3);
+
   return (
     <section id="avis" className="bg-white py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5">
@@ -50,32 +55,19 @@ export default function Reviews({ data, as: Heading = "h2", heading }: ReviewsPr
           </div>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {data.reviews.slice(0, 3).map((r, i) => (
-            <Reveal
-              as="article"
-              key={i}
-              delay={(i % 3) * 90}
-              className="flex h-full flex-col rounded-3xl border border-brand-light bg-white p-7 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)]"
-            >
-              <Stars rating={r.rating} />
-              <p className="mt-4 flex-1 text-sm leading-relaxed text-ink-soft">
-                “{r.text}”
-              </p>
-              <div className="mt-6 flex items-center gap-3 border-t border-brand-light pt-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
-                  {r.author.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-ink">{r.author}</p>
-                  {r.relativeTime && (
-                    <p className="text-xs text-ink-soft">{r.relativeTime}</p>
-                  )}
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal
+          delay={100}
+          variant="scale"
+          className="mt-14 flex max-h-[620px] justify-center gap-6 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
+        >
+          <ReviewsColumn reviews={columns[0]} duration={26} />
+          <div className="hidden md:block">
+            <ReviewsColumn reviews={columns[1]} duration={32} />
+          </div>
+          <div className="hidden lg:block">
+            <ReviewsColumn reviews={columns[2]} duration={29} />
+          </div>
+        </Reveal>
 
         <div className="mt-12 text-center">
           <a
