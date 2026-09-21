@@ -23,7 +23,12 @@ type ReviewsProps = {
 };
 
 export default function Reviews({ data, as: Heading = "h2", heading }: ReviewsProps) {
-  const columns = splitColumns(data.reviews, 3);
+  // On ne met en avant que les avis 5 étoiles. Repli sur l'ensemble des avis
+  // s'il n'y en a aucun (mieux vaut montrer quelque chose que rien) — cas
+  // purement défensif vu la note globale du profil.
+  const fiveStarReviews = data.reviews.filter((r) => r.rating === 5);
+  const featured = fiveStarReviews.length > 0 ? fiveStarReviews : data.reviews;
+  const columns = splitColumns(featured, 3);
 
   return (
     <section id="avis" className="bg-white py-20 md:py-28">
