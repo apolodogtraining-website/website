@@ -189,11 +189,3 @@ export function ArrowIcon(p: IconProps) {
     </svg>
   );
 }
-
-export function ChevronDownIcon(p: IconProps) {
-  return (
-    <svg {...base} {...p}>
-      <path d="M6 9l6 6 6-6" />
-    </svg>
-  );
-}

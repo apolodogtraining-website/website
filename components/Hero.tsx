@@ -2,7 +2,6 @@ import Image from "next/image";
 import { site } from "@/lib/site";
 import HeroTextParallax from "./HeroTextParallax";
 import HeroIntro from "./HeroIntro";
-import ScrollCue from "./ScrollCue";
 
 type HeroProps = {
   rating?: number;
@@ -35,8 +34,6 @@ export default function Hero({
           <HeroIntro rating={rating} total={total} />
         </HeroTextParallax>
       </div>
-
-      <ScrollCue />
     </section>
   );
 }

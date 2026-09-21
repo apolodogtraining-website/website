@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion, type Variants } from "motion/react";
 import { ArrowIcon, StarIcon } from "./icons";
 import ZoneModal from "./ZoneModal";
-import Magnetic from "./Magnetic";
 
 type HeroIntroProps = {
   rating: number;
@@ -57,23 +56,19 @@ export default function HeroIntro({ rating, total }: HeroIntroProps) {
       </motion.p>
 
       <motion.div variants={item} className="motion-safe mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <Magnetic>
-          <Link
-            href="/contact"
-            className="btn-shine inline-flex items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-base font-semibold text-white shadow-brand transition-colors hover:bg-brand-dark"
-          >
-            Réserver une évaluation
-            <ArrowIcon className="h-5 w-5" />
-          </Link>
-        </Magnetic>
-        <Magnetic>
-          <Link
-            href="/services"
-            className="btn-shine inline-flex items-center justify-center gap-2 rounded-full border border-white/40 bg-white/10 px-7 py-3.5 text-base font-semibold text-white backdrop-blur transition-colors hover:bg-white hover:text-ink"
-          >
-            Découvrir les accompagnements
-          </Link>
-        </Magnetic>
+        <Link
+          href="/contact"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-base font-semibold text-white shadow-brand"
+        >
+          Réserver une évaluation
+          <ArrowIcon className="h-5 w-5" />
+        </Link>
+        <Link
+          href="/services"
+          className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 bg-white/10 px-7 py-3.5 text-base font-semibold text-white backdrop-blur transition-colors hover:bg-white hover:text-ink"
+        >
+          Découvrir les accompagnements
+        </Link>
       </motion.div>
 
       <motion.div variants={item} className="motion-safe">

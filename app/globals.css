@@ -152,28 +152,6 @@ body {
   animation: hero-kenburns 16s ease-out forwards;
 }
 
-/* Balayage lumineux au survol des boutons (CTA hero). */
-.btn-shine {
-  position: relative;
-  overflow: hidden;
-}
-.btn-shine::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    115deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.35) 50%,
-    transparent 60%
-  );
-  transform: translateX(-120%);
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.btn-shine:hover::after {
-  transform: translateX(120%);
-}
-
 /* Accordéon FAQ (components/Faq.tsx) : on garde le <details>/<summary>
    natif (fonctionne sans JS, navigable clavier) et on anime juste la
    hauteur de la réponse via grid-template-rows, en réécrivant l'affichage
@@ -222,9 +200,6 @@ details[open] > .faq-a-wrap {
   }
   .hero-kenburns {
     animation: none;
-  }
-  .btn-shine::after {
-    transition: none;
   }
   .faq-a-wrap {
     transition: none;
