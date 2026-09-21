@@ -2,6 +2,7 @@ import { site } from "@/lib/site";
 import type { ReviewsData } from "@/lib/reviews";
 import { StarIcon, GoogleIcon, ArrowIcon } from "./icons";
 import Reveal from "./Reveal";
+import AnimatedNumber from "./AnimatedNumber";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -39,9 +40,7 @@ export default function Reviews({ data, as: Heading = "h2", heading }: ReviewsPr
             <GoogleIcon className="h-8 w-8" />
             <div className="text-left">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-ink">
-                  {data.rating.toFixed(1)}
-                </span>
+                <AnimatedNumber value={data.rating} decimals={1} className="text-2xl font-bold text-ink" />
                 <Stars rating={data.rating} />
               </div>
               <p className="text-sm text-ink-soft">

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { motion, useReducedMotion } from "motion/react";
 import useScrollLock from "@/hooks/useScrollLock";
 
 const VIDEO_SRC = "/videos/reel-terrain.mp4";
@@ -23,6 +24,7 @@ export default function ReelPlayer() {
   const cardVideoRef = useRef<HTMLVideoElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     const el = wrapperRef.current;
@@ -79,46 +81,51 @@ export default function ReelPlayer() {
   // toujours disponible au moment du portail.
   return (
     <>
-      <button
-        ref={wrapperRef}
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label="Agrandir la vidéo avec le son"
-        className="group relative block aspect-[9/16] w-[254px] cursor-pointer overflow-hidden rounded-[28px] border-4 border-ink bg-ink shadow-[0_40px_70px_-30px_rgba(14,95,130,0.45)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:w-[280px]"
+      <motion.div
+        animate={reduced ? undefined : { y: [0, -10, 0] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        {loaded ? (
-          <video
-            ref={cardVideoRef}
-            src={VIDEO_SRC}
-            poster={POSTER_SRC}
-            muted
-            loop
-            playsInline
-            autoPlay
-            preload="none"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        ) : (
-          <Image src={POSTER_SRC} alt="" fill sizes="280px" className="object-cover" />
-        )}
+        <button
+          ref={wrapperRef}
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Agrandir la vidéo avec le son"
+          className="group relative block aspect-[9/16] w-[254px] cursor-pointer overflow-hidden rounded-[28px] border-4 border-ink bg-ink shadow-[0_40px_70px_-30px_rgba(14,95,130,0.45)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:w-[280px]"
+        >
+          {loaded ? (
+            <video
+              ref={cardVideoRef}
+              src={VIDEO_SRC}
+              poster={POSTER_SRC}
+              muted
+              loop
+              playsInline
+              autoPlay
+              preload="none"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <Image src={POSTER_SRC} alt="" fill sizes="280px" className="object-cover" />
+          )}
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-transparent" />
 
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-90 transition-opacity duration-300 group-hover:opacity-100">
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#16232c">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </span>
-        </div>
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-90 transition-opacity duration-300 group-hover:opacity-100">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#16232c">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </span>
+          </div>
 
-        <div className="pointer-events-none absolute bottom-3.5 left-3.5 right-3.5 flex items-center gap-2">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-[11px] font-bold text-white">
-            A
-          </span>
-          <span className="text-xs font-semibold text-white">apolo.dogtraining</span>
-        </div>
-      </button>
+          <div className="pointer-events-none absolute bottom-3.5 left-3.5 right-3.5 flex items-center gap-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-[11px] font-bold text-white">
+              A
+            </span>
+            <span className="text-xs font-semibold text-white">apolo.dogtraining</span>
+          </div>
+        </button>
+      </motion.div>
 
       {open &&
         createPortal(
