@@ -21,7 +21,7 @@ export default function Contact({
   return (
     <section id="contact" className="bg-white py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5">
-        <Reveal className="overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand to-brand-darker shadow-brand">
+        <Reveal className="contact-gradient overflow-hidden rounded-[2.5rem] shadow-brand">
           <div className="grid gap-10 p-6 sm:p-8 lg:grid-cols-2 lg:p-14">
             <div className="text-white">
               <h2 className="text-balance text-3xl font-bold uppercase lg:text-4xl">
