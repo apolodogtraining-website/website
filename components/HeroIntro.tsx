@@ -58,7 +58,7 @@ export default function HeroIntro({ rating, total }: HeroIntroProps) {
       <motion.div variants={item} className="motion-safe mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <Link
           href="/contact"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-base font-semibold text-white shadow-brand"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-base font-semibold text-white shadow-brand transition-transform hover:-translate-y-0.5 hover:bg-brand-dark"
         >
           Réserver une évaluation
           <ArrowIcon className="h-5 w-5" />
