@@ -29,6 +29,10 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
     };
   }, [open]);
 
+  const closeOnBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) setOpen(false);
+  };
+
   return (
     <>
       {variant === "badge" ? (
@@ -59,51 +63,68 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
 
       {open &&
         createPortal(
-          <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/60 p-5 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-          >
+          // Le fond (assombri + flou) et la couche qui défile sont deux
+          // éléments distincts. C'est la couche plein écran qui scrolle, pas
+          // le panneau : la molette / le trackpad fonctionne donc où que soit
+          // le curseur (titre, croix, marges). Lenis, en pause pendant la
+          // modale, bloque sinon tout événement hors d'un élément
+          // `data-lenis-prevent`.
+          <div className="fixed inset-0 z-[100]">
+            <div aria-hidden className="absolute inset-0 bg-ink/60 backdrop-blur-sm" />
             <div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={titleId}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md rounded-[2rem] bg-white p-7 shadow-brand"
+              data-lenis-prevent
+              className="absolute inset-0 overflow-y-auto overscroll-contain"
+              onClick={closeOnBackdropClick}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
-                    Zone d&apos;intervention
-                  </span>
-                  <h2 id={titleId} className="mt-2 text-2xl font-semibold text-ink">
-                    {site.areaLong}
-                  </h2>
-                </div>
-                <button
-                  ref={closeRef}
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  aria-label="Fermer"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light text-lg text-brand-darker transition-colors hover:bg-brand hover:text-white"
+              <div
+                className="flex min-h-full items-center justify-center p-5"
+                onClick={closeOnBackdropClick}
+              >
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby={titleId}
+                  className="w-full max-w-md rounded-[2rem] bg-white shadow-brand"
                 >
-                  ✕
-                </button>
+                  {/* En-tête collant : la croix reste atteignable même en bas de liste. */}
+                  <div className="sticky top-0 z-10 flex items-start justify-between gap-4 rounded-t-[2rem] bg-white px-7 pb-4 pt-7">
+                    <div>
+                      <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
+                        Zone d&apos;intervention
+                      </span>
+                      <h2 id={titleId} className="mt-2 text-2xl font-semibold text-ink">
+                        {site.areaLong}
+                      </h2>
+                    </div>
+                    <button
+                      ref={closeRef}
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      aria-label="Fermer"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light text-lg text-brand-darker transition-colors hover:bg-brand hover:text-white"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="px-7 pb-7">
+                    <p className="text-sm leading-relaxed text-ink-soft">
+                      J&apos;interviens à domicile ou en extérieur dans les communes
+                      suivantes :
+                    </p>
+                    <ul className="mt-5 flex flex-wrap gap-2">
+                      {serviceAreas.map((city) => (
+                        <li
+                          key={city}
+                          className="flex items-center gap-1.5 rounded-full bg-brand-tint px-3.5 py-2 text-sm font-medium text-ink"
+                        >
+                          <MapPinIcon className="h-3.5 w-3.5 text-brand" />
+                          {city}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-                J&apos;interviens à domicile ou en extérieur dans les communes
-                suivantes :
-              </p>
-              <ul className="mt-5 flex flex-wrap gap-2">
-                {serviceAreas.map((city) => (
-                  <li
-                    key={city}
-                    className="flex items-center gap-1.5 rounded-full bg-brand-tint px-3.5 py-2 text-sm font-medium text-ink"
-                  >
-                    <MapPinIcon className="h-3.5 w-3.5 text-brand" />
-                    {city}
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>,
           document.body
