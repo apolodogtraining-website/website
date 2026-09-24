@@ -25,6 +25,10 @@ export const site = {
   email: "apolo.dogtraining@gmail.com",
   phone: "06 23 80 76 59",
   phoneIntl: "+33623807659",
+  // Lien WhatsApp : numéro international sans le « + ».
+  whatsappUrl:
+    "https://wa.me/33623807659?text=" +
+    encodeURIComponent("Bonjour, je vous contacte depuis votre site au sujet de mon chien."),
   instagram: {
     handle: "@apolodog.training",
     url: "https://www.instagram.com/apolodog.training",

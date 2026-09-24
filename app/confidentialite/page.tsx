@@ -56,7 +56,7 @@ export default function ConfidentialitePage() {
               body: [
                 "Vos données ne sont ni vendues ni transmises à des tiers à des fins commerciales.",
                 "Elles peuvent être traitées par mes prestataires techniques (hébergeur du site, service de messagerie, outil de facturation), dans le seul cadre de leur mission et dans l'Union européenne ou sous un cadre de transfert conforme au RGPD.",
-                "Le formulaire de contact utilise le service d'envoi d'emails Resend, qui achemine votre message vers ma boîte de réception.",
+                "Le formulaire de contact transmet votre message par un script Google (Google Apps Script), qui l'achemine vers ma boîte Gmail.",
               ],
             },
             {

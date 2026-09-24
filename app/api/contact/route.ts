@@ -113,28 +113,33 @@ export async function POST(req: Request) {
     return Response.json({ error: "invalid", errors }, { status: 422 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.error("[contact] RESEND_API_KEY manquante : message non envoyé");
+  const webhookUrl = process.env.CONTACT_WEBHOOK_URL;
+  const webhookSecret = process.env.CONTACT_WEBHOOK_SECRET;
+  if (!webhookUrl || !webhookSecret) {
+    console.error("[contact] CONTACT_WEBHOOK_URL / CONTACT_WEBHOOK_SECRET manquantes : message non envoyé");
     return Response.json({ error: "unavailable" }, { status: 503 });
   }
 
   const { subject, text } = buildEmail(input);
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    // Google Apps Script répond à un POST par une redirection 302 vers l'URL
+    // du résultat : fetch la suit (redirect: "follow", par défaut).
+    const res = await fetch(webhookUrl, {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: process.env.CONTACT_FROM_EMAIL || `${site.name} <onboarding@resend.dev>`,
-        to: [process.env.CONTACT_TO_EMAIL || site.email],
-        ...(isEmail(input.contact) ? { reply_to: input.contact } : {}),
+        secret: webhookSecret,
         subject,
         text,
+        ...(isEmail(input.contact) ? { replyTo: input.contact } : {}),
       }),
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(15_000),
     });
-    if (!res.ok) {
-      console.error(`[contact] Resend a répondu ${res.status}`);
+    // Un déploiement mal configuré renvoie une page HTML avec un statut 200 :
+    // seul un JSON `{ ok: true }` compte comme un envoi réussi.
+    const result = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+    if (!res.ok || result?.ok !== true) {
+      console.error(`[contact] le script Google n'a pas confirmé l'envoi (HTTP ${res.status})`);
       return Response.json({ error: "send_failed" }, { status: 502 });
     }
   } catch (err) {

@@ -8,10 +8,10 @@ import Reveal from "@/components/Reveal";
 import { site } from "@/lib/site";
 import {
   FacebookIcon,
-  GoogleIcon,
   InstagramIcon,
   MailIcon,
   PhoneIcon,
+  WhatsAppIcon,
 } from "@/components/icons";
 import ZoneModal from "@/components/ZoneModal";
 import { breadcrumb, graph, jsonLdScript } from "@/lib/jsonld";
@@ -122,10 +122,10 @@ export default function ContactPage() {
                     external
                   />
                   <Tile
-                    href={site.google.url}
-                    icon={<GoogleIcon className="h-6 w-6" />}
-                    label="Avis Google"
-                    value={`${site.google.rating.toFixed(1)}/5 · ${site.google.count} avis`}
+                    href={site.whatsappUrl}
+                    icon={<WhatsAppIcon className="h-6 w-6" />}
+                    label="WhatsApp"
+                    value={site.phone}
                     external
                   />
                 </div>

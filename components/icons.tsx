@@ -134,6 +134,15 @@ export function FacebookIcon(p: IconProps) {
   );
 }
 
+export function WhatsAppIcon(p: IconProps) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M3 21l1.65-4.9A8.5 8.5 0 1 1 8 19.4L3 21Z" />
+      <path d="M9 8.8c-.2 1.9 2.2 4.6 4.6 5.4.8.3 1.6-.2 1.9-.9l-1.8-1.1-.9.7c-.9-.4-1.9-1.3-2.3-2.2l.7-.9-1-1.8c-.5.2-1.1.5-1.2 0.8Z" />
+    </svg>
+  );
+}
+
 export function MapPinIcon(p: IconProps) {
   return (
     <svg {...base} {...p}>
