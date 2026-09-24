@@ -30,8 +30,9 @@ export default function ConfidentialitePage() {
             {
               heading: "Données collectées",
               body: [
-                "Ce site ne comporte pas de formulaire de contact. La prise de contact se fait par téléphone ou par courriel, à votre initiative.",
-                "Lorsque vous m'écrivez, je reçois les données que vous choisissez de me transmettre : nom, coordonnées, et les informations concernant votre chien et votre situation.",
+                "Vous pouvez me contacter par téléphone, par courriel ou via le formulaire de contact du site, à votre initiative.",
+                "Lorsque vous m'écrivez, je reçois les données que vous choisissez de me transmettre : prénom, email ou numéro de téléphone, et les informations concernant votre chien et votre situation. Seuls le prénom, un moyen de vous joindre et votre message sont obligatoires.",
+                "Les données saisies dans le formulaire ne sont pas enregistrées sur le site : elles sont transmises par courriel à ma boîte de réception, puis conservées dans les conditions décrites ci-dessous.",
                 "Aucune donnée n'est collectée à votre insu en naviguant sur le site.",
               ],
             },
@@ -55,6 +56,7 @@ export default function ConfidentialitePage() {
               body: [
                 "Vos données ne sont ni vendues ni transmises à des tiers à des fins commerciales.",
                 "Elles peuvent être traitées par mes prestataires techniques (hébergeur du site, service de messagerie, outil de facturation), dans le seul cadre de leur mission et dans l'Union européenne ou sous un cadre de transfert conforme au RGPD.",
+                "Le formulaire de contact utilise le service d'envoi d'emails Resend, qui achemine votre message vers ma boîte de réception.",
               ],
             },
             {

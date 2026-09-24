@@ -50,7 +50,7 @@ export const site = {
     mediatorName: "CMAP — Centre de Médiation et d'Arbitrage de Paris",
     mediatorAddress: "39 avenue Franklin D. Roosevelt, 75008 Paris",
     mediatorUrl: "https://www.cmap.fr/saisir-cmap-mediation-consommation/",
-    lastUpdated: "15 septembre 2026",
+    lastUpdated: "24 septembre 2026",
   },
   google: {
     // Lien court de la fiche Google Business Profile (bouton « Partager »).
