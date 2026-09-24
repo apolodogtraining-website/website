@@ -137,9 +137,15 @@ export async function POST(req: Request) {
     });
     // Un déploiement mal configuré renvoie une page HTML avec un statut 200 :
     // seul un JSON `{ ok: true }` compte comme un envoi réussi.
-    const result = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+    const contentType = res.headers.get("content-type") ?? "type inconnu";
+    const result = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
     if (!res.ok || result?.ok !== true) {
-      console.error(`[contact] le script Google n'a pas confirmé l'envoi (HTTP ${res.status})`);
+      const reason = result
+        ? result.error === "forbidden"
+          ? "secret refusé : CONTACT_WEBHOOK_SECRET ≠ SECRET du script"
+          : `le script répond « ${result.error ?? "ok absent"} » (vérifier l'autorisation Gmail)`
+        : `réponse non JSON (${contentType}) : accès du déploiement pas réglé sur « Tout le monde », ou URL qui n'est pas celle en /exec`;
+      console.error(`[contact] envoi non confirmé (HTTP ${res.status}) — ${reason}`);
       return Response.json({ error: "send_failed" }, { status: 502 });
     }
   } catch (err) {
