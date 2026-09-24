@@ -584,7 +584,7 @@ export const partners: Partner[] = [
     tag: "Agility, hooper",
     location: "Cestas (33)",
     description:
-      "Éducatrice canine à Cestas spécialisée en agility, hoopers et école du chiot. Séances individuelles ou collectives pour tous niveaux, dans une approche bienveillante.",
+      "Éducatrice canine à Cestas spécialisée en agility, hoopers et soins coopératifs. Séances individuelles ou collectives pour tous niveaux, dans une approche bienveillante.",
     url: "https://activcanin.com/",
     logo: "/partners/activcanin.png",
   },
