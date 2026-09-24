@@ -93,7 +93,10 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
                   ✕
                 </button>
               </div>
-              <div className="min-h-0 overflow-y-auto overscroll-contain px-7 pb-7">
+              <div
+                data-lenis-prevent
+                className="min-h-0 overflow-y-auto overscroll-contain px-7 pb-7"
+              >
                 <p className="text-sm leading-relaxed text-ink-soft">
                   J&apos;interviens à domicile ou en extérieur dans les communes
                   suivantes :
