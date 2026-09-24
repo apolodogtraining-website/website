@@ -68,9 +68,13 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
               aria-modal="true"
               aria-labelledby={titleId}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md rounded-[2rem] bg-white p-7 shadow-brand"
+              // flex-col + max-h + overflow-hidden sur le panneau, puis
+              // min-h-0 + overflow-y-auto sur le seul bloc défilant : la
+              // croix (dans l'en-tête, hors de la zone qui scrolle) reste
+              // donc toujours atteignable, même avec les 28 communes.
+              className="flex w-full max-w-md max-h-[85vh] flex-col overflow-hidden rounded-[2rem] bg-white shadow-brand"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex shrink-0 items-start justify-between gap-4 px-7 pb-4 pt-7">
                 <div>
                   <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
                     Zone d&apos;intervention
@@ -89,21 +93,23 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
                   ✕
                 </button>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-                J&apos;interviens à domicile ou en extérieur dans les communes
-                suivantes :
-              </p>
-              <ul className="mt-5 flex flex-wrap gap-2">
-                {serviceAreas.map((city) => (
-                  <li
-                    key={city}
-                    className="flex items-center gap-1.5 rounded-full bg-brand-tint px-3.5 py-2 text-sm font-medium text-ink"
-                  >
-                    <MapPinIcon className="h-3.5 w-3.5 text-brand" />
-                    {city}
-                  </li>
-                ))}
-              </ul>
+              <div className="min-h-0 overflow-y-auto overscroll-contain px-7 pb-7">
+                <p className="text-sm leading-relaxed text-ink-soft">
+                  J&apos;interviens à domicile ou en extérieur dans les communes
+                  suivantes :
+                </p>
+                <ul className="mt-5 flex flex-wrap gap-2">
+                  {serviceAreas.map((city) => (
+                    <li
+                      key={city}
+                      className="flex items-center gap-1.5 rounded-full bg-brand-tint px-3.5 py-2 text-sm font-medium text-ink"
+                    >
+                      <MapPinIcon className="h-3.5 w-3.5 text-brand" />
+                      {city}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>,
           document.body
