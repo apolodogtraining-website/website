@@ -7,8 +7,9 @@ export async function POST(req: Request) {
     if (!sameOrigin(req)) return json({ error: "Requête refusée." }, 403);
     const session = await currentSession();
     if (!session) return json({ error: "Session expirée. Reconnectez-vous." }, 401);
-    const { type, ...payload } = await readBody(req);
-    const result = await runAction(await db(), session, String(type), payload);
+    // « action » et non « type » : les champs métier (ex. type de contrat) portent déjà ce nom.
+    const { action, ...payload } = await readBody(req);
+    const result = await runAction(await db(), session, String(action), payload);
     return json({ result, data: await dataFor(session) });
   } catch (e) {
     return handleError(e);

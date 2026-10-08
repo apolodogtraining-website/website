@@ -125,7 +125,7 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
   /** Appelle une action serveur ; en cas d'échec, affiche l'erreur et renvoie undefined. */
   const call = useCallback(async <T,>(type: string, payload: Record<string, unknown> = {}): Promise<T | undefined> => {
     try {
-      const { ok, status, payload: p } = await post("/api/portal/action", { type, ...payload });
+      const { ok, status, payload: p } = await post("/api/portal/action", { ...payload, action: type });
       if (!ok) {
         if (status === 401) {
           setSession(null);
