@@ -20,6 +20,8 @@ const LEGACY_PATHS: Record<string, string> = {
 };
 
 const nextConfig: NextConfig = {
+  // Client libSQL/Turso : binaire natif, à ne pas empaqueter.
+  serverExternalPackages: ["@libsql/client", "libsql"],
   // Formats modernes : ~40 % de poids en moins sur les photos servies.
   images: {
     formats: ["image/avif", "image/webp"],
