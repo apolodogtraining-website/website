@@ -1,21 +1,50 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { usePortal } from "@/lib/portal/store";
 import { site } from "@/lib/site";
 import { btn, Field, inputCls } from "@/components/portal/ui";
 
+const googleErrors: Record<string, string> = {
+  google_denied: "Ce compte Google n'est associé à aucun accès au portail. Utilisez l'adresse e-mail de votre fiche partenaire.",
+  google_cancel: "Connexion Google annulée.",
+  google_state: "La connexion Google a expiré. Réessayez.",
+  google_token: "La connexion Google a échoué. Réessayez dans un instant.",
+  google_off: "La connexion Google n'est pas configurée sur ce site.",
+};
+
 const home = (role: "admin" | "partner") => (role === "admin" ? "/portail/admin" : "/portail/partenaire");
 
 export default function PortalLogin() {
+  // useSearchParams impose une frontière Suspense pour le rendu statique.
+  return (
+    <Suspense>
+      <LoginView />
+    </Suspense>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
+      <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z" />
+      <path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1A12 12 0 0 0 12 24z" />
+      <path fill="#FBBC05" d="M5.4 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.4a12 12 0 0 0 0 10.8l4-3.1z" />
+      <path fill="#EA4335" d="M12 4.800c1.800 0 3.300.6 4.600 1.800l3.400-3.400A12 12 0 0 0 1.400 6.600l4 3.100C6.300 6.900 8.900 4.800 12 4.800z" />
+    </svg>
+  );
+}
+
+function LoginView() {
   const { ready, session, login } = usePortal();
+  const urlError = useSearchParams().get("error");
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(urlError ? (googleErrors[urlError] ?? "Connexion impossible.") : "");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -31,8 +60,14 @@ export default function PortalLogin() {
         <div className="rounded-3xl border border-brand-light bg-white p-6 shadow-soft sm:p-8">
           <h1 className="text-2xl font-bold text-ink">Portail partenaires</h1>
           <p className="mt-1 text-sm text-ink-soft">Connectez-vous pour suivre vos contrats et votre facturation.</p>
+          <a href="/api/portal/google/start" className={`${btn.secondary} mt-6 w-full gap-3 py-3`}>
+            <GoogleIcon /> Se connecter avec Google
+          </a>
+          <div className="my-5 flex items-center gap-3 text-xs text-ink-soft" aria-hidden>
+            <span className="h-px flex-1 bg-brand-light" /> ou avec un mot de passe (partenaires) <span className="h-px flex-1 bg-brand-light" />
+          </div>
           <form
-            className="mt-6 space-y-4"
+            className="space-y-4"
             onSubmit={async (e) => {
               e.preventDefault();
               setBusy(true);
@@ -75,16 +110,10 @@ export default function PortalLogin() {
             <p className="font-semibold text-brand-darker">Environnement de développement</p>
             <p className="mt-1 text-ink-soft">Données de démonstration, base locale. Comptes de test :</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                className={btn.secondary}
-                onClick={() => {
-                  setEmail("admin@apolodogtraining.com");
-                  setPassword("admin-demo");
-                }}
-              >
+              {/* L'administrateur n'a pas de mot de passe : en local, ce raccourci remplace Google. */}
+              <a href="/api/portal/dev-admin" className={btn.secondary}>
                 Administrateur
-              </button>
+              </a>
               <button
                 type="button"
                 className={btn.secondary}

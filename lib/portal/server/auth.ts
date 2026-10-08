@@ -12,13 +12,18 @@ function secret() {
   return "dev-only-secret-do-not-use-in-production-0000";
 }
 
-export function adminCredentials() {
-  const email = process.env.PORTAL_ADMIN_EMAIL;
-  const password = process.env.PORTAL_ADMIN_PASSWORD;
-  if (email && password) return { email: email.toLowerCase(), password };
-  if (process.env.NODE_ENV === "production") return null; // pas d'admin par défaut en production
-  return { email: "admin@apolodogtraining.com", password: "admin-demo" };
-}
+/** Adresses Google autorisées comme administrateur (PORTAL_ADMIN_EMAIL, séparées par des virgules). */
+export const adminEmails = () =>
+  (process.env.PORTAL_ADMIN_EMAIL ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+export const googleConfig = () => {
+  const id = process.env.GOOGLE_CLIENT_ID;
+  const secret = process.env.GOOGLE_CLIENT_SECRET;
+  return id && secret ? { id, secret } : null;
+};
 
 const sign = (payload: string) => createHmac("sha256", secret()).update(payload).digest("base64url");
 
@@ -44,6 +49,30 @@ export async function verifyPassword(pw: string, stored: string) {
 }
 
 export const tempPassword = () => `Apolo-${randomBytes(6).toString("base64url")}`;
+
+/* ---- cookie temporaire signé pour le flux OAuth (state + PKCE) ---- */
+const OAUTH_COOKIE = "apolo_oauth";
+
+export async function setOauthCookie(state: string, verifier: string) {
+  const payload = `${state}.${verifier}`;
+  (await cookies()).set(OAUTH_COOKIE, `${payload}.${sign(payload)}`, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax", // doit accompagner le retour (navigation GET) depuis Google
+    path: "/api/portal/google",
+    maxAge: 600,
+  });
+}
+
+/** Lit puis supprime le cookie OAuth : à usage unique. */
+export async function takeOauthCookie(): Promise<{ state: string; verifier: string } | null> {
+  const jar = await cookies();
+  const raw = jar.get(OAUTH_COOKIE)?.value;
+  jar.delete({ name: OAUTH_COOKIE, path: "/api/portal/google" });
+  const [state, verifier, sig] = raw?.split(".") ?? [];
+  if (!state || !verifier || !sig || !safeEqual(sig, sign(`${state}.${verifier}`))) return null;
+  return { state, verifier };
+}
 
 /* ---- cookie de session signé (HttpOnly) ---- */
 export async function startSession(session: PortalSession) {

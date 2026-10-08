@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import Turnstile, { turnstileSiteKey } from "@/components/portal/Turnstile";
 import { btn, Card, Field, inputCls } from "@/components/portal/ui";
 import { CLIENT_CONTRACT_VERSION, clientContractArticles } from "@/lib/portal/contract-text";
 import { toLocalInput } from "@/lib/portal/format";
@@ -29,6 +30,7 @@ export default function ClientSignup() {
   const [accepted, setAccepted] = useState(false);
   const [signature, setSignature] = useState("");
   const [website, setWebsite] = useState(""); // champ piège anti-robots
+  const [captcha, setCaptcha] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const set = <K extends keyof RequestInput>(k: K, v: RequestInput[K]) => setF((x) => ({ ...x, [k]: v }));
@@ -142,9 +144,13 @@ export default function ClientSignup() {
                   e.preventDefault();
                   setBusy(true);
                   setError("");
-                  const err = await submitClientRequest(f, signature.trim(), website);
+                  const err = await submitClientRequest(f, signature.trim(), website, captcha);
                   setBusy(false);
-                  if (err) return setError(err);
+                  if (err) {
+                    setError(err);
+                    setCaptcha(""); // un jeton ne sert qu'une fois : le widget est à refaire
+                    return;
+                  }
                   setStep("done");
                   window.scrollTo({ top: 0 });
                 }}
@@ -162,12 +168,19 @@ export default function ClientSignup() {
                     <input tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
                   </label>
                 </div>
+                {turnstileSiteKey ? (
+                  <Turnstile key={error} onToken={setCaptcha} />
+                ) : (
+                  <p role="alert" className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900">
+                    Les inscriptions sont momentanément indisponibles. Appelez-nous au {site.phone}.
+                  </p>
+                )}
                 {error && (
                   <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
                     {error}
                   </p>
                 )}
-                <button type="submit" className={btn.primary} disabled={!accepted || !nameOk || busy}>
+                <button type="submit" className={btn.primary} disabled={!accepted || !nameOk || busy || !captcha}>
                   Signer et envoyer
                 </button>
               </form>

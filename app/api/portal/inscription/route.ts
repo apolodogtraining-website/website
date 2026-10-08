@@ -3,6 +3,7 @@ import { toLocalInput, uid } from "@/lib/portal/format";
 import { ActionError } from "@/lib/portal/server/actions";
 import { db } from "@/lib/portal/server/db";
 import { handleError, json, readBody, sameOrigin } from "@/lib/portal/server/http";
+import { verifyTurnstile } from "@/lib/portal/server/turnstile";
 import { services } from "@/lib/site";
 
 const str = (v: unknown, label: string, max: number, required = true) => {
@@ -27,6 +28,9 @@ export async function POST(req: Request) {
     const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3600_000);
     if (recent.length >= 5) return json({ error: "Trop de demandes. Réessayez plus tard." }, 429);
     hits.set(ip, [...recent, now]);
+
+    // Défi anti-robot vérifié côté serveur avant tout traitement.
+    await verifyTurnstile(b.turnstileToken, req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null);
 
     const name = str(b.name, "Le nom", 120);
     const email = str(b.email, "L'e-mail", 200).toLowerCase();

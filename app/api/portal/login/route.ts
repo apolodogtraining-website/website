@@ -1,4 +1,4 @@
-import { adminCredentials, hashPassword, safeEqual, startSession, verifyPassword } from "@/lib/portal/server/auth";
+import { hashPassword, startSession, verifyPassword } from "@/lib/portal/server/auth";
 import { db } from "@/lib/portal/server/db";
 import { dataFor, handleError, json, readBody, sameOrigin } from "@/lib/portal/server/http";
 import type { PortalSession } from "@/lib/portal/types";
@@ -24,17 +24,13 @@ export async function POST(req: Request) {
     const rec = attempts.get(key);
     if (rec && rec.until > now && rec.n >= MAX) return json({ error: "Trop de tentatives. Réessayez dans quelques minutes." }, 429);
 
+    // Mot de passe : partenaires uniquement. L'administrateur passe exclusivement par Google.
     let session: PortalSession | null = null;
-    const admin = adminCredentials();
-    if (admin && email === admin.email && safeEqual(password, admin.password)) {
-      session = { role: "admin" };
-    } else {
-      const client = await db();
-      const res = await client.execute({ sql: "SELECT id, password_hash, active FROM partners WHERE email = ? AND is_self = 0", args: [email] });
-      const row = res.rows[0];
-      const ok = await verifyPassword(password, row ? String(row.password_hash) : await (dummy ??= hashPassword("dummy")));
-      if (row && ok && Number(row.active) === 1) session = { role: "partner", partnerId: String(row.id) };
-    }
+    const client = await db();
+    const res = await client.execute({ sql: "SELECT id, password_hash, active FROM partners WHERE email = ? AND is_self = 0", args: [email] });
+    const row = res.rows[0];
+    const ok = await verifyPassword(password, row ? String(row.password_hash) : await (dummy ??= hashPassword("dummy")));
+    if (row && ok && Number(row.active) === 1) session = { role: "partner", partnerId: String(row.id) };
 
     if (!session) {
       attempts.set(key, { n: (rec && rec.until > now ? rec.n : 0) + 1, until: now + WINDOW });

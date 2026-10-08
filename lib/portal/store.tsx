@@ -197,9 +197,14 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
 }
 
 /** Inscription publique d'un client (sans session). Renvoie un message d'erreur, ou null si tout va bien. */
-export async function submitClientRequest(input: RequestInput, signedBy: string, website: string): Promise<string | null> {
+export async function submitClientRequest(
+  input: RequestInput,
+  signedBy: string,
+  website: string,
+  turnstileToken: string,
+): Promise<string | null> {
   try {
-    const { ok, payload } = await post("/api/portal/inscription", { ...input, signedBy, website });
+    const { ok, payload } = await post("/api/portal/inscription", { ...input, signedBy, website, turnstileToken });
     return ok ? null : typeof payload.error === "string" ? payload.error : "Envoi impossible.";
   } catch {
     return "Impossible de joindre le serveur.";
