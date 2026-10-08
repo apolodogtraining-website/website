@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       session = { role: "admin" };
     } else {
       const client = await db();
-      const res = await client.execute({ sql: "SELECT id, password_hash, active FROM partners WHERE email = ?", args: [email] });
+      const res = await client.execute({ sql: "SELECT id, password_hash, active FROM partners WHERE email = ? AND is_self = 0", args: [email] });
       const row = res.rows[0];
       const ok = await verifyPassword(password, row ? String(row.password_hash) : await (dummy ??= hashPassword("dummy")));
       if (row && ok && Number(row.active) === 1) session = { role: "partner", partnerId: String(row.id) };

@@ -32,13 +32,13 @@ export default function InvoiceTable({ invoices, admin }: { invoices: Invoice[];
               </Link>
               <div className="text-xs text-ink-soft">émise le {fmtDate(inv.issuedAt)}</div>
             </td>
-            {admin && <td>{partner?.company ?? "—"}</td>}
+            {admin && <td>{partner?.isSelf ? "Moi-même" : (partner?.company ?? "—")}</td>}
             <td>{contract?.clientName ?? "—"}</td>
             <td className="whitespace-nowrap">{money(inv.gross)}</td>
             <td className="whitespace-nowrap text-ink-soft">{money(inv.commission)}</td>
             <td className="whitespace-nowrap font-semibold">{money(inv.net)}</td>
             <td>
-              <Badge tone={statusTone[st]}>{invoiceStatusLabel[st]}</Badge>
+              <Badge tone={statusTone[st]}>{partner?.isSelf && st === "settled" ? "Payée" : invoiceStatusLabel[st]}</Badge>
               <div className="mt-1 text-xs text-ink-soft">
                 {st === "settled" && inv.payoutAt
                   ? `réglé le ${fmtDate(inv.payoutAt)}`

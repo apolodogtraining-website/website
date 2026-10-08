@@ -14,6 +14,7 @@ const toPartner = (r: Row): Partner => ({
   specialties: s(r.specialties),
   commissionRate: Number(r.commission_rate),
   active: Number(r.active) === 1,
+  isSelf: Number(r.is_self) === 1,
   createdAt: s(r.created_at),
   contractSignedAt: sn(r.contract_signed_at),
   contractSignedBy: sn(r.contract_signed_by),

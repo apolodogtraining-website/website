@@ -21,7 +21,10 @@ export default function ContractForm({
   onSaved?: (id: string) => void;
 }) {
   const { partners, saveContract } = usePortal();
-  const eligible = partners.filter((p) => p.active || p.id === contract?.partnerId);
+  // « Moi-même » en tête de liste, puis les partenaires actifs.
+  const eligible = partners
+    .filter((p) => p.active || p.id === contract?.partnerId)
+    .sort((a, b) => Number(b.isSelf) - Number(a.isSelf));
   const initialPartner = contract?.partnerId ?? presetPartnerId ?? eligible[0]?.id ?? "";
   const defaultStart = (() => {
     const d = new Date();
@@ -47,6 +50,7 @@ export default function ContractForm({
   });
   const set = <K extends keyof ContractInput>(k: K, v: ContractInput[K]) => setF((x) => ({ ...x, [k]: v }));
   const recurring = f.type === "recurring";
+  const self = partners.find((p) => p.id === f.partnerId)?.isSelf ?? false;
 
   return (
     <Modal title={contract ? "Modifier le contrat" : "Nouveau contrat client"} onClose={onClose} wide>
@@ -74,12 +78,13 @@ export default function ContractForm({
                 onChange={(e) => {
                   set("partnerId", e.target.value);
                   // Le taux proposé suit le partenaire choisi (modifiable ensuite).
-                  if (!contract) set("commissionRate", partners.find((p) => p.id === e.target.value)?.commissionRate ?? 15);
+                  const chosen = partners.find((p) => p.id === e.target.value);
+                  if (!contract || chosen?.isSelf) set("commissionRate", chosen?.commissionRate ?? 15);
                 }}
               >
                 {eligible.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.company}
+                    {p.isSelf ? "Moi-même (aucune commission)" : p.company}
                   </option>
                 ))}
               </select>
@@ -113,8 +118,8 @@ export default function ContractForm({
           <Field label="Prix d'une séance (€)">
             {(id) => <input id={id} type="number" min={0} step={0.5} required className={inputCls} value={f.price} onChange={(e) => set("price", Number(e.target.value))} />}
           </Field>
-          <Field label="Commission (%)" hint="Figée sur ce contrat.">
-            {(id) => <input id={id} type="number" min={0} max={100} step={0.5} required className={inputCls} value={f.commissionRate} onChange={(e) => set("commissionRate", Number(e.target.value))} />}
+          <Field label="Commission (%)" hint={self ? "Aucune : vous réalisez la prestation." : "Figée sur ce contrat."}>
+            {(id) => <input id={id} type="number" min={0} max={100} step={0.5} required readOnly={self} className={`${inputCls} ${self ? "bg-brand-tint" : ""}`} value={f.commissionRate} onChange={(e) => set("commissionRate", Number(e.target.value))} />}
           </Field>
         </div>
         {!contract && (

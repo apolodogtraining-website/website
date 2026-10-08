@@ -3,6 +3,7 @@ import { CONTRACT_VERSION } from "../contract-text";
 import { addDaysISO, billableSessions, generateSessions, splitAmount, todayISO, toLocalInput, uid } from "../format";
 import type { Contract, Frequency, PortalSession, Session } from "../types";
 import { hashPassword, tempPassword } from "./auth";
+import { SELF_ID } from "./db";
 import { snapshot } from "./repo";
 
 export class ActionError extends Error {
@@ -118,6 +119,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const id = typeof b.id === "string" ? b.id : null;
       const dup = await one(client, "SELECT id FROM partners WHERE email = ?", [f.email]);
       if (dup && dup.id !== id) throw new ActionError("Un partenaire utilise déjà cet e-mail.");
+      if (id === SELF_ID) throw new ActionError("Le partenaire interne n'est pas modifiable.");
       if (id) {
         await requirePartnerRow(client, id);
         await client.execute({
@@ -136,6 +138,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
     }
     case "deletePartner": {
       const id = text(b.id, "Le partenaire", { max: 80 });
+      if (id === SELF_ID) throw new ActionError("Le partenaire interne ne peut pas être supprimé.");
       await client.batch(
         [
           { sql: "DELETE FROM sessions WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
@@ -150,6 +153,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
     }
     case "resetPartnerPassword": {
       const id = text(b.id, "Le partenaire", { max: 80 });
+      if (id === SELF_ID) throw new ActionError("Le partenaire interne n'a pas de compte.");
       await requirePartnerRow(client, id);
       const password = tempPassword();
       await client.execute({ sql: "UPDATE partners SET password_hash = ? WHERE id = ?", args: [await hashPassword(password), id] });
@@ -175,6 +179,8 @@ export async function runAction(client: Client, session: PortalSession, type: st
     case "saveContract": {
       const f = contractFields(b);
       await requirePartnerRow(client, f.partnerId);
+      // Prestation réalisée en direct : aucune commission à prélever.
+      if (f.partnerId === SELF_ID) f.commissionRate = 0;
       const id = typeof b.id === "string" ? b.id : null;
       if (id) {
         await loadContract(client, id);
@@ -264,7 +270,10 @@ export async function runAction(client: Client, session: PortalSession, type: st
       return { id };
     }
     case "markClientPaid": {
-      await client.execute({ sql: "UPDATE invoices SET client_paid_at = COALESCE(client_paid_at, ?) WHERE id = ?", args: [todayISO(), text(b.id, "La facture", { max: 80 })] });
+      const id = text(b.id, "La facture", { max: 80 });
+      await client.execute({ sql: "UPDATE invoices SET client_paid_at = COALESCE(client_paid_at, ?) WHERE id = ?", args: [todayISO(), id] });
+      // Facture « Moi-même » : il n'y a personne à reverser, elle est soldée à l'encaissement.
+      await client.execute({ sql: "UPDATE invoices SET payout_at = COALESCE(payout_at, ?) WHERE id = ? AND partner_id = ?", args: [todayISO(), id, SELF_ID] });
       return null;
     }
     case "markPayout": {

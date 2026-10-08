@@ -40,24 +40,28 @@ export default function AdminPartners() {
                     <Link href={`/portail/admin/partenaires/${p.id}`} className="font-semibold text-brand-dark hover:underline">
                       {p.company}
                     </Link>
-                    <div className="text-xs text-ink-soft">{p.specialties}</div>
+                    <div className="text-xs text-ink-soft">{p.isSelf ? "Vous réalisez la prestation" : p.specialties}</div>
                   </td>
                   <td>
                     {p.contact}
-                    <div className="text-xs text-ink-soft">{p.email}</div>
+                    {!p.isSelf && <div className="text-xs text-ink-soft">{p.email}</div>}
                   </td>
-                  <td>{p.commissionRate} %</td>
-                  <td>{p.contractSignedAt ? <Badge tone="green">Signé</Badge> : <Badge tone="amber">En attente</Badge>}</td>
+                  <td>{p.isSelf ? "Aucune" : `${p.commissionRate} %`}</td>
+                  <td>{p.isSelf ? <Badge tone="blue">Non requis</Badge> : p.contractSignedAt ? <Badge tone="green">Signé</Badge> : <Badge tone="amber">En attente</Badge>}</td>
                   <td>{o.contracts.length}</td>
                   <td className="whitespace-nowrap">{money(o.summary.billed)}</td>
-                  <td>{p.active ? <Badge tone="green">Actif</Badge> : <Badge tone="gray">Suspendu</Badge>}</td>
+                  <td>{p.isSelf ? <Badge tone="blue">Interne</Badge> : p.active ? <Badge tone="green">Actif</Badge> : <Badge tone="gray">Suspendu</Badge>}</td>
                   <td className="whitespace-nowrap text-right">
+                    {!p.isSelf && (
+                      <>
                     <button type="button" aria-label={`Modifier ${p.company}`} className="rounded-full p-2 text-ink-soft hover:bg-brand-tint" onClick={() => setEditing(p)}>
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button type="button" aria-label={`Supprimer ${p.company}`} className="rounded-full p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(p)}>
                       <Trash2 className="h-4 w-4" />
                     </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               );

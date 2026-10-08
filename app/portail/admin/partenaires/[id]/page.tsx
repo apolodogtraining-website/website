@@ -40,8 +40,9 @@ export default function AdminPartnerDetail({ params }: { params: Promise<{ id: s
       </Link>
       <PageHeader
         title={partner.company}
-        subtitle={`${partner.contact} · ${partner.email}${partner.phone ? ` · ${partner.phone}` : ""}`}
+        subtitle={partner.isSelf ? "Partenaire interne" : `${partner.contact} · ${partner.email}${partner.phone ? ` · ${partner.phone}` : ""}`}
         action={
+          partner.isSelf ? null : (
           <div className="flex flex-wrap gap-2">
             <button type="button" className={btn.secondary} onClick={async () => setNewPassword((await resetPartnerPassword(partner.id)) ?? null)}>
               <KeyRound className="h-4 w-4" /> Réinitialiser le mot de passe
@@ -50,6 +51,7 @@ export default function AdminPartnerDetail({ params }: { params: Promise<{ id: s
               <Pencil className="h-4 w-4" /> Modifier
             </button>
           </div>
+          )
         }
       />
 
@@ -62,7 +64,11 @@ export default function AdminPartnerDetail({ params }: { params: Promise<{ id: s
 
       <Card className="mt-4">
         <h2 className="mb-3 text-base font-bold text-ink">Contrat partenaire</h2>
-        {partner.contractSignedAt ? (
+        {partner.isSelf ? (
+          <p className="text-sm text-ink-soft">
+            <Badge tone="blue">Non requis</Badge> Vous réalisez ces prestations en direct : aucune commission, aucun contrat partenaire ni compte de connexion.
+          </p>
+        ) : partner.contractSignedAt ? (
           <p className="text-sm text-ink-soft">
             <Badge tone="green">Signé</Badge> par <strong className="text-ink">{partner.contractSignedBy}</strong> le{" "}
             {fmtDateTime(partner.contractSignedAt)} (version {partner.contractVersion}).

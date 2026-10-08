@@ -84,8 +84,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
           </div>
           <div>
             <h2 className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-soft">Prestation réalisée par</h2>
-            <p className="font-semibold text-ink">{partner?.company}</p>
-            <p className="text-ink-soft">SIRET {partner?.siret}</p>
+            <p className="font-semibold text-ink">{partner?.isSelf ? site.name : partner?.company}</p>
+            <p className="text-ink-soft">SIRET {partner?.isSelf ? site.siret : partner?.siret}</p>
           </div>
         </section>
 

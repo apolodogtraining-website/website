@@ -86,6 +86,19 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS idx_invoices_partner ON invoices(partner_id)`,
 ];
 
+/** Partenaire interne « Moi-même » : toujours présent, sans commission, sans connexion possible. */
+export const SELF_ID = "self";
+
+async function ensureSelfPartner(client: Client) {
+  const { site } = await import("@/lib/site");
+  await client.execute({
+    sql: `INSERT OR IGNORE INTO partners
+      (id, company, contact, email, phone, siret, specialties, commission_rate, active, is_self, password_hash, created_at, contract_signed_at, contract_signed_by, contract_version)
+      VALUES (?,?,?,?,?,?,?,0,1,1,'!',?,?,?,'interne')`,
+    args: [SELF_ID, `Moi-même (${site.name})`, site.legal.publisherFullName, "interne@portail.invalid", site.phone, site.siret, "Prestations réalisées en direct", "2026-01-01", "2026-01-01T00:00", site.legal.publisherFullName],
+  });
+}
+
 type Cache = { client?: Client; ready?: Promise<Client> };
 const g = globalThis as unknown as { __portalDb?: Cache };
 const cache: Cache = (g.__portalDb ??= {});
@@ -99,6 +112,11 @@ export function db(): Promise<Client> {
     cache.client = client;
     cache.ready = (async () => {
       await client.batch(SCHEMA, "write");
+      // Migration : colonne ajoutée après la première version du schéma (les bases existantes ne l'ont pas).
+      await client.execute("ALTER TABLE partners ADD COLUMN is_self INTEGER NOT NULL DEFAULT 0").catch((e: Error) => {
+        if (!/duplicate column/i.test(e.message)) throw e;
+      });
+      await ensureSelfPartner(client);
       const { seedDemoIfEmpty } = await import("./seed");
       await seedDemoIfEmpty(client);
       return client;

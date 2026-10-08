@@ -11,6 +11,8 @@ export type Partner = {
   /** Commission prélevée par la plateforme, en % du montant facturé au client. */
   commissionRate: number;
   active: boolean;
+  /** Partenaire interne « Moi-même » : le gérant réalise la prestation, sans commission ni compte. */
+  isSelf: boolean;
   createdAt: string;
   contractSignedAt: string | null;
   contractSignedBy: string | null;

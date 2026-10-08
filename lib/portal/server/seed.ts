@@ -8,7 +8,7 @@ import { hashPassword } from "./auth";
  */
 export async function seedDemoIfEmpty(client: Client) {
   if (process.env.NODE_ENV === "production" && process.env.PORTAL_SEED_DEMO !== "1") return;
-  const count = await client.execute("SELECT COUNT(*) AS n FROM partners");
+  const count = await client.execute("SELECT COUNT(*) AS n FROM partners WHERE is_self = 0");
   if (Number(count.rows[0].n) > 0) return;
   const reqCount = await client.execute("SELECT COUNT(*) AS n FROM requests");
   if (Number(reqCount.rows[0].n) > 0) return;
@@ -17,7 +17,7 @@ export async function seedDemoIfEmpty(client: Client) {
   const hash = await hashPassword(DEMO_PARTNER_PASSWORD);
   const stmts = [
     ...d.partners.map((p) => ({
-      sql: "INSERT INTO partners VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      sql: "INSERT INTO partners (id, company, contact, email, phone, siret, specialties, commission_rate, active, password_hash, created_at, contract_signed_at, contract_signed_by, contract_version) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
       args: [p.id, p.company, p.contact, p.email, p.phone, p.siret, p.specialties, p.commissionRate, p.active ? 1 : 0, hash, p.createdAt, p.contractSignedAt, p.contractSignedBy, p.contractVersion],
     })),
     ...d.contracts.map((c) => ({

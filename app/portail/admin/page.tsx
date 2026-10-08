@@ -12,7 +12,7 @@ export default function AdminHome() {
   const total = billingSummary(contracts, invoices);
   const activeContracts = contracts.filter((c) => c.sessions.some((s) => s.status === "planned"));
   const pendingRequests = requests.filter((r) => r.status === "pending");
-  const unsigned = partners.filter((p) => p.active && !p.contractSignedAt);
+  const unsigned = partners.filter((p) => p.active && !p.isSelf && !p.contractSignedAt);
 
   const upcoming = contracts
     .map((c) => ({ c, next: nextSession(c) }))
@@ -25,7 +25,7 @@ export default function AdminHome() {
       <PageHeader title="Vue d'ensemble" subtitle="Partenaires, contrats et état de la facturation." />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Partenaires actifs" value={String(partners.filter((p) => p.active).length)} hint={`${partners.length} au total`} />
+        <Stat label="Partenaires actifs" value={String(partners.filter((p) => p.active && !p.isSelf).length)} hint={`${partners.filter((p) => !p.isSelf).length} au total`} />
         <Stat label="Contrats en cours" value={String(activeContracts.length)} hint={`${contracts.length} au total`} />
         <Stat label="Commissions" value={money(total.commission)} hint={`sur ${money(total.billed)} facturés`} />
         <Stat label="Impayés clients" value={money(total.outstanding)} hint={total.lateCount ? `${total.lateCount} en retard` : "aucun retard"} tone={total.lateCount ? "red" : undefined} />
@@ -89,7 +89,7 @@ export default function AdminHome() {
                   </Link>
                   {!p.active && <span className="ml-2 text-xs text-ink-soft">(suspendu)</span>}
                 </td>
-                <td>{p.contractSignedAt ? <Badge tone="green">Signé</Badge> : <Badge tone="amber">En attente</Badge>}</td>
+                <td>{p.isSelf ? <Badge tone="blue">Non requis</Badge> : p.contractSignedAt ? <Badge tone="green">Signé</Badge> : <Badge tone="amber">En attente</Badge>}</td>
                 <td>{o.contracts.length}</td>
                 <td className="whitespace-nowrap">{money(o.summary.billed)}</td>
                 <td className="whitespace-nowrap">{money(o.summary.toPayOut)}</td>
