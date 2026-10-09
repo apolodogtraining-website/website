@@ -30,6 +30,8 @@ export type ContractInput = {
   /** Création uniquement : première séance et nombre de séances prévues. */
   firstDate: string;
   count: number;
+  /** Séances dont la date est passée : enregistrées comme réalisées (reprise d'un ancien client). */
+  markPastDone?: boolean;
   /** Inscription client à transformer en contrat (marquée « traitée » côté serveur). */
   requestId?: string;
 };

@@ -198,6 +198,10 @@ export async function runAction(client: Client, session: PortalSession, type: st
         f.frequency as Frequency | null,
         Math.round(num(b.count ?? 1, "Le nombre de séances", 1, 52)),
       );
+      if (b.markPastDone === true) {
+        const now = toLocalInput(new Date());
+        for (const x of sessions) if (x.date <= now) x.status = "done";
+      }
       const newId = uid("c");
       const stmts: InStatement[] = [
         {

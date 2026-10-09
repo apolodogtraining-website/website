@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { Trash2, UserPlus } from "lucide-react";
 import ContractForm from "@/components/portal/ContractForm";
 import PortalShell from "@/components/portal/PortalShell";
 import { Badge, btn, Card, ConfirmModal, Empty, PageHeader } from "@/components/portal/ui";
@@ -21,6 +21,7 @@ export default function AdminRequests() {
   const [converting, setConverting] = useState<ClientRequest | null>(null);
   const [deleting, setDeleting] = useState<ClientRequest | null>(null);
   const [copied, setCopied] = useState(false);
+  const [addingExisting, setAddingExisting] = useState(false);
 
   const sorted = [...requests].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
@@ -30,6 +31,10 @@ export default function AdminRequests() {
         title="Inscriptions clients"
         subtitle="Dossiers créés et contrats signés par les clients. Affectez-les à un partenaire pour créer le contrat."
         action={
+          <div className="flex flex-wrap gap-2">
+          <button type="button" className={btn.primary} onClick={() => setAddingExisting(true)} disabled={!partners.some((p) => p.active)}>
+            <UserPlus className="h-4 w-4" /> Ajouter un client existant
+          </button>
           <button
             type="button"
             className={btn.secondary}
@@ -39,6 +44,7 @@ export default function AdminRequests() {
           >
             {copied ? "Lien copié" : "Copier le lien d'inscription"}
           </button>
+          </div>
         }
       />
       {sorted.length === 0 ? (
@@ -92,6 +98,7 @@ export default function AdminRequests() {
         </div>
       )}
       {converting && <ContractForm request={converting} onClose={() => setConverting(null)} />}
+      {addingExisting && <ContractForm existingClient onClose={() => setAddingExisting(false)} />}
       {deleting && (
         <ConfirmModal
           title="Supprimer cette inscription ?"

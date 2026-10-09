@@ -65,7 +65,9 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
             <Row k="Téléphone">{contract.clientPhone || "—"}</Row>
             <Row k="E-mail">{contract.clientEmail || "—"}</Row>
             {contract.notes && <Row k="Notes">{contract.notes}</Row>}
-            {contract.clientSignedAt && <Row k="Contrat client">Signé par {contract.clientSignedBy}, le {fmtDateTime(contract.clientSignedAt)}</Row>}
+            <Row k="Contrat client">
+              {contract.clientSignedAt ? `Signé par ${contract.clientSignedBy}, le ${fmtDateTime(contract.clientSignedAt)}` : <Badge tone="gray">Non signé en ligne (client existant)</Badge>}
+            </Row>
           </dl>
         </Card>
         <Card>
