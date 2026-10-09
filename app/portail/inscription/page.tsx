@@ -48,7 +48,7 @@ export default function ClientSignup() {
             <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" aria-hidden />
             <h1 className="mt-3 text-2xl font-bold text-ink">Merci, votre contrat est signé</h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-ink-soft">
-              Nous revenons vers vous très vite à l&apos;adresse {f.email} pour confirmer le partenaire et la date du premier rendez-vous.
+              Un exemplaire de votre contrat vous est envoyé par e-mail à {f.email}. Nous revenons vers vous très vite pour confirmer le partenaire et la date du premier rendez-vous.
             </p>
             <Link href="/" className={`${btn.primary} mt-6`}>
               Retour au site

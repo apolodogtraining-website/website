@@ -1,6 +1,8 @@
+import { after } from "next/server";
 import { CLIENT_CONTRACT_VERSION } from "@/lib/portal/contract-text";
 import { toLocalInput, uid } from "@/lib/portal/format";
 import { ActionError } from "@/lib/portal/server/actions";
+import { deliverRequestCopy } from "@/lib/portal/server/copies";
 import { db } from "@/lib/portal/server/db";
 import { handleError, json, readBody, sameOrigin } from "@/lib/portal/server/http";
 import { verifyTurnstile } from "@/lib/portal/server/turnstile";
@@ -48,10 +50,13 @@ export async function POST(req: Request) {
     if (Number(pending.rows[0].n) >= 500) throw new ActionError("Les inscriptions sont momentanément fermées.", 503);
 
     const signedAt = toLocalInput(new Date());
+    const requestId = uid("r");
     await client.execute({
-      sql: "INSERT INTO requests VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-      args: [uid("r"), signedAt, name, email, str(b.phone, "Le téléphone", 40), str(b.address, "L'adresse", 300), str(b.dogName, "Le nom du chien", 80), str(b.dogBreed, "La race", 120, false), service, type, preferred, str(b.notes, "Les précisions", 1000, false), signedAt, name, CLIENT_CONTRACT_VERSION, "pending", null],
+      sql: "INSERT INTO requests (id, created_at, name, email, phone, address, dog_name, dog_breed, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      args: [requestId, signedAt, name, email, str(b.phone, "Le téléphone", 40), str(b.address, "L'adresse", 300), str(b.dogName, "Le nom du chien", 80), str(b.dogBreed, "La race", 120, false), service, type, preferred, str(b.notes, "Les précisions", 1000, false), signedAt, name, CLIENT_CONTRACT_VERSION, "pending", null],
     });
+    // Exemplaire du contrat par e-mail, après la réponse : un échec n'annule pas l'inscription (l'admin peut renvoyer).
+    after(() => deliverRequestCopy(client, requestId));
     return json({ ok: true });
   } catch (e) {
     return handleError(e);

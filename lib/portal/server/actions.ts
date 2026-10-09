@@ -2,7 +2,9 @@ import type { Client, InStatement } from "@libsql/client";
 import { CONTRACT_VERSION } from "../contract-text";
 import { addDaysISO, billableSessions, generateSessions, splitAmount, todayISO, toLocalInput, uid } from "../format";
 import type { Contract, Frequency, PortalSession, Session } from "../types";
+import { after } from "next/server";
 import { hashPassword, tempPassword } from "./auth";
+import { deliverPartnerCopy, deliverRequestCopy } from "./copies";
 import { SELF_ID } from "./db";
 import { snapshot } from "./repo";
 
@@ -106,6 +108,8 @@ const ADMIN_ONLY = new Set([
   "markPayout",
   "declineRequest",
   "deleteRequest",
+  "resendPartnerContract",
+  "resendRequestContract",
 ]);
 
 /** Exécute une action métier avec les droits de la session et renvoie un éventuel résultat. */
@@ -172,6 +176,9 @@ export async function runAction(client: Client, session: PortalSession, type: st
         sql: "UPDATE partners SET contract_signed_at=?, contract_signed_by=?, contract_version=? WHERE id=?",
         args: [toLocalInput(new Date()), String(row.contact), CONTRACT_VERSION, session.partnerId],
       });
+      // Exemplaire par e-mail après la réponse : n'allonge pas la signature, et son échec ne l'annule pas.
+      const partnerId = session.partnerId;
+      after(() => deliverPartnerCopy(client, partnerId));
       return null;
     }
 
@@ -295,6 +302,16 @@ export async function runAction(client: Client, session: PortalSession, type: st
     }
     case "deleteRequest": {
       await client.execute({ sql: "DELETE FROM requests WHERE id = ?", args: [text(b.id, "L'inscription", { max: 80 })] });
+      return null;
+    }
+    case "resendPartnerContract": {
+      const res = await deliverPartnerCopy(client, text(b.id, "Le partenaire", { max: 80 }));
+      if (!res.ok) throw new ActionError(`Envoi impossible : ${res.reason}`, 502);
+      return null;
+    }
+    case "resendRequestContract": {
+      const res = await deliverRequestCopy(client, text(b.id, "L'inscription", { max: 80 }));
+      if (!res.ok) throw new ActionError(`Envoi impossible : ${res.reason}`, 502);
       return null;
     }
     default:

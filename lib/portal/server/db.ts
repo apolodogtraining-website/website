@@ -113,9 +113,15 @@ export function db(): Promise<Client> {
     cache.ready = (async () => {
       await client.batch(SCHEMA, "write");
       // Migration : colonne ajoutée après la première version du schéma (les bases existantes ne l'ont pas).
-      await client.execute("ALTER TABLE partners ADD COLUMN is_self INTEGER NOT NULL DEFAULT 0").catch((e: Error) => {
-        if (!/duplicate column/i.test(e.message)) throw e;
-      });
+      for (const ddl of [
+        "ALTER TABLE partners ADD COLUMN is_self INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE partners ADD COLUMN copy_sent_at TEXT", // exemplaire du contrat envoyé par e-mail
+        "ALTER TABLE requests ADD COLUMN copy_sent_at TEXT",
+      ]) {
+        await client.execute(ddl).catch((e: Error) => {
+          if (!/duplicate column/i.test(e.message)) throw e;
+        });
+      }
       await ensureSelfPartner(client);
       const { seedDemoIfEmpty } = await import("./seed");
       await seedDemoIfEmpty(client);

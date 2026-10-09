@@ -14,7 +14,7 @@ import { usePortal } from "@/lib/portal/store";
 
 export default function AdminPartnerDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { partners, contracts, invoices, resetPartnerPassword } = usePortal();
+  const { partners, contracts, invoices, resetPartnerPassword, resendPartnerContract } = usePortal();
   const [editing, setEditing] = useState(false);
   const [adding, setAdding] = useState(false);
   const [newPassword, setNewPassword] = useState<string | null>(null);
@@ -71,7 +71,11 @@ export default function AdminPartnerDetail({ params }: { params: Promise<{ id: s
         ) : partner.contractSignedAt ? (
           <p className="text-sm text-ink-soft">
             <Badge tone="green">Signé</Badge> par <strong className="text-ink">{partner.contractSignedBy}</strong> le{" "}
-            {fmtDateTime(partner.contractSignedAt)} (version {partner.contractVersion}).
+            {fmtDateTime(partner.contractSignedAt)} (version {partner.contractVersion}).{" "}
+            {partner.copySentAt ? `Exemplaire envoyé par e-mail le ${fmtDateTime(partner.copySentAt)}.` : "Exemplaire pas encore envoyé par e-mail."}{" "}
+            <button type="button" className={btn.ghost} onClick={() => resendPartnerContract(partner.id)}>
+              {partner.copySentAt ? "Renvoyer" : "Envoyer"}
+            </button>
           </p>
         ) : (
           <p className="text-sm text-ink-soft">

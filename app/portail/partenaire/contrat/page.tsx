@@ -51,6 +51,7 @@ export default function PartnerContract() {
           <p className="mt-6 border-t border-brand-light pt-4 text-sm">
             <Badge tone="green">Signé</Badge> par <strong>{p.contractSignedBy}</strong> le {fmtDateTime(p.contractSignedAt!)} · version{" "}
             {p.contractVersion}
+            {p.copySentAt && <> · exemplaire envoyé à {p.email}</>}
           </p>
         )}
       </Card>

@@ -17,7 +17,7 @@ const statusBadge = {
 };
 
 export default function AdminRequests() {
-  const { requests, partners, declineRequest, deleteRequest } = usePortal();
+  const { requests, partners, declineRequest, deleteRequest, resendRequestContract } = usePortal();
   const [converting, setConverting] = useState<ClientRequest | null>(null);
   const [deleting, setDeleting] = useState<ClientRequest | null>(null);
   const [copied, setCopied] = useState(false);
@@ -71,6 +71,7 @@ export default function AdminRequests() {
                 <Info k="Chien" v={[r.dogName, r.dogBreed].filter(Boolean).join(" — ")} />
                 <Info k="Date souhaitée" v={r.preferredDate ? fmtDateTime(r.preferredDate) : "—"} />
                 <Info k="Contrat signé" v={`${r.signedBy}, le ${fmtDateTime(r.signedAt)} (v. ${r.contractVersion})`} />
+                <Info k="Exemplaire par e-mail" v={r.copySentAt ? `envoyé le ${fmtDateTime(r.copySentAt)}` : "pas encore envoyé"} />
               </dl>
               {r.notes && <p className="mt-3 rounded-xl bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{r.notes}</p>}
               <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -84,6 +85,9 @@ export default function AdminRequests() {
                     </button>
                   </>
                 )}
+                <button type="button" className={btn.ghost} onClick={() => resendRequestContract(r.id)}>
+                  {r.copySentAt ? "Renvoyer l'exemplaire" : "Envoyer l'exemplaire"}
+                </button>
                 {r.contractId && (
                   <Link href={`/portail/admin/contrats/${r.contractId}`} className={btn.ghost}>
                     Voir le contrat

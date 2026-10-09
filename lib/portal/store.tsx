@@ -72,6 +72,8 @@ type Store = PortalData & {
   markPayout: (invoiceId: string) => Promise<void>;
   declineRequest: (id: string) => Promise<void>;
   deleteRequest: (id: string) => Promise<void>;
+  resendPartnerContract: (partnerId: string) => Promise<void>;
+  resendRequestContract: (requestId: string) => Promise<void>;
 };
 
 const Ctx = createContext<Store | null>(null);
@@ -191,6 +193,8 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
 
       declineRequest: async (id) => void (await call("declineRequest", { id })),
       deleteRequest: async (id) => void (await call("deleteRequest", { id })),
+      resendPartnerContract: async (id) => void (await call("resendPartnerContract", { id })),
+      resendRequestContract: async (id) => void (await call("resendRequestContract", { id })),
     }),
     [data, ready, session, error, call],
   );

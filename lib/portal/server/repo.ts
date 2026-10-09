@@ -19,6 +19,7 @@ const toPartner = (r: Row): Partner => ({
   contractSignedAt: sn(r.contract_signed_at),
   contractSignedBy: sn(r.contract_signed_by),
   contractVersion: sn(r.contract_version),
+  copySentAt: sn(r.copy_sent_at),
 });
 
 const toSession = (r: Row): Session & { contractId: string } => ({
@@ -62,6 +63,7 @@ const toRequest = (r: Row): ClientRequest => ({
   contractVersion: s(r.contract_version),
   status: s(r.status) as ClientRequest["status"],
   contractId: sn(r.contract_id),
+  copySentAt: sn(r.copy_sent_at),
 });
 
 /**

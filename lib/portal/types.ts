@@ -17,6 +17,8 @@ export type Partner = {
   contractSignedAt: string | null;
   contractSignedBy: string | null;
   contractVersion: string | null;
+  /** Date d'envoi par e-mail de l'exemplaire signé (null : pas encore envoyé). */
+  copySentAt?: string | null;
 };
 
 export type Frequency = "weekly" | "biweekly" | "monthly";
@@ -92,6 +94,7 @@ export type ClientRequest = {
   contractVersion: string;
   status: RequestStatus;
   contractId: string | null;
+  copySentAt?: string | null;
 };
 
 export type PortalSession = { role: "admin" } | { role: "partner"; partnerId: string };
