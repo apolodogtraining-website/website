@@ -98,7 +98,13 @@ export function Stat({ label, value, hint, tone }: { label: string; value: strin
   return (
     <div className="rounded-sm border border-brand-light/70 bg-white p-4 shadow-soft">
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
-      <p className={`mt-1.5 font-display text-3xl tracking-wide ${tone === "red" ? "text-red-700" : "text-ink"}`}>{value}</p>
+      {/* Chiffres en contour orange, italiques, intérieur vide (comme le « 01 » du visuel). */}
+      <p
+        className="mt-2 font-display text-4xl italic leading-none tracking-wide text-transparent [-webkit-text-stroke:1.5px] [paint-order:stroke_fill]"
+        style={{ WebkitTextStrokeColor: tone === "red" ? "var(--color-red-700)" : "var(--color-brand)" }}
+      >
+        {value}
+      </p>
       {hint && <p className="mt-0.5 text-xs text-ink-soft">{hint}</p>}
     </div>
   );
