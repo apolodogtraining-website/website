@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { CalendarSync, Plus } from "lucide-react";
 import ContractForm from "@/components/portal/ContractForm";
 import PortalShell from "@/components/portal/PortalShell";
 import { Badge, btn, Card, Empty, PageHeader, Table } from "@/components/portal/ui";
@@ -10,7 +10,9 @@ import { contractBilling, fmtDateTime, money, nextSession } from "@/lib/portal/f
 import { usePortal } from "@/lib/portal/store";
 
 export default function AdminContracts() {
-  const { contracts, partners, invoices } = usePortal();
+  const { contracts, partners, invoices, syncCalendar } = usePortal();
+  const [syncing, setSyncing] = useState(false);
+  const [synced, setSynced] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<"all" | "recurring" | "oneoff">("all");
   const shown = contracts.filter((c) => filter === "all" || c.type === filter);
@@ -21,11 +23,34 @@ export default function AdminContracts() {
         title="Contrats clients"
         subtitle="Chaque contrat confie un client, ponctuel ou récurrent, à un partenaire."
         action={
-          <button type="button" className={btn.primary} onClick={() => setCreating(true)} disabled={partners.length === 0}>
-            <Plus className="h-4 w-4" /> Nouveau contrat
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className={btn.secondary}
+              disabled={syncing}
+              onClick={async () => {
+                setSyncing(true);
+                setSynced(null);
+                const n = await syncCalendar();
+                setSyncing(false);
+                if (n !== undefined) setSynced(n);
+              }}
+            >
+              <CalendarSync className="h-4 w-4" /> {syncing ? "Synchronisation…" : "Synchroniser l'agenda"}
+            </button>
+            <button type="button" className={btn.primary} onClick={() => setCreating(true)} disabled={partners.length === 0}>
+              <Plus className="h-4 w-4" /> Nouveau contrat
+            </button>
+          </div>
         }
       />
+      <p className="mb-4 text-xs text-ink-soft">
+        Agenda Google « Apolo » :{" "}
+        <span className="font-semibold text-ink">gris</span> = demande d&apos;inscription à confirmer ·{" "}
+        <span className="font-semibold text-brand-darker">bleu</span> = rendez-vous que vous assurez ·{" "}
+        <span className="font-semibold text-emerald-700">vert</span> = rendez-vous confié à un partenaire.
+        {synced !== null && <strong className="ml-2 text-emerald-700">Agenda à jour ({synced} événement{synced > 1 ? "s" : ""}).</strong>}
+      </p>
       <div className="mb-4 flex gap-2" role="group" aria-label="Filtrer par type">
         {([["all", "Tous"], ["recurring", "Récurrents"], ["oneoff", "Ponctuels"]] as const).map(([k, l]) => (
           <button
