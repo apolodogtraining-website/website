@@ -42,7 +42,9 @@ export default function ContractForm({
   const [f, setF] = useState<Draft>({
     partnerId: initialPartner,
     type: contract?.type ?? request?.type ?? "oneoff",
-    clientName: contract?.clientName ?? request?.name ?? "",
+    // Anciens contrats sans prénom enregistré : le nom complet va dans « Nom », le prénom reste vide.
+    clientFirstName: contract ? (contract.clientFirstName ?? "") : (request?.firstName ?? ""),
+    clientLastName: contract ? (contract.clientLastName ?? contract.clientName) : (request?.lastName ?? request?.name ?? ""),
     clientEmail: contract?.clientEmail ?? request?.email ?? "",
     clientPhone: onlyDigits(contract?.clientPhone ?? request?.phone ?? ""),
     address: contract?.address ?? request?.address ?? "",
@@ -126,8 +128,11 @@ export default function ContractForm({
               </select>
             )}
           </Field>
-          <Field label="Client">
-            {(id) => <input id={id} required className={inputCls} value={f.clientName} onChange={(e) => set("clientName", e.target.value)} />}
+          <Field label="Nom du client">
+            {(id) => <input id={id} required maxLength={60} autoComplete="off" className={inputCls} value={f.clientLastName} onChange={(e) => set("clientLastName", e.target.value)} />}
+          </Field>
+          <Field label="Prénom du client" hint="Facultatif (famille, M. X…).">
+            {(id) => <input id={id} maxLength={60} autoComplete="off" className={inputCls} value={f.clientFirstName} onChange={(e) => set("clientFirstName", e.target.value)} />}
           </Field>
           <Field label="Téléphone du client">
             {(id) => <PhoneInput id={id} value={f.clientPhone} onValueChange={(v) => set("clientPhone", v)} />}
@@ -135,9 +140,11 @@ export default function ContractForm({
           <Field label="E-mail du client (facturation)">
             {(id) => <input id={id} type="email" className={inputCls} value={f.clientEmail} onChange={(e) => set("clientEmail", e.target.value)} />}
           </Field>
-          <Field label="Prestation">
-            {(id) => <input id={id} required className={inputCls} placeholder="Ex. Bilan comportemental" value={f.service} onChange={(e) => set("service", e.target.value)} />}
-          </Field>
+          <div className="sm:col-span-2">
+            <Field label="Prestation">
+              {(id) => <input id={id} required className={inputCls} placeholder="Ex. Bilan comportemental" value={f.service} onChange={(e) => set("service", e.target.value)} />}
+            </Field>
+          </div>
         </div>
         <Field label="Adresse d'intervention">
           {(id) => <input id={id} required className={inputCls} value={f.address} onChange={(e) => set("address", e.target.value)} />}

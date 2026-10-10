@@ -103,6 +103,8 @@ export async function snapshot(client: Client, session: PortalSession): Promise<
       partnerId: s(r.partner_id),
       type: s(r.type) as Contract["type"],
       clientName: s(r.client_name),
+      clientFirstName: sn(r.client_first_name),
+      clientLastName: sn(r.client_last_name),
       clientEmail: s(r.client_email),
       clientPhone: s(r.client_phone),
       address: s(r.address),

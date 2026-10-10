@@ -21,8 +21,8 @@ export async function seedDemoIfEmpty(client: Client) {
       args: [p.id, p.company, p.contact, p.email, p.phone, p.siret, p.specialties, p.commissionRate, p.active ? 1 : 0, hash, p.createdAt, p.contractSignedAt, p.contractSignedBy, p.contractVersion],
     })),
     ...d.contracts.map((c) => ({
-      sql: "INSERT INTO contracts VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-      args: [c.id, c.partnerId, c.type, c.clientName, c.clientEmail, c.clientPhone, c.address, c.service, c.price, c.commissionRate, c.frequency, c.notes, c.createdAt, c.clientSignedAt ?? null, c.clientSignedBy ?? null],
+      sql: "INSERT INTO contracts (id, partner_id, type, client_name, client_first_name, client_last_name, client_email, client_phone, address, service, price, commission_rate, frequency, notes, created_at, client_signed_at, client_signed_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      args: [c.id, c.partnerId, c.type, c.clientName, c.clientFirstName ?? null, c.clientLastName ?? null, c.clientEmail, c.clientPhone, c.address, c.service, c.price, c.commissionRate, c.frequency, c.notes, c.createdAt, c.clientSignedAt ?? null, c.clientSignedBy ?? null],
     })),
     ...d.contracts.flatMap((c) =>
       c.sessions.map((s) => ({

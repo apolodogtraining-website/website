@@ -1,6 +1,6 @@
 import type { Client, InStatement } from "@libsql/client";
 import { CONTRACT_VERSION } from "../contract-text";
-import { addDaysISO, billableSessions, generateSessions, splitAmount, todayISO, toLocalInput, uid } from "../format";
+import { addDaysISO, billableSessions, composeName, generateSessions, splitAmount, todayISO, toLocalInput, uid } from "../format";
 import type { Contract, Frequency, PortalSession, Session } from "../types";
 import { after } from "next/server";
 import { hashPassword, tempPassword } from "./auth";
@@ -79,7 +79,9 @@ function contractFields(b: Body) {
   return {
     partnerId: text(b.partnerId, "Le partenaire", { max: 80 }),
     type,
-    clientName: text(b.clientName, "Le client"),
+    // Nom (obligatoire) et prénom (facultatif : « Famille Dubois », « M. Castaing »…) ; nom complet composé ici.
+    clientFirstName: text(b.clientFirstName, "Le prénom", { max: 60, required: false }),
+    clientLastName: text(b.clientLastName, "Le nom", { max: 60 }),
     clientEmail: email(b.clientEmail, "L'e-mail du client", false),
     clientPhone: phoneDigits(b.clientPhone, "Le téléphone du client"),
     address: text(b.address, "L'adresse", { max: 300 }),
@@ -209,8 +211,8 @@ export async function runAction(client: Client, session: PortalSession, type: st
       if (id) {
         await loadContract(client, id);
         await client.execute({
-          sql: "UPDATE contracts SET partner_id=?, type=?, client_name=?, client_email=?, client_phone=?, address=?, service=?, price=?, commission_rate=?, frequency=?, notes=? WHERE id=?",
-          args: [f.partnerId, f.type, f.clientName, f.clientEmail, f.clientPhone, f.address, f.service, f.price, f.commissionRate, f.frequency, f.notes, id],
+          sql: "UPDATE contracts SET partner_id=?, type=?, client_name=?, client_first_name=?, client_last_name=?, client_email=?, client_phone=?, address=?, service=?, price=?, commission_rate=?, frequency=?, notes=? WHERE id=?",
+          args: [f.partnerId, f.type, composeName(f.clientFirstName, f.clientLastName), f.clientFirstName, f.clientLastName, f.clientEmail, f.clientPhone, f.address, f.service, f.price, f.commissionRate, f.frequency, f.notes, id],
         });
         after(() => syncContract(client, id)); // client, adresse ou partenaire peuvent avoir changé
         return { id };
@@ -230,8 +232,8 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const newId = uid("c");
       const stmts: InStatement[] = [
         {
-          sql: "INSERT INTO contracts VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-          args: [newId, f.partnerId, f.type, f.clientName, f.clientEmail, f.clientPhone, f.address, f.service, f.price, f.commissionRate, f.frequency, f.notes, todayISO(), req ? String(req.signed_at) : null, req ? String(req.signed_by) : null],
+          sql: "INSERT INTO contracts (id, partner_id, type, client_name, client_first_name, client_last_name, client_email, client_phone, address, service, price, commission_rate, frequency, notes, created_at, client_signed_at, client_signed_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+          args: [newId, f.partnerId, f.type, composeName(f.clientFirstName, f.clientLastName), f.clientFirstName, f.clientLastName, f.clientEmail, f.clientPhone, f.address, f.service, f.price, f.commissionRate, f.frequency, f.notes, todayISO(), req ? String(req.signed_at) : null, req ? String(req.signed_by) : null],
         },
         ...sessions.map((x): InStatement => ({ sql: "INSERT INTO sessions (id, contract_id, date, status, invoice_id) VALUES (?,?,?,?,?)", args: [x.id, newId, x.date, x.status, null] })),
       ];

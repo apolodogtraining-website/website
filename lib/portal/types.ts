@@ -38,7 +38,10 @@ export type Contract = {
   id: string;
   partnerId: string;
   type: ContractType;
+  /** Nom complet affiché : « Prénom NOM » (ou le nom seul quand il n'y a pas de prénom). */
   clientName: string;
+  clientFirstName?: string | null;
+  clientLastName?: string | null;
   clientEmail: string;
   clientPhone: string;
   address: string;

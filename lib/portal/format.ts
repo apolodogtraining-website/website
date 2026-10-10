@@ -109,7 +109,7 @@ export const fmtPhone = (s: string) => {
 
 /** Nom complet d'un client : « Prénom NOM ». Même règle côté formulaire et côté serveur. */
 export const composeName = (firstName: string, lastName: string) =>
-  `${firstName.trim()} ${lastName.trim().toUpperCase()}`.trim();
+  firstName.trim() ? `${firstName.trim()} ${lastName.trim().toUpperCase()}`.trim() : lastName.trim(); // sans prénom (famille, M. X…) : nom tel que saisi
 
 /** Nombre saisi dans un champ texte (virgule ou point) ; NaN si vide ou invalide. */
 export const parseDecimal = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));
