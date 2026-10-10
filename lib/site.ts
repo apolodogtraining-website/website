@@ -561,6 +561,7 @@ export const footerNav = [...nav, { label: "Zone d'intervention", href: "/zone-i
 /** Pages légales : hors menu principal, mais liées depuis le footer et présentes dans le sitemap. */
 export const legalNav = [
   { label: "Mentions légales", href: "/mentions-legales" },
+  { label: "Conditions générales de vente", href: "/cgv" },
   { label: "Politique de confidentialité", href: "/confidentialite" },
 ];
 

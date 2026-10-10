@@ -7,6 +7,7 @@ import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import Turnstile, { turnstileSiteKey } from "@/components/portal/Turnstile";
 import { btn, Card, Field, inputCls, PhoneInput } from "@/components/portal/ui";
 import { CLIENT_CONTRACT_VERSION, clientContractArticles } from "@/lib/portal/contract-text";
+import { CGV_VERSION } from "@/lib/cgv";
 import { composeName, toLocalInput } from "@/lib/portal/format";
 import { type RequestInput, submitClientRequest } from "@/lib/portal/store";
 import { services, site } from "@/lib/site";
@@ -184,7 +185,13 @@ export default function ClientSignup() {
               >
                 <label className="flex items-start gap-2.5 text-sm text-ink">
                   <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-brand" />
-                  J&apos;ai lu le contrat (version {CLIENT_CONTRACT_VERSION}) et j&apos;en accepte les conditions.
+                  <span>
+                    J&apos;ai lu le contrat (version {CLIENT_CONTRACT_VERSION}) et les{" "}
+                    <a href="/cgv" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-darker underline">
+                      conditions générales de vente
+                    </a>{" "}
+                    (version {CGV_VERSION}) et j&apos;en accepte les conditions.
+                  </span>
                 </label>
                 <Field label={`Pour signer, saisissez votre nom complet : ${fullName}`}>
                   {(id) => <input id={id} autoComplete="off" className={inputCls} value={signature} onChange={(e) => setSignature(e.target.value)} />}
