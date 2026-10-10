@@ -60,15 +60,19 @@ export const metadata: Metadata = {
     description,
     images: ["/photos/hero.jpg"],
   },
+  // ⚠️ Le favicon vient uniquement de public/ : ne PAS remettre de fichier
+  // `app/favicon.ico` (Next le sert à la place de public/favicon.ico, et celui
+  // du modèle par défaut est le triangle Vercel). `?v=` force les navigateurs à
+  // recharger l'icône malgré le cache de 7 jours : à incrémenter si on la change.
+  // Les icônes 192/512 ne sont PAS déclarées ici mais dans site.webmanifest :
+  // en rel="icon", Chrome peut les réduire pour l'onglet et le rendu devient flou.
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico?v=2", sizes: "48x48" },
+      { url: "/favicon-32x32.png?v=2", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png?v=2", sizes: "16x16", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png?v=2", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/site.webmanifest",
 };
