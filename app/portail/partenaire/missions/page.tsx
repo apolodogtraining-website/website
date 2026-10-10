@@ -49,7 +49,7 @@ export default function PartnerContracts() {
                   {money(c.price)} / séance · <strong>{money(splitAmount(c.price, c.commissionRate).net)} net pour vous</strong>{" "}
                   <span className="text-ink-soft">(commission {c.commissionRate} %)</span>
                 </p>
-                {c.notes && <p className="mt-2 rounded-xl bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{c.notes}</p>}
+                {c.notes && <p className="mt-2 rounded-sm bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{c.notes}</p>}
                 <div className="mt-4 border-t border-brand-light/60 pt-2">
                   <SessionList contract={c} />
                 </div>

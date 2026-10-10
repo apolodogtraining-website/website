@@ -31,6 +31,7 @@ export default function Turnstile({ onToken }: { onToken: (token: string) => voi
     widget.current = window.turnstile.render(box.current, {
       sitekey: turnstileSiteKey,
       language: "fr",
+      theme: "dark",
       callback: (t: string) => cb.current(t),
       "expired-callback": () => cb.current(""),
       "error-callback": () => cb.current(""),

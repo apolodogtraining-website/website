@@ -36,7 +36,7 @@ function AutoTextarea({ value, onChange, id, rows = 2 }: { value: string; onChan
 }
 
 const chip =
-  "rounded-full border px-3.5 py-1.5 text-sm font-medium transition [print-color-adjust:exact] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40";
+  "rounded-sm border px-3.5 py-1.5 text-sm font-medium transition [print-color-adjust:exact] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40";
 const chipOn = "border-brand bg-brand text-white";
 const chipOff = "border-brand-light bg-white text-ink-soft hover:bg-brand-tint";
 
@@ -197,7 +197,7 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
         <Link href={backHref} className={`${btn.ghost} mb-3`}>
           <ArrowLeft className="h-4 w-4" /> Retour
         </Link>
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p role="alert" className="rounded-sm bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </p>
       </div>
@@ -235,12 +235,12 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
       </div>
 
       {notice && (
-        <p role="status" className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800 print:hidden">
+        <p role="status" className="mb-4 rounded-sm bg-emerald-50 px-4 py-3 text-sm text-emerald-800 print:hidden">
           {notice}
         </p>
       )}
       {error && (
-        <div role="alert" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 print:hidden">
+        <div role="alert" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-sm bg-red-50 px-4 py-3 text-sm text-red-700 print:hidden">
           <span>{error}</span>
           {conflict && (
             <button type="button" className={btn.secondary} onClick={() => window.location.reload()}>
@@ -252,7 +252,7 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
 
       <Card className="print:border-0 print:shadow-none">
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Apolo Dog Training</p>
-        <h1 className="mt-1 text-2xl font-bold text-brand md:text-3xl">Étude de comportement</h1>
+        <h1 className="font-display uppercase tracking-wide mt-1 text-2xl font-normal text-brand md:text-3xl">Étude de comportement</h1>
         <p className="mt-1 text-sm text-ink-soft">
           Confidentiel : réservé à l&apos;administration et au partenaire en charge du client.
         </p>
@@ -293,7 +293,7 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
           <p className="text-sm text-ink-soft">
             L&apos;étude de comportement de <strong className="text-ink">{view.dog.name}</strong> sera envoyée en PDF, avec un message de présentation, à :
           </p>
-          <p className="mt-3 rounded-xl bg-brand-tint px-4 py-3 text-center text-sm font-semibold text-ink">{view.owner.email}</p>
+          <p className="mt-3 rounded-sm bg-brand-tint px-4 py-3 text-center text-sm font-semibold text-ink">{view.owner.email}</p>
           <p className="mt-3 text-xs text-ink-soft">
             Vos dernières modifications sont enregistrées avant l&apos;envoi. Le document contient les informations que vous avez saisies (santé, comportement) : relisez-le au besoin avant d&apos;envoyer.
             Une copie est adressée à {site.email}.

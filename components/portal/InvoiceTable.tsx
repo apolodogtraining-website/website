@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { fmtDate, invoiceStatus, invoiceStatusLabel, money } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 import type { Invoice, InvoiceStatus } from "@/lib/portal/types";
-import { Badge, btn, Empty, type Tone, Table } from "./ui";
+import { Badge, btn, ConfirmModal, Empty, type Tone, Table } from "./ui";
 
 export const statusTone: Record<InvoiceStatus, Tone> = { sent: "blue", late: "red", paid: "amber", settled: "green" };
 
 /** Vue admin : actions d'encaissement et de reversement. Vue partenaire : lecture seule, montants nets. */
 export default function InvoiceTable({ invoices, admin }: { invoices: Invoice[]; admin?: boolean }) {
-  const { contracts, partners, markClientPaid, markPayout } = usePortal();
+  const { contracts, partners, markClientPaid, markPayout, remindInvoice } = usePortal();
+  const [reminding, setReminding] = useState<Invoice | null>(null);
   if (invoices.length === 0) return <Empty>Aucune facture pour le moment.</Empty>;
 
   const sorted = [...invoices].sort((a, b) => b.issuedAt.localeCompare(a.issuedAt) || b.number.localeCompare(a.number));
@@ -19,6 +21,7 @@ export default function InvoiceTable({ invoices, admin }: { invoices: Invoice[];
     : ["Facture", "Client", "Total", "Commission", "Net à percevoir", "État", ""];
 
   return (
+    <>
     <Table head={head}>
       {sorted.map((inv) => {
         const st = invoiceStatus(inv);
@@ -46,8 +49,16 @@ export default function InvoiceTable({ invoices, admin }: { invoices: Invoice[];
                     ? `payée le ${fmtDate(inv.clientPaidAt)}`
                     : `échéance ${fmtDate(inv.dueAt)}`}
               </div>
+              {admin && inv.lastReminderAt && !inv.clientPaidAt && <div className="text-xs text-ink-soft">relancée le {fmtDate(inv.lastReminderAt)}</div>}
             </td>
             <td className="whitespace-nowrap text-right">
+              {admin && st === "late" && (
+                <>
+                  <button type="button" className={`${btn.secondary} mr-2`} onClick={() => setReminding(inv)}>
+                    Relancer
+                  </button>
+                </>
+              )}
               {admin && !inv.clientPaidAt && (
                 <button type="button" className={btn.secondary} onClick={() => markClientPaid(inv.id)}>
                   Marquer payée
@@ -63,5 +74,15 @@ export default function InvoiceTable({ invoices, admin }: { invoices: Invoice[];
         );
       })}
     </Table>
+    {reminding && (
+      <ConfirmModal
+        title="Relancer le client ?"
+        message={`Un e-mail de rappel de paiement pour la facture ${reminding.number} (${money(reminding.gross)}) sera envoyé à ${contracts.find((c) => c.id === reminding.contractId)?.clientEmail ?? "son adresse"}.`}
+        confirmLabel="Envoyer la relance"
+        onConfirm={() => void remindInvoice(reminding.id)}
+        onClose={() => setReminding(null)}
+      />
+    )}
+    </>
   );
 }

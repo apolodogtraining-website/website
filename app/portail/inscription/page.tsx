@@ -43,13 +43,13 @@ export default function ClientSignup() {
     <main className="min-h-screen-mobile bg-brand-tint px-4 py-8">
       <div className="mx-auto max-w-2xl">
         <Link href="/" className="mx-auto mb-6 block w-fit" aria-label={`${site.name} — retour au site`}>
-          <Image src="/logo/logo-header.png" alt={site.name} width={160} height={55} priority className="h-12 w-auto" />
+          <Image src="/logo/logo-white.png" alt={site.name} width={160} height={55} priority className="h-12 w-auto" />
         </Link>
 
         {step === "done" ? (
           <Card className="text-center">
             <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" aria-hidden />
-            <h1 className="mt-3 text-2xl font-bold text-ink">Merci, votre contrat est signé</h1>
+            <h1 className="font-display uppercase tracking-wide mt-3 text-2xl font-normal text-ink">Merci, votre contrat est signé</h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-ink-soft">
               Un exemplaire de votre contrat vous est envoyé par e-mail à {f.email}. Nous revenons vers vous très vite pour confirmer le partenaire et la date du premier rendez-vous.
             </p>
@@ -59,7 +59,7 @@ export default function ClientSignup() {
           </Card>
         ) : step === "form" ? (
           <Card>
-            <h1 className="text-2xl font-bold text-ink">Créer mon dossier client</h1>
+            <h1 className="font-display uppercase tracking-wide text-2xl font-normal text-ink">Créer mon dossier client</h1>
             <p className="mt-1 text-sm text-ink-soft">Étape 1 sur 2 · Vos informations et votre demande.</p>
             <form
               className="mt-6 space-y-4"
@@ -89,7 +89,7 @@ export default function ClientSignup() {
                 {(id) => <input id={id} required autoComplete="street-address" className={inputCls} value={f.address} onChange={(e) => set("address", e.target.value)} />}
               </Field>
               {f.dogs.map((dog, i) => (
-                <div key={i} className="rounded-xl border border-brand-light/70 p-3 sm:p-4">
+                <div key={i} className="rounded-sm border border-brand-light/70 p-3 sm:p-4">
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-sm font-semibold text-ink">{f.dogs.length > 1 ? `Chien n°${i + 1}` : "Votre chien"}</p>
                     {i > 0 && (
@@ -155,7 +155,7 @@ export default function ClientSignup() {
               <ArrowLeft className="h-4 w-4" /> Modifier mes informations
             </button>
             <Card>
-              <h1 className="text-2xl font-bold text-ink">Contrat de prestation</h1>
+              <h1 className="font-display uppercase tracking-wide text-2xl font-normal text-ink">Contrat de prestation</h1>
               <p className="mt-1 text-sm text-ink-soft">Étape 2 sur 2 · Lisez puis signez pour valider votre dossier.</p>
               <div className="mt-5 space-y-4 text-sm leading-relaxed">
                 {clientContractArticles({ name: fullName, service: f.service }).map((a) => (
@@ -213,12 +213,12 @@ export default function ClientSignup() {
                 {turnstileSiteKey ? (
                   <Turnstile key={error} onToken={setCaptcha} />
                 ) : (
-                  <p role="alert" className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900">
+                  <p role="alert" className="rounded-sm bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900">
                     Les inscriptions sont momentanément indisponibles. Appelez-nous au {site.phone}.
                   </p>
                 )}
                 {error && (
-                  <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+                  <p role="alert" className="rounded-sm bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
                     {error}
                   </p>
                 )}

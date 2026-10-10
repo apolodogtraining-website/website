@@ -222,4 +222,4 @@ const requests: ClientRequest[] = [
   },
 ];
 
-export const seedData = (): PortalData => structuredClone({ partners, contracts, invoices, requests });
+export const seedData = (): Omit<PortalData, "settings"> => structuredClone({ partners, contracts, invoices, requests });

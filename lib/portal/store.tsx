@@ -9,6 +9,7 @@ import type {
   PortalSession,
   SessionStatus,
 } from "./types";
+import { DEFAULT_SETTINGS, type PortalSettings } from "./settings";
 
 export type PartnerInput = Pick<
   Partner,
@@ -79,6 +80,9 @@ type Store = PortalData & {
   resendPartnerContract: (partnerId: string) => Promise<void>;
   resendRequestContract: (requestId: string) => Promise<void>;
   syncCalendar: () => Promise<number | undefined>;
+  saveSettings: (input: Partial<PortalSettings>) => Promise<void>;
+  /** Relance de paiement par e-mail ; renvoie true si elle est partie. */
+  remindInvoice: (id: string) => Promise<boolean>;
   saveDog: (contractId: string, input: DogInput, id?: string) => Promise<string | undefined>;
   deleteDog: (id: string) => Promise<void>;
   /** Recharge les données depuis le serveur (après une action hors du store, ex. une fiche). */
@@ -93,7 +97,7 @@ export const usePortal = () => {
   return v;
 };
 
-const EMPTY: PortalData = { partners: [], contracts: [], invoices: [], requests: [] };
+const EMPTY: PortalData = { partners: [], contracts: [], invoices: [], requests: [], settings: DEFAULT_SETTINGS };
 
 async function post(url: string, body: unknown) {
   const res = await fetch(url, {
@@ -216,6 +220,8 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
         }
       },
       syncCalendar: async () => (await call<{ events: number }>("syncCalendar"))?.events,
+      saveSettings: async (input) => void (await call("saveSettings", input)),
+      remindInvoice: async (id) => (await call("remindInvoice", { id })) !== undefined,
     }),
     [data, ready, session, error, call],
   );

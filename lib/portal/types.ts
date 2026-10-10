@@ -1,3 +1,5 @@
+import type { PortalSettings } from "./settings";
+
 export type Role = "admin" | "partner";
 
 export type Partner = {
@@ -89,6 +91,8 @@ export type Invoice = {
   net: number;
   clientPaidAt: string | null;
   payoutAt: string | null;
+  /** Date de la dernière relance de paiement envoyée au client par e-mail. */
+  lastReminderAt?: string | null;
 };
 
 export type InvoiceStatus = "sent" | "late" | "paid" | "settled";
@@ -131,4 +135,5 @@ export type PortalData = {
   contracts: Contract[];
   invoices: Invoice[];
   requests: ClientRequest[];
+  settings: PortalSettings;
 };

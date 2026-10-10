@@ -6,16 +6,16 @@ import useScrollLock from "@/hooks/useScrollLock";
 
 export const btn = {
   primary:
-    "inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-sm bg-brand px-5 py-2.5 text-sm font-bold text-white shadow-brand transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50",
   secondary:
-    "inline-flex items-center justify-center gap-2 rounded-full border border-brand-light bg-white px-4 py-2 text-sm font-semibold text-brand-darker transition hover:bg-brand-tint disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-sm border border-brand-light bg-white px-4 py-2 text-sm font-semibold text-brand-darker transition hover:bg-brand-tint disabled:cursor-not-allowed disabled:opacity-50",
   danger:
-    "inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50",
+    "inline-flex items-center justify-center gap-2 rounded-sm border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50",
   ghost: "inline-flex items-center gap-1.5 text-sm font-semibold text-brand-dark hover:underline",
 };
 
 export const inputCls =
-  "w-full rounded-xl border border-brand-light bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink-soft/60 focus:border-brand focus:ring-2 focus:ring-brand/20";
+  "w-full rounded-sm border border-brand-light bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink-soft/60 focus:border-brand focus:ring-2 focus:ring-brand/20";
 
 type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type"> & {
   value: string;
@@ -72,21 +72,21 @@ export type Tone = keyof typeof tones;
 
 export function Badge({ tone = "gray", children }: { tone?: Tone; children: React.ReactNode }) {
   return (
-    <span className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${tones[tone]}`}>
+    <span className={`inline-flex items-center whitespace-nowrap rounded-sm px-2.5 py-1 text-xs font-semibold ${tones[tone]}`}>
       {children}
     </span>
   );
 }
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <section className={`rounded-2xl border border-brand-light/70 bg-white p-5 shadow-soft ${className}`}>{children}</section>;
+  return <section className={`rounded-sm border border-brand-light/70 bg-white p-5 shadow-soft ${className}`}>{children}</section>;
 }
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-bold text-ink md:text-3xl">{title}</h1>
+        <h1 className="font-display uppercase tracking-wide text-2xl font-normal text-ink md:text-3xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-ink-soft">{subtitle}</p>}
       </div>
       {action}
@@ -96,9 +96,9 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
 
 export function Stat({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: Tone }) {
   return (
-    <div className="rounded-2xl border border-brand-light/70 bg-white p-4 shadow-soft">
+    <div className="rounded-sm border border-brand-light/70 bg-white p-4 shadow-soft">
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
-      <p className={`mt-1.5 text-2xl font-bold ${tone === "red" ? "text-red-700" : "text-ink"}`}>{value}</p>
+      <p className={`mt-1.5 font-display text-4xl leading-none tracking-wide ${tone === "red" ? "text-red-700" : "text-ink"}`}>{value}</p>
       {hint && <p className="mt-0.5 text-xs text-ink-soft">{hint}</p>}
     </div>
   );
@@ -118,7 +118,7 @@ export function Field({ label, children, hint }: { label: string; children: (id:
 }
 
 export function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="rounded-xl bg-brand-tint px-4 py-6 text-center text-sm text-ink-soft">{children}</p>;
+  return <p className="rounded-sm bg-brand-tint px-4 py-6 text-center text-sm text-ink-soft">{children}</p>;
 }
 
 /** Tableau défilable horizontalement sur mobile. */
@@ -162,18 +162,18 @@ export function Modal({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-ink/50 p-0 sm:items-center sm:p-4" onMouseDown={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 p-0 sm:items-center sm:p-4" onMouseDown={onClose}>
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
         data-lenis-prevent
         onMouseDown={(e) => e.stopPropagation()}
-        className={`max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-soft sm:rounded-3xl sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-lg"}`}
+        className={`max-h-[92vh] w-full overflow-y-auto rounded-t-sm bg-white p-5 shadow-soft sm:rounded-sm sm:p-6 ${wide ? "sm:max-w-2xl" : "sm:max-w-lg"}`}
       >
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-bold text-ink">{title}</h2>
-          <button type="button" onClick={onClose} aria-label="Fermer" className="rounded-full p-2 text-ink-soft hover:bg-brand-tint">
+          <h2 className="font-display text-xl uppercase tracking-wide text-ink">{title}</h2>
+          <button type="button" onClick={onClose} aria-label="Fermer" className="rounded-sm p-2 text-ink-soft hover:bg-brand-tint">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -205,7 +205,7 @@ export function ConfirmModal({
         </button>
         <button
           type="button"
-          className="inline-flex items-center rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
+          className="inline-flex items-center rounded-sm bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
           onClick={() => {
             onConfirm();
             onClose();

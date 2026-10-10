@@ -1,4 +1,5 @@
 import type { Client, Row } from "@libsql/client";
+import { getSettings } from "./settings";
 import type { ClientRequest, Contract, Dog, Invoice, Partner, PortalData, PortalSession, Session } from "../types";
 
 const s = (v: unknown) => (v == null ? "" : String(v));
@@ -43,6 +44,7 @@ const toInvoice = (r: Row, sessionIds: string[]): Invoice => ({
   net: Number(r.net),
   clientPaidAt: sn(r.client_paid_at),
   payoutAt: sn(r.payout_at),
+  lastReminderAt: sn(r.last_reminder_at),
 });
 
 function parseDogs(json: unknown, name: unknown, breed: unknown): { name: string; breed: string }[] {
@@ -157,5 +159,6 @@ export async function snapshot(client: Client, session: PortalSession): Promise<
     })),
     invoices: invoices.rows.map((r) => toInvoice(r, byInvoice.get(s(r.id)) ?? [])),
     requests: requests.rows.map(toRequest),
+    settings: await getSettings(client),
   };
 }

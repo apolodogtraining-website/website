@@ -65,7 +65,7 @@ export default function ContractForm({
   return (
     <Modal title={contract ? "Modifier le contrat" : existingClient ? "Ajouter un client existant" : "Nouveau contrat client"} onClose={onClose} wide>
       {existingClient && !contract && (
-        <p className="mb-4 rounded-xl bg-brand-tint px-4 py-3 text-sm text-ink-soft">
+        <p className="mb-4 rounded-sm bg-brand-tint px-4 py-3 text-sm text-ink-soft">
           Pour un ancien client : il est ajouté <strong className="text-ink">sans signature de contrat en ligne</strong>. Indiquez la date de sa première séance
           (même passée) pour enregistrer son historique.
         </p>
@@ -158,7 +158,7 @@ export default function ContractForm({
           </Field>
         </div>
         {!contract && (
-          <div className="grid gap-4 rounded-xl bg-brand-tint p-4 sm:grid-cols-3">
+          <div className="grid gap-4 rounded-sm bg-brand-tint p-4 sm:grid-cols-3">
             <Field label={recurring ? "Première séance" : "Date du rendez-vous"}>
               {(id) => <input id={id} type="datetime-local" required className={inputCls} value={f.firstDate} onChange={(e) => set("firstDate", e.target.value)} />}
             </Field>
@@ -197,7 +197,7 @@ export default function ContractForm({
           {(id) => <textarea id={id} rows={2} className={inputCls} value={f.notes} onChange={(e) => set("notes", e.target.value)} />}
         </Field>
         {error && (
-          <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+          <p role="alert" className="rounded-sm bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
             {error}
           </p>
         )}

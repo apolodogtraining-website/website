@@ -74,7 +74,7 @@ export default function AdminRequests() {
                 <Info k="Début avant 14 jours" v={r.earlyStartAt ? `demandé le ${fmtDateTime(r.earlyStartAt)}` : "non demandé : attendre la fin du délai de rétractation"} />
                 <Info k="Exemplaire par e-mail" v={r.copySentAt ? `envoyé le ${fmtDateTime(r.copySentAt)}` : "pas encore envoyé"} />
               </dl>
-              {r.notes && <p className="mt-3 rounded-xl bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{r.notes}</p>}
+              {r.notes && <p className="mt-3 rounded-sm bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{r.notes}</p>}
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {r.status === "pending" && (
                   <>
@@ -94,7 +94,7 @@ export default function AdminRequests() {
                     Voir le contrat
                   </Link>
                 )}
-                <button type="button" aria-label={`Supprimer l'inscription de ${r.name}`} className="ml-auto rounded-full p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(r)}>
+                <button type="button" aria-label={`Supprimer l'inscription de ${r.name}`} className="ml-auto rounded-sm p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(r)}>
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
