@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { ReactLenis } from "lenis/react";
 
 function subscribe(callback: () => void) {
@@ -23,11 +24,14 @@ function getServerSnapshot() {
  * Scroll inertiel sur tout le site (molette desktop ; le tactile garde son
  * scroll natif, Lenis ne le lisse pas par défaut). Désactivé si
  * prefers-reduced-motion, y compris si ce réglage change en cours de visite.
+ * Désactivé aussi sur le portail (/portail) : écrans de gestion, tableaux et
+ * modales, où le scroll natif est plus prévisible.
  */
 export default function SmoothScroll({ children }: { children: ReactNode }) {
-  const enabled = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const motionOk = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const inPortal = usePathname().startsWith("/portail");
 
-  if (!enabled) return <>{children}</>;
+  if (!motionOk || inPortal) return <>{children}</>;
 
   return (
     <ReactLenis root options={{ lerp: 0.1, duration: 1.2 }}>

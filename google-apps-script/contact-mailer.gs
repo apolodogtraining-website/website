@@ -6,8 +6,9 @@
  * 1. Connectez-vous à Google avec le compte qui doit ENVOYER les mails
  *    (apolo.dogtraining@gmail.com), puis ouvrez https://script.google.com
  * 2. « Nouveau projet », supprimez le code par défaut et collez ce fichier.
- * 3. Remplacez SECRET par une longue phrase aléatoire (30 caractères ou plus).
- *    Gardez-la : c'est la valeur de CONTACT_WEBHOOK_SECRET côté site.
+ * 3. Paramètres du projet (engrenage) > Propriétés du script > ajoutez SECRET = une longue
+ *    phrase aléatoire (30 caractères ou plus). Gardez-la : c'est la valeur de
+ *    CONTACT_WEBHOOK_SECRET côté site. Le secret n'est ainsi jamais écrit dans le code.
  * 4. Cliquez sur « Déployer » > « Nouveau déploiement » > type « Application web » :
  *      - Exécuter en tant que : Moi
  *      - Qui a accès : Tout le monde
@@ -24,13 +25,13 @@
  * LIMITES : environ 100 mails par jour avec un compte Gmail gratuit.
  */
 
-const SECRET = "REMPLACEZ-MOI-PAR-UNE-LONGUE-PHRASE-ALEATOIRE";
 const TO = "apolo.dogtraining@gmail.com";
 
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
-    if (data.secret !== SECRET) return reply({ ok: false, error: "forbidden" });
+    const secret = PropertiesService.getScriptProperties().getProperty("SECRET");
+    if (!secret || data.secret !== secret) return reply({ ok: false, error: "forbidden" });
 
     const options = { name: "Site Apolo Dog Training" };
     if (data.replyTo) options.replyTo = String(data.replyTo);
