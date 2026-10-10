@@ -16,7 +16,6 @@ const NAV = {
     { href: "/portail/admin/inscriptions", label: "Inscriptions clients", icon: UserPlus },
     { href: "/portail/admin/contrats", label: "Contrats clients", icon: Handshake },
     { href: "/portail/admin/facturation", label: "Facturation", icon: Receipt },
-    { href: "/portail/admin/parametres", label: "Paramètres", icon: Settings },
   ],
   partner: [
     { href: "/portail/partenaire", label: "Accueil", icon: LayoutDashboard },
@@ -25,6 +24,9 @@ const NAV = {
     { href: "/portail/partenaire/contrat", label: "Contrat partenaire", icon: FileSignature },
   ],
 } as const;
+
+/** Lien placé en bas de la barre latérale, à côté de « Se déconnecter ». */
+const SETTINGS = { href: "/portail/admin/parametres", label: "Paramètres", icon: Settings };
 
 const isActive = (pathname: string, href: string) =>
   pathname === href || (href.split("/").length > 3 && pathname.startsWith(`${href}/`));
@@ -94,6 +96,17 @@ export default function PortalShell({ role, children }: { role: Role; children: 
           })}
         </nav>
         <div className="hidden px-3 pb-5 md:absolute md:bottom-0 md:block md:w-64">
+          {role === "admin" && (
+            <Link
+              href={SETTINGS.href}
+              aria-current={isActive(pathname, SETTINGS.href) ? "page" : undefined}
+              className={`mb-1 flex items-center gap-2.5 rounded-sm px-3.5 py-2.5 text-sm font-medium transition ${
+                isActive(pathname, SETTINGS.href) ? "bg-brand text-white" : "text-ink-soft hover:bg-brand-tint hover:text-brand-darker"
+              }`}
+            >
+              <SETTINGS.icon className="h-4 w-4" aria-hidden /> {SETTINGS.label}
+            </Link>
+          )}
           <button
             type="button"
             onClick={async () => {
@@ -108,7 +121,12 @@ export default function PortalShell({ role, children }: { role: Role; children: 
       </aside>
       <main className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-9 print:p-0">
         <div className="mx-auto max-w-5xl">{children}</div>
-        <div className="mt-8 md:hidden">
+        <div className="mt-8 space-y-3 md:hidden">
+          {role === "admin" && (
+            <Link href={SETTINGS.href} className={`flex items-center gap-2 text-sm font-medium ${isActive(pathname, SETTINGS.href) ? "text-brand" : "text-ink-soft"}`}>
+              <SETTINGS.icon className="h-4 w-4" aria-hidden /> {SETTINGS.label}
+            </Link>
+          )}
           <button
             type="button"
             onClick={async () => {
