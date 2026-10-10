@@ -117,6 +117,8 @@ export function db(): Promise<Client> {
         "ALTER TABLE partners ADD COLUMN is_self INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE partners ADD COLUMN copy_sent_at TEXT", // exemplaire du contrat envoyé par e-mail
         "ALTER TABLE requests ADD COLUMN copy_sent_at TEXT",
+        "ALTER TABLE sessions ADD COLUMN calendar_event_id TEXT", // événement Google Agenda lié
+        "ALTER TABLE requests ADD COLUMN calendar_event_id TEXT",
       ]) {
         await client.execute(ddl).catch((e: Error) => {
           if (!/duplicate column/i.test(e.message)) throw e;

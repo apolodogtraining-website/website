@@ -74,6 +74,7 @@ type Store = PortalData & {
   deleteRequest: (id: string) => Promise<void>;
   resendPartnerContract: (partnerId: string) => Promise<void>;
   resendRequestContract: (requestId: string) => Promise<void>;
+  syncCalendar: () => Promise<number | undefined>;
 };
 
 const Ctx = createContext<Store | null>(null);
@@ -195,6 +196,7 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       deleteRequest: async (id) => void (await call("deleteRequest", { id })),
       resendPartnerContract: async (id) => void (await call("resendPartnerContract", { id })),
       resendRequestContract: async (id) => void (await call("resendRequestContract", { id })),
+      syncCalendar: async () => (await call<{ events: number }>("syncCalendar"))?.events,
     }),
     [data, ready, session, error, call],
   );
