@@ -71,6 +71,7 @@ export default function AdminRequests() {
                 <Info k={(r.dogs?.length ?? 0) > 1 ? "Chiens" : "Chien"} v={(r.dogs?.length ? r.dogs : [{ name: r.dogName, breed: r.dogBreed }]).map((d) => [d.name, d.breed].filter(Boolean).join(" — ")).join(" ; ")} />
                 <Info k="Date souhaitée" v={r.preferredDate ? fmtDateTime(r.preferredDate) : "—"} />
                 <Info k="Contrat signé" v={`${r.signedBy}, le ${fmtDateTime(r.signedAt)} (v. ${r.contractVersion})`} />
+                <Info k="Début avant 14 jours" v={r.earlyStartAt ? `demandé le ${fmtDateTime(r.earlyStartAt)}` : "non demandé : attendre la fin du délai de rétractation"} />
                 <Info k="Exemplaire par e-mail" v={r.copySentAt ? `envoyé le ${fmtDateTime(r.copySentAt)}` : "pas encore envoyé"} />
               </dl>
               {r.notes && <p className="mt-3 rounded-xl bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{r.notes}</p>}

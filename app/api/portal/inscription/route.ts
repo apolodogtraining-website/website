@@ -65,8 +65,8 @@ export async function POST(req: Request) {
     const signedAt = toLocalInput(new Date());
     const requestId = uid("r");
     await client.execute({
-      sql: "INSERT INTO requests (id, created_at, name, first_name, last_name, email, phone, address, dog_name, dog_breed, dogs_json, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-      args: [requestId, signedAt, name, firstName, lastName, email, phoneDigits(b.phone, "Le téléphone", true), str(b.address, "L'adresse", 300), dogs[0].name, dogs[0].breed, JSON.stringify(dogs), service, type, preferred, str(b.notes, "Les précisions", 1000, false), signedAt, name, CLIENT_CONTRACT_VERSION, "pending", null],
+      sql: "INSERT INTO requests (id, created_at, name, first_name, last_name, email, phone, address, dog_name, dog_breed, dogs_json, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id, early_start_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      args: [requestId, signedAt, name, firstName, lastName, email, phoneDigits(b.phone, "Le téléphone", true), str(b.address, "L'adresse", 300), dogs[0].name, dogs[0].breed, JSON.stringify(dogs), service, type, preferred, str(b.notes, "Les précisions", 1000, false), signedAt, name, CLIENT_CONTRACT_VERSION, "pending", null, b.earlyStart === true ? signedAt : null],
     });
     // Exemplaire du contrat par e-mail, après la réponse : un échec n'annule pas l'inscription (l'admin peut renvoyer).
     after(() => deliverRequestCopy(client, requestId));

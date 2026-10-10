@@ -229,9 +229,10 @@ export async function submitClientRequest(
   signedBy: string,
   website: string,
   turnstileToken: string,
+  earlyStart: boolean,
 ): Promise<string | null> {
   try {
-    const { ok, payload } = await post("/api/portal/inscription", { ...input, signedBy, website, turnstileToken });
+    const { ok, payload } = await post("/api/portal/inscription", { ...input, signedBy, website, turnstileToken, earlyStart });
     return ok ? null : typeof payload.error === "string" ? payload.error : "Envoi impossible.";
   } catch {
     return "Impossible de joindre le serveur.";

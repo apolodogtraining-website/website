@@ -29,6 +29,7 @@ export default function ClientSignup() {
   const [step, setStep] = useState<"form" | "contract" | "done">("form");
   const [f, setF] = useState<RequestInput>(empty);
   const [accepted, setAccepted] = useState(false);
+  const [earlyStart, setEarlyStart] = useState(false);
   const [signature, setSignature] = useState("");
   const [website, setWebsite] = useState(""); // champ piège anti-robots
   const [captcha, setCaptcha] = useState("");
@@ -172,7 +173,7 @@ export default function ClientSignup() {
                   e.preventDefault();
                   setBusy(true);
                   setError("");
-                  const err = await submitClientRequest(f, signature.trim(), website, captcha);
+                  const err = await submitClientRequest(f, signature.trim(), website, captcha, earlyStart);
                   setBusy(false);
                   if (err) {
                     setError(err);
@@ -191,6 +192,13 @@ export default function ClientSignup() {
                       conditions générales de vente
                     </a>{" "}
                     (version {CGV_VERSION}) et j&apos;en accepte les conditions.
+                  </span>
+                </label>
+                <label className="flex items-start gap-2.5 text-sm text-ink">
+                  <input type="checkbox" checked={earlyStart} onChange={(e) => setEarlyStart(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-brand" />
+                  <span>
+                    Je demande que la prestation commence avant la fin du délai de rétractation de 14 jours (facultatif). Si je me rétracte ensuite, je règle
+                    les séances déjà réalisées.
                   </span>
                 </label>
                 <Field label={`Pour signer, saisissez votre nom complet : ${fullName}`}>
