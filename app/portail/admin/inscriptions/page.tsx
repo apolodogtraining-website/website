@@ -6,7 +6,7 @@ import { Trash2, UserPlus } from "lucide-react";
 import ContractForm from "@/components/portal/ContractForm";
 import PortalShell from "@/components/portal/PortalShell";
 import { Badge, btn, Card, ConfirmModal, Empty, PageHeader } from "@/components/portal/ui";
-import { fmtDateTime } from "@/lib/portal/format";
+import { fmtDateTime, fmtPhone } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 import type { ClientRequest } from "@/lib/portal/types";
 
@@ -66,7 +66,7 @@ export default function AdminRequests() {
               </div>
               <dl className="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
                 <Info k="E-mail" v={r.email} />
-                <Info k="Téléphone" v={r.phone} />
+                <Info k="Téléphone" v={fmtPhone(r.phone)} />
                 <Info k="Adresse" v={r.address} />
                 <Info k="Chien" v={[r.dogName, r.dogBreed].filter(Boolean).join(" — ")} />
                 <Info k="Date souhaitée" v={r.preferredDate ? fmtDateTime(r.preferredDate) : "—"} />

@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { frequencyLabel, toLocalInput } from "@/lib/portal/format";
+import { frequencyLabel, onlyDigits, parseDecimal, toLocalInput } from "@/lib/portal/format";
 import { type ContractInput, usePortal } from "@/lib/portal/store";
 import type { ClientRequest, Contract, Frequency } from "@/lib/portal/types";
-import { btn, Field, inputCls, Modal } from "./ui";
+import { btn, Field, inputCls, Modal, NumberInput, PhoneInput } from "./ui";
+
+// Les champs numériques restent du texte tant que le formulaire est ouvert (voir NumberInput).
+type Draft = Omit<ContractInput, "price" | "commissionRate" | "count"> & { price: string; commissionRate: string; count: string };
 
 export default function ContractForm({
   contract,
@@ -36,23 +39,26 @@ export default function ContractForm({
     return toLocalInput(d);
   })();
 
-  const [f, setF] = useState<ContractInput>({
+  const [f, setF] = useState<Draft>({
     partnerId: initialPartner,
     type: contract?.type ?? request?.type ?? "oneoff",
-    clientName: contract?.clientName ?? request?.name ?? "",
+    // Anciens contrats sans prénom enregistré : le nom complet va dans « Nom », le prénom reste vide.
+    clientFirstName: contract ? (contract.clientFirstName ?? "") : (request?.firstName ?? ""),
+    clientLastName: contract ? (contract.clientLastName ?? contract.clientName) : (request?.lastName ?? request?.name ?? ""),
     clientEmail: contract?.clientEmail ?? request?.email ?? "",
-    clientPhone: contract?.clientPhone ?? request?.phone ?? "",
+    clientPhone: onlyDigits(contract?.clientPhone ?? request?.phone ?? ""),
     address: contract?.address ?? request?.address ?? "",
     service: contract?.service ?? request?.service ?? "",
-    price: contract?.price ?? 60,
-    commissionRate: contract?.commissionRate ?? partners.find((p) => p.id === initialPartner)?.commissionRate ?? 15,
+    price: String(contract?.price ?? 60),
+    commissionRate: String(contract?.commissionRate ?? partners.find((p) => p.id === initialPartner)?.commissionRate ?? 15),
     frequency: contract?.frequency ?? "weekly",
     notes: contract?.notes ?? (request ? [request.dogName && `Chien : ${request.dogName}`, request.dogBreed, request.notes].filter(Boolean).join(" — ") : ""),
     firstDate: request?.preferredDate || defaultStart,
-    count: 4,
+    count: "4",
     markPastDone: Boolean(existingClient),
   });
-  const set = <K extends keyof ContractInput>(k: K, v: ContractInput[K]) => setF((x) => ({ ...x, [k]: v }));
+  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setF((x) => ({ ...x, [k]: v }));
+  const [error, setError] = useState("");
   const recurring = f.type === "recurring";
   const self = partners.find((p) => p.id === f.partnerId)?.isSelf ?? false;
 
@@ -68,8 +74,22 @@ export default function ContractForm({
         className="space-y-4"
         onSubmit={async (e) => {
           e.preventDefault();
+          const price = parseDecimal(f.price);
+          const commission = self ? 0 : parseDecimal(f.commissionRate);
+          const count = parseDecimal(f.count);
+          if (Number.isNaN(price) || price < 0) return setError("Indiquez le prix d'une séance (un nombre, par exemple 60).");
+          if (Number.isNaN(commission) || commission < 0 || commission > 100) return setError("La commission doit être un nombre entre 0 et 100.");
+          if (!contract && recurring && (!Number.isInteger(count) || count < 2 || count > 52)) return setError("Le nombre de séances doit être un entier entre 2 et 52.");
+          setError("");
           const id = await saveContract(
-            { ...f, frequency: recurring ? f.frequency : null, price: Number(f.price), commissionRate: Number(f.commissionRate), requestId: request?.id },
+            {
+              ...f,
+              frequency: recurring ? f.frequency : null,
+              price,
+              commissionRate: commission,
+              count: recurring ? count : 1,
+              requestId: request?.id,
+            },
             contract?.id,
           );
           if (!id) return; // erreur affichée par le bandeau du portail
@@ -89,7 +109,7 @@ export default function ContractForm({
                   set("partnerId", e.target.value);
                   // Le taux proposé suit le partenaire choisi (modifiable ensuite).
                   const chosen = partners.find((p) => p.id === e.target.value);
-                  if (!contract || chosen?.isSelf) set("commissionRate", chosen?.commissionRate ?? 15);
+                  if (!contract || chosen?.isSelf) set("commissionRate", String(chosen?.commissionRate ?? 15));
                 }}
               >
                 {eligible.map((p) => (
@@ -108,28 +128,33 @@ export default function ContractForm({
               </select>
             )}
           </Field>
-          <Field label="Client">
-            {(id) => <input id={id} required className={inputCls} value={f.clientName} onChange={(e) => set("clientName", e.target.value)} />}
+          <Field label="Nom du client">
+            {(id) => <input id={id} required maxLength={60} autoComplete="off" className={inputCls} value={f.clientLastName} onChange={(e) => set("clientLastName", e.target.value)} />}
+          </Field>
+          <Field label="Prénom du client" hint="Facultatif (famille, M. X…).">
+            {(id) => <input id={id} maxLength={60} autoComplete="off" className={inputCls} value={f.clientFirstName} onChange={(e) => set("clientFirstName", e.target.value)} />}
           </Field>
           <Field label="Téléphone du client">
-            {(id) => <input id={id} type="tel" className={inputCls} value={f.clientPhone} onChange={(e) => set("clientPhone", e.target.value)} />}
+            {(id) => <PhoneInput id={id} value={f.clientPhone} onValueChange={(v) => set("clientPhone", v)} />}
           </Field>
           <Field label="E-mail du client (facturation)">
             {(id) => <input id={id} type="email" className={inputCls} value={f.clientEmail} onChange={(e) => set("clientEmail", e.target.value)} />}
           </Field>
-          <Field label="Prestation">
-            {(id) => <input id={id} required className={inputCls} placeholder="Ex. Bilan comportemental" value={f.service} onChange={(e) => set("service", e.target.value)} />}
-          </Field>
+          <div className="sm:col-span-2">
+            <Field label="Prestation">
+              {(id) => <input id={id} required className={inputCls} placeholder="Ex. Bilan comportemental" value={f.service} onChange={(e) => set("service", e.target.value)} />}
+            </Field>
+          </div>
         </div>
         <Field label="Adresse d'intervention">
           {(id) => <input id={id} required className={inputCls} value={f.address} onChange={(e) => set("address", e.target.value)} />}
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Prix d'une séance (€)">
-            {(id) => <input id={id} type="number" min={0} step={0.5} required className={inputCls} value={f.price} onChange={(e) => set("price", Number(e.target.value))} />}
+            {(id) => <NumberInput id={id} required value={f.price} onValueChange={(v) => set("price", v)} />}
           </Field>
           <Field label="Commission (%)" hint={self ? "Aucune : vous réalisez la prestation." : "Figée sur ce contrat."}>
-            {(id) => <input id={id} type="number" min={0} max={100} step={0.5} required readOnly={self} className={`${inputCls} ${self ? "bg-brand-tint" : ""}`} value={f.commissionRate} onChange={(e) => set("commissionRate", Number(e.target.value))} />}
+            {(id) => <NumberInput id={id} required readOnly={self} value={self ? "0" : f.commissionRate} onValueChange={(v) => set("commissionRate", v)} />}
           </Field>
         </div>
         {!contract && (
@@ -151,7 +176,7 @@ export default function ContractForm({
                   )}
                 </Field>
                 <Field label="Nombre de séances">
-                  {(id) => <input id={id} type="number" min={2} max={52} required className={inputCls} value={f.count} onChange={(e) => set("count", Number(e.target.value))} />}
+                  {(id) => <NumberInput id={id} required value={f.count} onValueChange={(v) => set("count", v)} />}
                 </Field>
               </>
             )}
@@ -171,6 +196,11 @@ export default function ContractForm({
         <Field label="Notes pour le partenaire">
           {(id) => <textarea id={id} rows={2} className={inputCls} value={f.notes} onChange={(e) => set("notes", e.target.value)} />}
         </Field>
+        {error && (
+          <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+            {error}
+          </p>
+        )}
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" className={btn.secondary} onClick={onClose}>
             Annuler

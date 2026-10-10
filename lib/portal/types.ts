@@ -38,7 +38,10 @@ export type Contract = {
   id: string;
   partnerId: string;
   type: ContractType;
+  /** Nom complet affiché : « Prénom NOM » (ou le nom seul quand il n'y a pas de prénom). */
   clientName: string;
+  clientFirstName?: string | null;
+  clientLastName?: string | null;
   clientEmail: string;
   clientPhone: string;
   address: string;
@@ -79,7 +82,10 @@ export type RequestStatus = "pending" | "converted" | "declined";
 export type ClientRequest = {
   id: string;
   createdAt: string;
+  /** Nom complet « Prénom NOM » (pour les anciennes inscriptions, tel que saisi). */
   name: string;
+  firstName?: string | null;
+  lastName?: string | null;
   email: string;
   phone: string;
   address: string;

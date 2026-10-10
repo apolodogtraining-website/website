@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId } from "react";
+import { useEffect, useId, type InputHTMLAttributes } from "react";
 import { X } from "lucide-react";
 import useScrollLock from "@/hooks/useScrollLock";
 
@@ -16,6 +16,50 @@ export const btn = {
 
 export const inputCls =
   "w-full rounded-xl border border-brand-light bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink-soft/60 focus:border-brand focus:ring-2 focus:ring-brand/20";
+
+type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type"> & {
+  value: string;
+  onValueChange: (v: string) => void;
+};
+
+/**
+ * Champ numérique à état texte : on peut le vider et le retaper librement (avec
+ * un type="number" lié à un nombre, le champ revenait de force à « 0 »). La
+ * saisie est limitée aux chiffres avec un séparateur décimal (virgule ou point).
+ */
+export function NumberInput({ value, onValueChange, ...rest }: InputProps) {
+  return (
+    <input
+      {...rest}
+      type="text"
+      inputMode="decimal"
+      autoComplete="off"
+      value={value}
+      onChange={(e) => {
+        const v = e.target.value;
+        if (/^\d*[.,]?\d*$/.test(v)) onValueChange(v);
+      }}
+      className={inputCls}
+    />
+  );
+}
+
+/** Téléphone : uniquement des chiffres (les espaces, points et signes sont retirés à la saisie). */
+export function PhoneInput({ value, onValueChange, ...rest }: InputProps) {
+  return (
+    <input
+      autoComplete="tel"
+      {...rest}
+      type="tel"
+      inputMode="numeric"
+      maxLength={15}
+      placeholder="0612345678"
+      value={value}
+      onChange={(e) => onValueChange(e.target.value.replace(/\D/g, "").slice(0, 15))}
+      className={inputCls}
+    />
+  );
+}
 
 const tones = {
   gray: "bg-gray-100 text-gray-700",

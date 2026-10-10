@@ -18,7 +18,8 @@ export type PartnerInput = Pick<
 export type ContractInput = {
   partnerId: string;
   type: ContractType;
-  clientName: string;
+  clientFirstName: string;
+  clientLastName: string;
   clientEmail: string;
   clientPhone: string;
   address: string;
@@ -37,7 +38,8 @@ export type ContractInput = {
 };
 
 export type RequestInput = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   address: string;

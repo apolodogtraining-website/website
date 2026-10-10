@@ -51,7 +51,7 @@ export async function deliverRequestCopy(client: Client, requestId: string): Pro
   const res = await sendMail({
     to: String(row.email),
     subject: "Votre contrat de prestation — Apolo Dog Training",
-    text: mailIntro(String(row.name), "du contrat de prestation"),
+    text: mailIntro(String(row.first_name || row.name), "du contrat de prestation"),
     html,
     pdfName: "Contrat-prestation-Apolo-Dog-Training.pdf",
   });

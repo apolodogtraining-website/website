@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { usePortal } from "@/lib/portal/store";
 import type { Partner } from "@/lib/portal/types";
-import { btn, Field, inputCls, Modal } from "./ui";
+import { onlyDigits, parseDecimal } from "@/lib/portal/format";
+import { btn, Field, inputCls, Modal, NumberInput, PhoneInput } from "./ui";
 
 export default function PartnerForm({ partner, onClose }: { partner?: Partner; onClose: () => void }) {
   const { savePartner } = usePortal();
@@ -12,12 +13,13 @@ export default function PartnerForm({ partner, onClose }: { partner?: Partner; o
     company: partner?.company ?? "",
     contact: partner?.contact ?? "",
     email: partner?.email ?? "",
-    phone: partner?.phone ?? "",
+    phone: onlyDigits(partner?.phone ?? ""),
     siret: partner?.siret ?? "",
     specialties: partner?.specialties ?? "",
-    commissionRate: partner?.commissionRate ?? 15,
+    commissionRate: String(partner?.commissionRate ?? 15),
     active: partner?.active ?? true,
   });
+  const [error, setError] = useState("");
   const [created, setCreated] = useState<{ email: string; password: string } | null>(null);
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((x) => ({ ...x, [k]: v }));
 
@@ -53,8 +55,11 @@ export default function PartnerForm({ partner, onClose }: { partner?: Partner; o
         className="space-y-4"
         onSubmit={async (e) => {
           e.preventDefault();
+          const commission = parseDecimal(f.commissionRate);
+          if (Number.isNaN(commission) || commission < 0 || commission > 100) return setError("La commission doit être un nombre entre 0 et 100.");
+          setError("");
           const res = await savePartner(
-            { ...f, email: f.email.trim().toLowerCase(), commissionRate: Number(f.commissionRate) },
+            { ...f, email: f.email.trim().toLowerCase(), commissionRate: commission },
             partner?.id,
           );
           if (!res) return; // erreur affichée par le bandeau du portail
@@ -73,25 +78,13 @@ export default function PartnerForm({ partner, onClose }: { partner?: Partner; o
             {(id) => <input id={id} type="email" required className={inputCls} value={f.email} onChange={(e) => set("email", e.target.value)} />}
           </Field>
           <Field label="Téléphone">
-            {(id) => <input id={id} type="tel" className={inputCls} value={f.phone} onChange={(e) => set("phone", e.target.value)} />}
+            {(id) => <PhoneInput id={id} value={f.phone} onValueChange={(v) => set("phone", v)} />}
           </Field>
           <Field label="SIRET">
             {(id) => <input id={id} required className={inputCls} value={f.siret} onChange={(e) => set("siret", e.target.value)} />}
           </Field>
           <Field label="Commission (%)" hint="Prélevée sur le montant facturé au client.">
-            {(id) => (
-              <input
-                id={id}
-                type="number"
-                min={0}
-                max={100}
-                step={0.5}
-                required
-                className={inputCls}
-                value={f.commissionRate}
-                onChange={(e) => set("commissionRate", Number(e.target.value))}
-              />
-            )}
+            {(id) => <NumberInput id={id} required value={f.commissionRate} onValueChange={(v) => set("commissionRate", v)} />}
           </Field>
         </div>
         <Field label="Spécialités">
@@ -102,6 +95,11 @@ export default function PartnerForm({ partner, onClose }: { partner?: Partner; o
             <input type="checkbox" checked={f.active} onChange={(e) => set("active", e.target.checked)} className="h-4 w-4 accent-brand" />
             Compte actif (un compte suspendu ne peut plus se connecter)
           </label>
+        )}
+        {error && (
+          <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+            {error}
+          </p>
         )}
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" className={btn.secondary} onClick={onClose}>
