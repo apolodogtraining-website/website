@@ -9,6 +9,9 @@ import { deliverAcceptance, deliverPartnerCopy, deliverRequestCopy } from "./cop
 import { assertContractAccess } from "./fiches";
 import { SELF_ID } from "./db";
 import { snapshot } from "./repo";
+import { saveSettings } from "./settings";
+import { sendMail } from "./mailer";
+import { invoiceReminderEmail } from "../mails";
 
 export class ActionError extends Error {
   constructor(
@@ -141,6 +144,8 @@ const ADMIN_ONLY = new Set([
   "resendRequestContract",
   "syncCalendar",
   "deleteDog",
+  "saveSettings",
+  "remindInvoice",
 ]);
 
 /** Exécute une action métier avec les droits de la session et renvoie un éventuel résultat. */
@@ -374,7 +379,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const last = await one(client, "SELECT MAX(CAST(SUBSTR(number, 8) AS INTEGER)) AS n FROM invoices WHERE number LIKE ?", [`F-${issuedAt.slice(0, 4)}-%`]);
       const number = `F-${issuedAt.slice(0, 4)}-${String(Number(last?.n ?? 0) + 1).padStart(4, "0")}`;
       const stmts: InStatement[] = [
-        { sql: "INSERT INTO invoices VALUES (?,?,?,?,?,?,?,?,?,?,?)", args: [id, number, contract.id, contract.partnerId, issuedAt, addDaysISO(issuedAt, 14), gross, commission, net, null, null] },
+        { sql: "INSERT INTO invoices (id, number, contract_id, partner_id, issued_at, due_at, gross, commission, net, client_paid_at, payout_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)", args: [id, number, contract.id, contract.partnerId, issuedAt, addDaysISO(issuedAt, 14), gross, commission, net, null, null] },
         ...todo.map((x: Session): InStatement => ({ sql: "UPDATE sessions SET invoice_id = ? WHERE id = ? AND invoice_id IS NULL", args: [id, x.id] })),
       ];
       await client.batch(stmts, "write");
@@ -422,6 +427,31 @@ export async function runAction(client: Client, session: PortalSession, type: st
     case "resendRequestContract": {
       const res = await deliverRequestCopy(client, text(b.id, "L'inscription", { max: 80 }));
       if (!res.ok) throw new ActionError(`Envoi impossible : ${res.reason}`, 502);
+      return null;
+    }
+    case "saveSettings": {
+      await saveSettings(client, b);
+      return null;
+    }
+    case "remindInvoice": {
+      const id = text(b.id, "La facture", { max: 80 });
+      const inv = await one(client, "SELECT i.*, c.client_email, c.client_first_name, c.client_name FROM invoices i JOIN contracts c ON c.id = i.contract_id WHERE i.id = ?", [id]);
+      if (!inv) throw new ActionError("Facture introuvable.", 404);
+      if (inv.client_paid_at) throw new ActionError("Cette facture est déjà payée.");
+      const email = String(inv.client_email ?? "");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ActionError("Le client n'a pas d'adresse e-mail valide.");
+      const today = todayISO();
+      if (String(inv.last_reminder_at ?? "").slice(0, 10) === today) throw new ActionError("Une relance a déjà été envoyée aujourd'hui.");
+      const mail = invoiceReminderEmail({
+        firstName: String(inv.client_first_name || inv.client_name),
+        number: String(inv.number),
+        amount: Number(inv.gross),
+        issuedAt: String(inv.issued_at),
+        dueAt: String(inv.due_at),
+      });
+      const res = await sendMail({ to: email, ...mail });
+      if (!res.ok) throw new ActionError(`Envoi impossible : ${res.reason}`, 502);
+      await client.execute({ sql: "UPDATE invoices SET last_reminder_at = ? WHERE id = ?", args: [toLocalInput(new Date()), id] });
       return null;
     }
     default:

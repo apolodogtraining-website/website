@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FileSignature, Handshake, LayoutDashboard, LogOut, Receipt, UserPlus, Users } from "lucide-react";
+import { FileSignature, Handshake, LayoutDashboard, LogOut, Receipt, Settings, UserPlus, Users } from "lucide-react";
 import { usePortal } from "@/lib/portal/store";
 import type { Role } from "@/lib/portal/types";
 import { site } from "@/lib/site";
@@ -16,6 +16,7 @@ const NAV = {
     { href: "/portail/admin/inscriptions", label: "Inscriptions clients", icon: UserPlus },
     { href: "/portail/admin/contrats", label: "Contrats clients", icon: Handshake },
     { href: "/portail/admin/facturation", label: "Facturation", icon: Receipt },
+    { href: "/portail/admin/parametres", label: "Paramètres", icon: Settings },
   ],
   partner: [
     { href: "/portail/partenaire", label: "Accueil", icon: LayoutDashboard },
