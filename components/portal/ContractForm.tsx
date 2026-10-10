@@ -52,7 +52,7 @@ export default function ContractForm({
     price: String(contract?.price ?? 60),
     commissionRate: String(contract?.commissionRate ?? partners.find((p) => p.id === initialPartner)?.commissionRate ?? 15),
     frequency: contract?.frequency ?? "weekly",
-    notes: contract?.notes ?? (request ? [request.dogName && `Chien : ${request.dogName}`, request.dogBreed, request.notes].filter(Boolean).join(" — ") : ""),
+    notes: contract?.notes ?? (request ? [request.notes].filter(Boolean).join(" — ") : ""),
     firstDate: request?.preferredDate || defaultStart,
     count: "4",
     markPastDone: Boolean(existingClient),

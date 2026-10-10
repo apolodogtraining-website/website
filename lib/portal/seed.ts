@@ -64,6 +64,7 @@ const partners: Partner[] = [
 const contracts: Contract[] = [
   {
     id: "c1",
+    dogs: [{ id: "d1", contractId: "c1", name: "Max", breed: "Labrador", sex: "M", age: "5 mois", chip: "250268712345678", ficheStatus: "none", ficheUpdatedAt: null }],
     partnerId: "p1",
     type: "recurring",
     clientName: "Famille Dubois",
@@ -89,6 +90,7 @@ const contracts: Contract[] = [
   },
   {
     id: "c2",
+    dogs: [{ id: "d2", contractId: "c2", name: "Opale", breed: "Berger australien", sex: "F", age: "3 ans", chip: "", ficheStatus: "none", ficheUpdatedAt: null }],
     partnerId: "p1",
     type: "oneoff",
     clientName: "M. Castaing",
@@ -105,6 +107,10 @@ const contracts: Contract[] = [
   },
   {
     id: "c3",
+    dogs: [
+      { id: "d3", contractId: "c3", name: "Ulysse", breed: "Malinois", sex: "M", age: "2 ans", chip: "", ficheStatus: "none", ficheUpdatedAt: null },
+      { id: "d4", contractId: "c3", name: "Nova", breed: "Border collie", sex: "F", age: "6 ans", chip: "", ficheStatus: "none", ficheUpdatedAt: null },
+    ],
     partnerId: "p3",
     type: "recurring",
     clientName: "Mme Rivière",
@@ -200,6 +206,10 @@ const requests: ClientRequest[] = [
     address: "9 rue Sainte-Catherine, 33000 Bordeaux",
     dogName: "Nala",
     dogBreed: "Border collie, 2 ans",
+    dogs: [
+      { name: "Nala", breed: "Border collie, 2 ans" },
+      { name: "Pixel", breed: "Jack Russell, 8 mois" },
+    ],
     service: "Nosework (détection sportive)",
     type: "recurring",
     preferredDate: "2026-10-18T10:00",

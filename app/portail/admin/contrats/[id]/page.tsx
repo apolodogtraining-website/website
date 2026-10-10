@@ -7,6 +7,7 @@ import { ArrowLeft, Pencil, Receipt, Trash2 } from "lucide-react";
 import ContractForm from "@/components/portal/ContractForm";
 import InvoiceTable from "@/components/portal/InvoiceTable";
 import PortalShell from "@/components/portal/PortalShell";
+import DogsPanel from "@/components/portal/DogsPanel";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, btn, Card, ConfirmModal, Field, inputCls, PageHeader } from "@/components/portal/ui";
 import { billableSessions, fmtDateTime, fmtPhone, frequencyLabel, money, splitAmount, toLocalInput } from "@/lib/portal/format";
@@ -110,6 +111,8 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
           </div>
         </Card>
       </div>
+
+      <DogsPanel contract={contract} area="admin" />
 
       <Card className="mt-4">
         <h2 className="mb-1 text-base font-bold text-ink">Séances</h2>

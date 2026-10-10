@@ -6,6 +6,7 @@ import { after } from "next/server";
 import { hashPassword, tempPassword } from "./auth";
 import { collectEventIds, deleteEvents, syncAll, syncContract, syncPartner, syncRequest, syncSessions } from "./calendar";
 import { deliverPartnerCopy, deliverRequestCopy } from "./copies";
+import { assertContractAccess } from "./fiches";
 import { SELF_ID } from "./db";
 import { snapshot } from "./repo";
 
@@ -93,6 +94,19 @@ function contractFields(b: Body) {
   };
 }
 
+/** Chiens d'une inscription : liste complète, ou l'unique chien des anciennes inscriptions. */
+function requestDogs(req: Record<string, unknown>): { name: string; breed: string }[] {
+  try {
+    const arr = JSON.parse(String(req.dogs_json));
+    if (Array.isArray(arr) && arr.length) {
+      return arr.slice(0, 5).map((d) => ({ name: String(d?.name ?? "").slice(0, 60), breed: String(d?.breed ?? "").slice(0, 80) })).filter((d) => d.name);
+    }
+  } catch {
+    /* ancienne inscription */
+  }
+  return req.dog_name ? [{ name: String(req.dog_name).slice(0, 60), breed: String(req.dog_breed ?? "").slice(0, 80) }] : [];
+}
+
 async function one(client: Client, sql: string, args: (string | number)[]) {
   return (await client.execute({ sql, args })).rows[0];
 }
@@ -126,6 +140,7 @@ const ADMIN_ONLY = new Set([
   "resendPartnerContract",
   "resendRequestContract",
   "syncCalendar",
+  "deleteDog",
 ]);
 
 /** Exécute une action métier avec les droits de la session et renvoie un éventuel résultat. */
@@ -163,6 +178,8 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const eventIds = await collectEventIds(client, { sessions: "c.partner_id = ?" }, [id]);
       await client.batch(
         [
+          { sql: "DELETE FROM fiches WHERE dog_id IN (SELECT d.id FROM dogs d JOIN contracts c ON c.id = d.contract_id WHERE c.partner_id = ?)", args: [id] },
+          { sql: "DELETE FROM dogs WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
           { sql: "DELETE FROM sessions WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
           { sql: "DELETE FROM invoices WHERE partner_id = ?", args: [id] },
           { sql: "UPDATE requests SET contract_id = NULL WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
@@ -237,7 +254,17 @@ export async function runAction(client: Client, session: PortalSession, type: st
         },
         ...sessions.map((x): InStatement => ({ sql: "INSERT INTO sessions (id, contract_id, date, status, invoice_id) VALUES (?,?,?,?,?)", args: [x.id, newId, x.date, x.status, null] })),
       ];
-      if (req) stmts.push({ sql: "UPDATE requests SET status='converted', contract_id=? WHERE id=?", args: [newId, String(req.id)] });
+      if (req) {
+        stmts.push({ sql: "UPDATE requests SET status='converted', contract_id=? WHERE id=?", args: [newId, String(req.id)] });
+        // Les chiens déclarés à l'inscription deviennent les chiens du client.
+        const declared = requestDogs(req);
+        for (const d of declared) {
+          stmts.push({
+            sql: "INSERT INTO dogs (id, contract_id, name, breed, sex, age, chip, created_at) VALUES (?,?,?,?,?,?,?,?)",
+            args: [uid("d"), newId, d.name, d.breed, "", "", "", todayISO()],
+          });
+        }
+      }
       await client.batch(stmts, "write");
       after(async () => {
         await syncContract(client, newId);
@@ -251,6 +278,8 @@ export async function runAction(client: Client, session: PortalSession, type: st
       await client.batch(
         [
           { sql: "DELETE FROM invoices WHERE contract_id = ?", args: [id] },
+          { sql: "DELETE FROM fiches WHERE dog_id IN (SELECT id FROM dogs WHERE contract_id = ?)", args: [id] },
+          { sql: "DELETE FROM dogs WHERE contract_id = ?", args: [id] },
           { sql: "DELETE FROM sessions WHERE contract_id = ?", args: [id] },
           { sql: "UPDATE requests SET contract_id = NULL WHERE contract_id = ?", args: [id] },
           { sql: "DELETE FROM contracts WHERE id = ?", args: [id] },
@@ -258,6 +287,43 @@ export async function runAction(client: Client, session: PortalSession, type: st
         "write",
       );
       after(() => deleteEvents(eventIds));
+      return null;
+    }
+
+    /* ---------- chiens ---------- */
+    case "saveDog": {
+      const contractId = text(b.contractId, "Le contrat", { max: 80 });
+      await assertContractAccess(client, session, contractId);
+      const name = text(b.name, "Le nom du chien", { max: 60 });
+      const breed = text(b.breed, "La race", { max: 80, required: false });
+      const sex = b.sex === "M" || b.sex === "F" ? b.sex : "";
+      const age = text(b.age, "L'âge", { max: 30, required: false });
+      const chip = typeof b.chip === "string" ? b.chip.replace(/\D/g, "").slice(0, 15) : "";
+      const id = typeof b.id === "string" ? b.id : null;
+      if (id) {
+        const own = await one(client, "SELECT id FROM dogs WHERE id = ? AND contract_id = ?", [id, contractId]);
+        if (!own) throw new ActionError("Chien introuvable.", 404);
+        await client.execute({ sql: "UPDATE dogs SET name=?, breed=?, sex=?, age=?, chip=? WHERE id=?", args: [name, breed, sex, age, chip, id] });
+        return { id };
+      }
+      const count = await one(client, "SELECT COUNT(*) AS n FROM dogs WHERE contract_id = ?", [contractId]);
+      if (Number(count?.n ?? 0) >= 10) throw new ActionError("Dix chiens au maximum par client.");
+      const newId = uid("d");
+      await client.execute({
+        sql: "INSERT INTO dogs (id, contract_id, name, breed, sex, age, chip, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        args: [newId, contractId, name, breed, sex, age, chip, todayISO()],
+      });
+      return { id: newId };
+    }
+    case "deleteDog": {
+      const id = text(b.id, "Le chien", { max: 80 });
+      await client.batch(
+        [
+          { sql: "DELETE FROM fiches WHERE dog_id = ?", args: [id] },
+          { sql: "DELETE FROM dogs WHERE id = ?", args: [id] },
+        ],
+        "write",
+      );
       return null;
     }
 

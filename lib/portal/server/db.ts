@@ -81,6 +81,25 @@ const SCHEMA = [
     status TEXT NOT NULL,
     contract_id TEXT
   )`,
+  `CREATE TABLE IF NOT EXISTS dogs (
+    id TEXT PRIMARY KEY,
+    contract_id TEXT NOT NULL REFERENCES contracts(id),
+    name TEXT NOT NULL,
+    breed TEXT NOT NULL DEFAULT '',
+    sex TEXT NOT NULL DEFAULT '',
+    age TEXT NOT NULL DEFAULT '',
+    chip TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+  )`,
+  // « Étude de comportement » : une fiche par chien, réponses en JSON (voir lib/portal/fiche.ts).
+  `CREATE TABLE IF NOT EXISTS fiches (
+    dog_id TEXT PRIMARY KEY REFERENCES dogs(id),
+    data TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'draft',
+    updated_at TEXT NOT NULL,
+    updated_by TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_dogs_contract ON dogs(contract_id)`,
   `CREATE INDEX IF NOT EXISTS idx_contracts_partner ON contracts(partner_id)`,
   `CREATE INDEX IF NOT EXISTS idx_sessions_contract ON sessions(contract_id)`,
   `CREATE INDEX IF NOT EXISTS idx_invoices_partner ON invoices(partner_id)`,
@@ -121,6 +140,7 @@ export function db(): Promise<Client> {
         "ALTER TABLE requests ADD COLUMN calendar_event_id TEXT",
         "ALTER TABLE requests ADD COLUMN first_name TEXT", // nom et prénom saisis séparément
         "ALTER TABLE contracts ADD COLUMN client_first_name TEXT",
+        "ALTER TABLE requests ADD COLUMN dogs_json TEXT", // tous les chiens déclarés à l'inscription
         "ALTER TABLE contracts ADD COLUMN client_last_name TEXT",
         "ALTER TABLE requests ADD COLUMN last_name TEXT",
       ]) {
