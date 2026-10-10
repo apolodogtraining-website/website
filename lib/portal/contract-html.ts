@@ -48,3 +48,36 @@ export function contractDocumentHtml(d: Doc) {
 
 export const mailIntro = (hello: string, what: string) =>
   `Bonjour ${hello},\n\nVous trouverez ci-joint votre exemplaire ${what}, au format PDF. Il est aussi reproduit ci-dessous.\n\nConservez-le : il fait foi des conditions acceptées.\n\n${site.name}\n${site.email} · ${site.phone}`;
+
+type Acceptance = {
+  firstName: string;
+  service: string;
+  dogs: string[];
+  /** Éducateur qui interviendra (null = Apolo lui-même). */
+  partner: { company: string; contact: string; phone: string } | null;
+  firstDate: string | null;
+};
+
+/** Corps de l'e-mail « votre contrat est accepté » envoyé au client à la validation de son dossier (sans pièce jointe). */
+export function acceptanceEmail(a: Acceptance) {
+  const who = a.partner
+    ? `Votre séance sera assurée par ${a.partner.company} (${a.partner.contact}${a.partner.phone ? `, ${a.partner.phone}` : ""}), éducateur partenaire d'${site.name}.`
+    : `Vos séances seront assurées par ${site.legal.publisherFullName}, ${site.name}.`;
+  const when = a.firstDate ? `Votre première séance est prévue le ${fmtSigned(a.firstDate)}.` : "Nous vous contactons très vite pour convenir des dates.";
+  const dogs = a.dogs.length ? ` pour ${a.dogs.join(", ")}` : "";
+  const lines = [`Nous avons bien accepté votre contrat : ${a.service}${dogs}.`, when, who];
+  const text = `Bonjour ${a.firstName},\n\n${lines.join("\n\n")}\n\nVotre exemplaire signé vous a déjà été envoyé à l'inscription. Une question ? Répondez simplement à ce message.\n\n${site.name}\n${site.email} · ${site.phone}`;
+  const html = `<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Votre contrat est accepté</title></head>
+<body style="margin:0;padding:24px;background:#f3f7f9;color:#16232c;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6">
+  <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #d5e6ed;border-radius:14px;padding:28px">
+    <p style="margin:0 0 4px;color:#1985b4;font-weight:bold;font-size:13px;letter-spacing:.04em;text-transform:uppercase">${esc(site.name)}</p>
+    <h1 style="margin:0 0 16px;font-size:22px">Votre contrat est accepté</h1>
+    <p style="margin:0 0 12px">Bonjour ${esc(a.firstName)},</p>
+    ${lines.map((l) => `<p style="margin:0 0 12px">${esc(l)}</p>`).join("\n    ")}
+    <p style="margin:18px 0 0;color:#5c6f7a;font-size:13px">Votre exemplaire signé vous a déjà été envoyé à l'inscription. Une question ? Répondez simplement à ce message.</p>
+    <p style="margin:22px 0 0;color:#5c6f7a;font-size:12px">${esc(site.name)} · ${esc(site.email)} · ${esc(site.phone)}</p>
+  </div>
+</body></html>`;
+  return { text, html };
+}
