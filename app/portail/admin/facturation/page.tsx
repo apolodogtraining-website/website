@@ -5,7 +5,7 @@ import { Download, Receipt } from "lucide-react";
 import InvoiceTable from "@/components/portal/InvoiceTable";
 import PortalShell from "@/components/portal/PortalShell";
 import { btn, Card, Empty, PageHeader, Stat, Table } from "@/components/portal/ui";
-import { billableSessions, money, splitAmount } from "@/lib/portal/format";
+import { billingTodo, isPackage, money, splitAmount } from "@/lib/portal/format";
 import { billingSummary } from "@/lib/portal/stats";
 import { usePortal } from "@/lib/portal/store";
 
@@ -25,7 +25,7 @@ export default function AdminBilling() {
   const router = useRouter();
   const { contracts, invoices, partners, invoiceContract } = usePortal();
   const t = billingSummary(contracts, invoices);
-  const pending = contracts.filter((c) => billableSessions(c).length > 0);
+  const pending = contracts.filter((c) => billingTodo(c, invoices).units > 0);
 
   return (
     <PortalShell role="admin">
@@ -64,19 +64,19 @@ export default function AdminBilling() {
       </div>
 
       <Card className="mt-6">
-        <h2 className="mb-3 text-base font-bold text-ink">Séances réalisées à facturer</h2>
+        <h2 className="mb-3 text-base font-bold text-ink">À facturer (séances réalisées et forfaits)</h2>
         {pending.length === 0 ? (
           <Empty>Tout est facturé.</Empty>
         ) : (
           <Table head={["Client", "Partenaire", "Séances", "Montant", "Commission", ""]}>
             {pending.map((c) => {
-              const n = billableSessions(c).length;
-              const amount = splitAmount(n * c.price, c.commissionRate);
+              const todo = billingTodo(c, invoices);
+              const amount = splitAmount(todo.amount, c.commissionRate);
               return (
                 <tr key={c.id}>
                   <td className="font-semibold">{c.clientName}</td>
                   <td>{partners.find((p) => p.id === c.partnerId)?.company}</td>
-                  <td>{n}</td>
+                  <td>{isPackage(c) ? "Forfait" : todo.units}</td>
                   <td className="whitespace-nowrap">{money(amount.gross)}</td>
                   <td className="whitespace-nowrap text-ink-soft">{money(amount.commission)}</td>
                   <td className="text-right">

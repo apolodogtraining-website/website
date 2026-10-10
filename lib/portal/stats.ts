@@ -1,4 +1,4 @@
-import { billableSessions, invoiceStatus, round2 } from "./format";
+import { billingTodo, invoiceStatus, round2 } from "./format";
 import type { ClientRequest, Contract, Invoice, Partner } from "./types";
 
 const sum = (xs: number[]) => round2(xs.reduce((a, b) => a + b, 0));
@@ -13,7 +13,7 @@ export function billingSummary(contracts: Contract[], invoices: Invoice[]) {
     toPayOut: sum(invoices.filter((i) => i.clientPaidAt && !i.payoutAt).map((i) => i.net)),
     outstanding: sum(invoices.filter((i) => !i.clientPaidAt).map((i) => i.gross)),
     lateCount: invoices.filter((i) => invoiceStatus(i) === "late").length,
-    toInvoiceCount: contracts.reduce((n, c) => n + billableSessions(c).length, 0),
+    toInvoiceCount: contracts.reduce((n, c) => n + billingTodo(c, invoices).units, 0),
   };
 }
 

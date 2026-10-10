@@ -145,6 +145,7 @@ export async function snapshot(client: Client, session: PortalSession): Promise<
       clientPhone: s(r.client_phone),
       address: s(r.address),
       service: s(r.service),
+      pricing: s(r.pricing) === "package" ? "package" : "session",
       price: Number(r.price),
       commissionRate: Number(r.commission_rate),
       frequency: sn(r.frequency) as Contract["frequency"],

@@ -10,7 +10,7 @@ import PortalShell from "@/components/portal/PortalShell";
 import DogsPanel from "@/components/portal/DogsPanel";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, btn, Card, ConfirmModal, Field, inputCls, PageHeader } from "@/components/portal/ui";
-import { billableSessions, fmtDateTime, fmtPhone, frequencyLabel, money, splitAmount, toLocalInput } from "@/lib/portal/format";
+import { billingTodo, fmtDateTime, isPackage, fmtPhone, frequencyLabel, money, splitAmount, toLocalInput } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 
 export default function AdminContractDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -34,8 +34,9 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
   }
 
   const partner = partners.find((p) => p.id === contract.partnerId);
-  const todo = billableSessions(contract);
-  const preview = splitAmount(todo.length * contract.price, contract.commissionRate);
+  const todo = billingTodo(contract, invoices);
+  const preview = splitAmount(todo.amount, contract.commissionRate);
+  const pack = isPackage(contract);
 
   return (
     <PortalShell role="admin">
@@ -83,15 +84,16 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
                 "—"
               )}
             </Row>
-            <Row k="Prix / séance">{money(contract.price)}</Row>
+            <Row k="Tarification">{pack ? "Forfait global" : "Prix par séance"}</Row>
+            <Row k={pack ? "Prix du forfait" : "Prix / séance"}>{money(contract.price)}</Row>
             <Row k="Commission">{contract.commissionRate} %</Row>
-            <Row k="Net partenaire / séance">{money(splitAmount(contract.price, contract.commissionRate).net)}</Row>
+            <Row k={pack ? "Net partenaire (forfait)" : "Net partenaire / séance"}>{money(splitAmount(contract.price, contract.commissionRate).net)}</Row>
           </dl>
           <div className="mt-4 border-t border-brand-light/60 pt-4">
-            {todo.length > 0 ? (
+            {todo.units > 0 ? (
               <>
                 <p className="text-sm text-ink-soft">
-                  {todo.length} séance{todo.length > 1 ? "s" : ""} réalisée{todo.length > 1 ? "s" : ""} à facturer :{" "}
+                  {pack ? "Forfait à facturer" : `${todo.units} séance${todo.units > 1 ? "s" : ""} réalisée${todo.units > 1 ? "s" : ""} à facturer`} :{" "}
                   <strong className="text-ink">{money(preview.gross)}</strong> dont {money(preview.commission)} de commission.
                 </p>
                 <button
@@ -106,7 +108,7 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
                 </button>
               </>
             ) : (
-              <p className="text-sm text-ink-soft">Aucune séance réalisée en attente de facturation.</p>
+              <p className="text-sm text-ink-soft">{pack ? "Le forfait est facturé, ou n'a pas encore de séance." : "Aucune séance réalisée en attente de facturation."}</p>
             )}
           </div>
         </Card>

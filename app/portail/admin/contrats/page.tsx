@@ -6,7 +6,7 @@ import { CalendarSync, Plus } from "lucide-react";
 import ContractForm from "@/components/portal/ContractForm";
 import PortalShell from "@/components/portal/PortalShell";
 import { Badge, btn, Card, Empty, PageHeader, Table } from "@/components/portal/ui";
-import { contractBilling, fmtDateTime, money, nextSession } from "@/lib/portal/format";
+import { contractBilling, fmtDateTime, nextSession, priceLabel } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 
 export default function AdminContracts() {
@@ -68,7 +68,7 @@ export default function AdminContracts() {
         {shown.length === 0 ? (
           <Empty>Aucun contrat.</Empty>
         ) : (
-          <Table head={["Client", "Type", "Partenaire", "Prochain rendez-vous", "Prix / séance", "Facturation"]}>
+          <Table head={["Client", "Type", "Partenaire", "Prochain rendez-vous", "Prix", "Facturation"]}>
             {shown.map((c) => {
               const next = nextSession(c);
               const billing = contractBilling(c, invoices);
@@ -83,7 +83,7 @@ export default function AdminContracts() {
                   <td>{c.type === "recurring" ? <Badge tone="blue">Récurrent</Badge> : <Badge>Ponctuel</Badge>}</td>
                   <td>{partners.find((p) => p.id === c.partnerId)?.company ?? "—"}</td>
                   <td className="whitespace-nowrap">{next ? fmtDateTime(next.date) : "—"}</td>
-                  <td className="whitespace-nowrap">{money(c.price)}</td>
+                  <td className="whitespace-nowrap">{priceLabel(c)}</td>
                   <td>
                     <Badge tone={billing.tone}>{billing.label}</Badge>
                   </td>

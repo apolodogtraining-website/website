@@ -25,6 +25,8 @@ export type Partner = {
 
 export type Frequency = "weekly" | "biweekly" | "monthly";
 export type ContractType = "recurring" | "oneoff";
+/** « session » : prix d'une séance, facturé au fil des séances réalisées ; « package » : prix global d'un forfait, facturé en une fois. */
+export type Pricing = "session" | "package";
 export type SessionStatus = "planned" | "done" | "cancelled";
 
 export type Session = {
@@ -48,7 +50,9 @@ export type Contract = {
   clientPhone: string;
   address: string;
   service: string;
-  /** Prix d'une séance facturé au client, en euros. */
+  /** Mode de tarification (absent = « session »). */
+  pricing?: Pricing;
+  /** Prix facturé au client, en euros : d'une séance, ou du forfait global selon `pricing`. */
   price: number;
   /** Taux figé à la création : changer le taux du partenaire n'altère pas l'existant. */
   commissionRate: number;
