@@ -12,6 +12,8 @@ type Doc = {
   signedBy: string;
   signedAt: string;
   version: string;
+  /** Mention complémentaire consignée dans l'exemplaire (ex. demande expresse de début anticipé). */
+  notice?: string;
 };
 
 /**
@@ -35,6 +37,7 @@ export function contractDocumentHtml(d: Doc) {
     <div style="margin-top:28px;padding:14px 16px;border:1px solid #d5e6ed;border-radius:10px;background:#f3f7f9">
       <strong>Signé par ${esc(d.signedBy)}</strong><br>le ${esc(fmtSigned(d.signedAt))}
     </div>
+    ${d.notice ? `<p style="margin:14px 0 0;color:#34454f">${esc(d.notice)}</p>` : ""}
     <p style="margin-top:22px;color:#5c6f7a;font-size:12px">
       ${esc(site.legal.publisherLegalName)} · SIRET ${esc(site.siret)} · ${esc(site.address.street)}, ${esc(site.address.postalCode)} ${esc(site.address.locality)}<br>
       ${esc(site.email)} · ${esc(site.phone)}

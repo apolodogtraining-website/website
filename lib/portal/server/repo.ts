@@ -79,6 +79,7 @@ const toRequest = (r: Row): ClientRequest => ({
   status: s(r.status) as ClientRequest["status"],
   contractId: sn(r.contract_id),
   copySentAt: sn(r.copy_sent_at),
+  earlyStartAt: sn(r.early_start_at),
 });
 
 /**
