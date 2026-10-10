@@ -37,14 +37,16 @@ export type ContractInput = {
   requestId?: string;
 };
 
+export type DogInput = { name: string; breed: string; sex: "M" | "F" | ""; age: string; chip: string };
+
 export type RequestInput = {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
   address: string;
-  dogName: string;
-  dogBreed: string;
+  /** Un ou plusieurs chiens (5 au maximum). */
+  dogs: { name: string; breed: string }[];
   service: string;
   type: ContractType;
   preferredDate: string;
@@ -77,6 +79,10 @@ type Store = PortalData & {
   resendPartnerContract: (partnerId: string) => Promise<void>;
   resendRequestContract: (requestId: string) => Promise<void>;
   syncCalendar: () => Promise<number | undefined>;
+  saveDog: (contractId: string, input: DogInput, id?: string) => Promise<string | undefined>;
+  deleteDog: (id: string) => Promise<void>;
+  /** Recharge les données depuis le serveur (après une action hors du store, ex. une fiche). */
+  refresh: () => Promise<void>;
 };
 
 const Ctx = createContext<Store | null>(null);
@@ -198,6 +204,17 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       deleteRequest: async (id) => void (await call("deleteRequest", { id })),
       resendPartnerContract: async (id) => void (await call("resendPartnerContract", { id })),
       resendRequestContract: async (id) => void (await call("resendRequestContract", { id })),
+      saveDog: async (contractId, input, id) => (await call<{ id: string }>("saveDog", { ...input, contractId, id }))?.id,
+      deleteDog: async (id) => void (await call("deleteDog", { id })),
+      refresh: async () => {
+        try {
+          const r = await fetch("/api/portal/me", { cache: "no-store" });
+          const p = (await r.json()) as { session: PortalSession | null; data?: PortalData };
+          if (p.data) setData(p.data);
+        } catch {
+          /* la prochaine action rechargera de toute façon */
+        }
+      },
       syncCalendar: async () => (await call<{ events: number }>("syncCalendar"))?.events,
     }),
     [data, ready, session, error, call],

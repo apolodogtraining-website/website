@@ -17,8 +17,7 @@ const empty: RequestInput = {
   email: "",
   phone: "",
   address: "",
-  dogName: "",
-  dogBreed: "",
+  dogs: [{ name: "", breed: "" }],
   service: services[0]?.title ?? "",
   type: "oneoff",
   preferredDate: "",
@@ -87,14 +86,35 @@ export default function ClientSignup() {
               <Field label="Adresse d'intervention">
                 {(id) => <input id={id} required autoComplete="street-address" className={inputCls} value={f.address} onChange={(e) => set("address", e.target.value)} />}
               </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nom du chien">
-                  {(id) => <input id={id} required className={inputCls} value={f.dogName} onChange={(e) => set("dogName", e.target.value)} />}
-                </Field>
-                <Field label="Race et âge">
-                  {(id) => <input id={id} className={inputCls} placeholder="Ex. Labrador, 5 mois" value={f.dogBreed} onChange={(e) => set("dogBreed", e.target.value)} />}
-                </Field>
-              </div>
+              {f.dogs.map((dog, i) => (
+                <div key={i} className="rounded-xl border border-brand-light/70 p-3 sm:p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <p className="text-sm font-semibold text-ink">{f.dogs.length > 1 ? `Chien n°${i + 1}` : "Votre chien"}</p>
+                    {i > 0 && (
+                      <button type="button" className="text-sm font-semibold text-red-700 hover:underline" onClick={() => set("dogs", f.dogs.filter((_, k) => k !== i))}>
+                        Retirer
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Nom du chien">
+                      {(id) => (
+                        <input id={id} required maxLength={60} className={inputCls} value={dog.name} onChange={(e) => set("dogs", f.dogs.map((d, k) => (k === i ? { ...d, name: e.target.value } : d)))} />
+                      )}
+                    </Field>
+                    <Field label="Race et âge">
+                      {(id) => (
+                        <input id={id} maxLength={80} className={inputCls} placeholder="Ex. Labrador, 5 mois" value={dog.breed} onChange={(e) => set("dogs", f.dogs.map((d, k) => (k === i ? { ...d, breed: e.target.value } : d)))} />
+                      )}
+                    </Field>
+                  </div>
+                </div>
+              ))}
+              {f.dogs.length < 5 && (
+                <button type="button" className={btn.ghost} onClick={() => set("dogs", [...f.dogs, { name: "", breed: "" }])}>
+                  + Ajouter un autre chien
+                </button>
+              )}
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Prestation souhaitée">
                   {(id) => (

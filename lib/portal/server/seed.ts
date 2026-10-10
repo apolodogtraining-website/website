@@ -30,13 +30,30 @@ export async function seedDemoIfEmpty(client: Client) {
         args: [s.id, c.id, s.date, s.status, s.invoiceId],
       })),
     ),
+    ...d.contracts.flatMap((c) =>
+      (c.dogs ?? []).map((dg) => ({
+        sql: "INSERT INTO dogs (id, contract_id, name, breed, sex, age, chip, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        args: [dg.id, c.id, dg.name, dg.breed, dg.sex, dg.age, dg.chip, "2026-09-01"],
+      })),
+    ),
+    // Fiche partiellement remplie pour illustrer l'étude de comportement.
+    {
+      sql: "INSERT INTO fiches (dog_id, data, status, updated_at, updated_by) VALUES (?,?,?,?,?)",
+      args: [
+        "d1",
+        JSON.stringify({ date: "2026-09-08", raisons: "Chiot qui tire en laisse et mordille.", sexe: "Mâle", age: "5 mois", temperament: "Sociable", energie: "Très haut", edu_tire: "oui", edu_assis: "non", comp_mordille: "oui", comp_mordille__detail: "Surtout le soir, sur les mains." }),
+        "draft",
+        "2026-09-08T17:50:00.000Z",
+        "Canin Nature 33",
+      ],
+    },
     ...d.invoices.map((i) => ({
       sql: "INSERT INTO invoices VALUES (?,?,?,?,?,?,?,?,?,?,?)",
       args: [i.id, i.number, i.contractId, i.partnerId, i.issuedAt, i.dueAt, i.gross, i.commission, i.net, i.clientPaidAt, i.payoutAt],
     })),
     ...d.requests.map((r) => ({
-      sql: "INSERT INTO requests (id, created_at, name, first_name, last_name, email, phone, address, dog_name, dog_breed, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-      args: [r.id, r.createdAt, r.name, r.firstName ?? null, r.lastName ?? null, r.email, r.phone, r.address, r.dogName, r.dogBreed, r.service, r.type, r.preferredDate, r.notes, r.signedAt, r.signedBy, r.contractVersion, r.status, r.contractId],
+      sql: "INSERT INTO requests (id, created_at, name, first_name, last_name, email, phone, address, dog_name, dog_breed, dogs_json, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      args: [r.id, r.createdAt, r.name, r.firstName ?? null, r.lastName ?? null, r.email, r.phone, r.address, r.dogName, r.dogBreed, JSON.stringify(r.dogs ?? [{ name: r.dogName, breed: r.dogBreed }]), r.service, r.type, r.preferredDate, r.notes, r.signedAt, r.signedBy, r.contractVersion, r.status, r.contractId],
     })),
   ];
   await client.batch(stmts, "write");

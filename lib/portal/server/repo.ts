@@ -1,5 +1,5 @@
 import type { Client, Row } from "@libsql/client";
-import type { ClientRequest, Contract, Invoice, Partner, PortalData, PortalSession, Session } from "../types";
+import type { ClientRequest, Contract, Dog, Invoice, Partner, PortalData, PortalSession, Session } from "../types";
 
 const s = (v: unknown) => (v == null ? "" : String(v));
 const sn = (v: unknown) => (v == null ? null : String(v));
@@ -45,6 +45,18 @@ const toInvoice = (r: Row, sessionIds: string[]): Invoice => ({
   payoutAt: sn(r.payout_at),
 });
 
+function parseDogs(json: unknown, name: unknown, breed: unknown): { name: string; breed: string }[] {
+  try {
+    const arr = JSON.parse(String(json));
+    if (Array.isArray(arr) && arr.length) {
+      return arr.map((d) => ({ name: String(d?.name ?? ""), breed: String(d?.breed ?? "") })).filter((d) => d.name);
+    }
+  } catch {
+    /* anciennes inscriptions : un seul chien dans dog_name / dog_breed */
+  }
+  return s(name) ? [{ name: s(name), breed: s(breed) }] : [];
+}
+
 const toRequest = (r: Row): ClientRequest => ({
   id: s(r.id),
   createdAt: s(r.created_at),
@@ -56,6 +68,7 @@ const toRequest = (r: Row): ClientRequest => ({
   address: s(r.address),
   dogName: s(r.dog_name),
   dogBreed: s(r.dog_breed),
+  dogs: parseDogs(r.dogs_json, r.dog_name, r.dog_breed),
   service: s(r.service),
   type: s(r.type) as ClientRequest["type"],
   preferredDate: s(r.preferred_date),
@@ -92,6 +105,26 @@ export async function snapshot(client: Client, session: PortalSession): Promise<
       })
     : { rows: [] as Row[] };
 
+  const dogRows = contractIds.length
+    ? await client.execute({
+        sql: `SELECT d.*, f.status AS fiche_status, f.updated_at AS fiche_updated
+              FROM dogs d LEFT JOIN fiches f ON f.dog_id = d.id
+              WHERE d.contract_id IN (${contractIds.map(() => "?").join(",")}) ORDER BY d.created_at, d.name`,
+        args: contractIds,
+      })
+    : { rows: [] as Row[] };
+  const dogs: Dog[] = dogRows.rows.map((r) => ({
+    id: s(r.id),
+    contractId: s(r.contract_id),
+    name: s(r.name),
+    breed: s(r.breed),
+    sex: (s(r.sex) as Dog["sex"]),
+    age: s(r.age),
+    chip: s(r.chip),
+    ficheStatus: r.fiche_status ? (s(r.fiche_status) as Dog["ficheStatus"]) : "none",
+    ficheUpdatedAt: sn(r.fiche_updated),
+  }));
+
   const sess = sessions.rows.map(toSession);
   const byInvoice = new Map<string, string[]>();
   for (const x of sess) if (x.invoiceId) byInvoice.set(x.invoiceId, [...(byInvoice.get(x.invoiceId) ?? []), x.id]);
@@ -116,6 +149,7 @@ export async function snapshot(client: Client, session: PortalSession): Promise<
       createdAt: s(r.created_at),
       clientSignedAt: sn(r.client_signed_at),
       clientSignedBy: sn(r.client_signed_by),
+      dogs: dogs.filter((d) => d.contractId === s(r.id)),
       sessions: sess
         .filter((x) => x.contractId === s(r.id))
         .map((x): Session => ({ id: x.id, date: x.date, status: x.status, invoiceId: x.invoiceId })),

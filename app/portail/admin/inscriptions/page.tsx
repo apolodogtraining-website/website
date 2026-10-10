@@ -68,7 +68,7 @@ export default function AdminRequests() {
                 <Info k="E-mail" v={r.email} />
                 <Info k="Téléphone" v={fmtPhone(r.phone)} />
                 <Info k="Adresse" v={r.address} />
-                <Info k="Chien" v={[r.dogName, r.dogBreed].filter(Boolean).join(" — ")} />
+                <Info k={(r.dogs?.length ?? 0) > 1 ? "Chiens" : "Chien"} v={(r.dogs?.length ? r.dogs : [{ name: r.dogName, breed: r.dogBreed }]).map((d) => [d.name, d.breed].filter(Boolean).join(" — ")).join(" ; ")} />
                 <Info k="Date souhaitée" v={r.preferredDate ? fmtDateTime(r.preferredDate) : "—"} />
                 <Info k="Contrat signé" v={`${r.signedBy}, le ${fmtDateTime(r.signedAt)} (v. ${r.contractVersion})`} />
                 <Info k="Exemplaire par e-mail" v={r.copySentAt ? `envoyé le ${fmtDateTime(r.copySentAt)}` : "pas encore envoyé"} />

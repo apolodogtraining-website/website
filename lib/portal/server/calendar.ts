@@ -64,12 +64,14 @@ type SessionRow = {
   notes: string;
   partnerCompany: string;
   isSelf: boolean;
+  dogs: string;
 };
 
 async function loadSessions(client: Client, where: string, args: InValue[]): Promise<SessionRow[]> {
   const r = await client.execute({
     sql: `SELECT s.id, s.date, s.status, s.calendar_event_id AS event_id, c.id AS contract_id, c.client_name, c.client_phone, c.client_email,
-                 c.address, c.service, c.notes, p.company, p.is_self
+                 c.address, c.service, c.notes, p.company, p.is_self,
+                 (SELECT group_concat(d.name, ', ') FROM dogs d WHERE d.contract_id = c.id) AS dogs
           FROM sessions s JOIN contracts c ON c.id = s.contract_id JOIN partners p ON p.id = c.partner_id
           WHERE ${where}`,
     args,
@@ -88,6 +90,7 @@ async function loadSessions(client: Client, where: string, args: InValue[]): Pro
     notes: String(x.notes ?? ""),
     partnerCompany: String(x.company),
     isSelf: Number(x.is_self) === 1,
+    dogs: String(x.dogs ?? ""),
   }));
 }
 
@@ -115,6 +118,7 @@ function sessionOp(s: SessionRow): Op | null {
       s.clientPhone && `Téléphone : ${fmtPhone(s.clientPhone)}`,
       s.clientEmail && `E-mail : ${s.clientEmail}`,
       `Adresse : ${s.address}`,
+      s.dogs && `Chien(s) : ${s.dogs}`,
       s.notes && `Notes : ${s.notes}`,
       "",
       `Portail : ${adminLink(`contrats/${s.contractId}`)}`,
@@ -134,7 +138,7 @@ async function loadRequests(client: Client, where: string, args: InValue[]): Pro
     phone: String(x.phone),
     email: String(x.email),
     address: String(x.address),
-    dog: [x.dog_name, x.dog_breed].filter(Boolean).join(" — "),
+    dog: String(x.dogs_json ? (() => { try { return (JSON.parse(String(x.dogs_json)) as { name: string; breed: string }[]).map((d) => [d.name, d.breed].filter(Boolean).join(" — ")).join(" ; "); } catch { return ""; } })() : [x.dog_name, x.dog_breed].filter(Boolean).join(" — ")),
     service: String(x.service),
     type: String(x.type),
     preferred: String(x.preferred_date ?? ""),
