@@ -70,6 +70,16 @@ export function dashboardStats(partners: Partner[], contracts: Contract[], invoi
     for (const i of invoices.filter((x) => within(x.issuedAt, cur))) m.set(key(i), round2((m.get(key(i)) ?? 0) + i.gross));
     return [...m.entries()].map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value);
   };
+  const commissionByPartner = (() => {
+    const m = new Map<string, { commission: number; gross: number }>();
+    for (const i of invoices.filter((x) => within(x.issuedAt, cur))) {
+      const p = partners.find((x) => x.id === i.partnerId);
+      if (!p || p.isSelf) continue; // « Moi-même » ne verse pas de commission
+      const e = m.get(p.company) ?? { commission: 0, gross: 0 };
+      m.set(p.company, { commission: round2(e.commission + i.commission), gross: round2(e.gross + i.gross) });
+    }
+    return [...m.entries()].map(([label, v]) => ({ label, value: v.commission, gross: v.gross })).filter((x) => x.value > 0).sort((a, b) => b.value - a.value);
+  })();
   const serviceOf = (i: Invoice) => contracts.find((c) => c.id === i.contractId)?.service ?? "Autre";
   const partnerOf = (i: Invoice) => {
     const p = partners.find((x) => x.id === i.partnerId);
@@ -112,6 +122,8 @@ export function dashboardStats(partners: Partner[], contracts: Contract[], invoi
     dogsTodo,
     byService: group(serviceOf),
     byPartner: group(partnerOf),
+    commissionByPartner,
+    commissionTotal: sum(commissionByPartner.map((x) => x.value)),
     months,
   };
 }

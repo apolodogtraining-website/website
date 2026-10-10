@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { CalendarSync, Plus, Receipt, UserPlus } from "lucide-react";
-import ContractForm from "@/components/portal/ContractForm";
-import { BarChart, ShareBars } from "@/components/portal/DashboardCharts";
-import PartnerForm from "@/components/portal/PartnerForm";
+import { Receipt } from "lucide-react";
+import { BarChart, PieChart, ShareBars } from "@/components/portal/DashboardCharts";
 import PortalShell from "@/components/portal/PortalShell";
 import { Badge, btn, Card, PageHeader, Stat, Table } from "@/components/portal/ui";
 import WeekCalendar from "@/components/portal/WeekCalendar";
@@ -20,10 +18,8 @@ const PERIODS: { key: PeriodKind; label: string }[] = [
 ];
 
 export default function AdminHome() {
-  const { partners, contracts, invoices, requests, settings, syncCalendar } = usePortal();
+  const { partners, contracts, invoices, requests, settings } = usePortal();
   const [period, setPeriod] = useState<PeriodKind>("month");
-  const [adding, setAdding] = useState<"client" | "partner" | null>(null);
-  const [syncMsg, setSyncMsg] = useState("");
   const total = billingSummary(contracts, invoices);
   const st = useMemo(() => dashboardStats(partners, contracts, invoices, requests, period), [partners, contracts, invoices, requests, period]);
   const alerts = useMemo(() => dashboardAlerts(partners, contracts, requests), [partners, contracts, requests]);
@@ -43,24 +39,6 @@ export default function AdminHome() {
       <PageHeader title="Vue d'ensemble" subtitle="Partenaires, contrats et état de la facturation." />
 
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        <button type="button" className={btn.primary} onClick={() => setAdding("client")}>
-          <UserPlus className="h-4 w-4" /> Client existant
-        </button>
-        <button type="button" className={btn.secondary} onClick={() => setAdding("partner")}>
-          <Plus className="h-4 w-4" /> Partenaire
-        </button>
-        <button
-          type="button"
-          className={btn.secondary}
-          onClick={async () => {
-            setSyncMsg("Synchronisation…");
-            const n = await syncCalendar();
-            setSyncMsg(n === undefined ? "" : `Agenda à jour (${n} événement${n > 1 ? "s" : ""}).`);
-          }}
-        >
-          <CalendarSync className="h-4 w-4" /> Synchroniser l&apos;agenda
-        </button>
-        {syncMsg && <span role="status" className="text-sm text-ink-soft">{syncMsg}</span>}
         <div className="ml-auto flex border border-brand-light" role="group" aria-label="Période des statistiques">
           {PERIODS.map((p) => (
             <button
@@ -177,8 +155,8 @@ export default function AdminHome() {
           </Card>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             <Card>
-              <h2 className="mb-4 font-display text-lg uppercase tracking-wide text-ink">Par partenaire</h2>
-              <ShareBars items={st.byPartner} empty="Aucune facture sur la période." />
+              <h2 className="mb-4 font-display text-lg uppercase tracking-wide text-ink">Commissions par partenaire</h2>
+              <PieChart items={st.commissionByPartner} total={st.commissionTotal} totalLabel="Commissions gagnées" empty="Aucune commission sur la période." />
             </Card>
             <Card>
               <h2 className="mb-4 font-display text-lg uppercase tracking-wide text-ink">Par prestation</h2>
@@ -252,8 +230,6 @@ export default function AdminHome() {
         )}
       </Card>
 
-      {adding === "client" && <ContractForm existingClient onClose={() => setAdding(null)} />}
-      {adding === "partner" && <PartnerForm onClose={() => setAdding(null)} />}
     </PortalShell>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
+import { CalendarSync } from "lucide-react";
 import PortalShell from "@/components/portal/PortalShell";
-import { Card, PageHeader } from "@/components/portal/ui";
+import { btn, Card, PageHeader } from "@/components/portal/ui";
 import { usePortal } from "@/lib/portal/store";
 
 function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint: string }) {
@@ -21,7 +23,9 @@ function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange
 }
 
 export default function AdminSettings() {
-  const { settings, saveSettings } = usePortal();
+  const { settings, saveSettings, syncCalendar } = usePortal();
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState("");
   const opt = (active: boolean) =>
     `flex-1 px-4 py-2 text-sm font-semibold transition ${active ? "bg-brand text-white" : "text-ink-soft hover:bg-brand-tint"}`;
 
@@ -30,6 +34,35 @@ export default function AdminSettings() {
       <PageHeader title="Paramètres" subtitle="Activez ou désactivez les fonctions du portail. Les changements sont enregistrés tout de suite." />
 
       <Card>
+        <h2 className="font-display text-lg uppercase tracking-wide text-ink">Google Agenda</h2>
+        <p className="mt-2 text-sm text-ink-soft">
+          Les séances et les demandes d&apos;inscription se synchronisent déjà automatiquement. Ce bouton remet tout l&apos;agenda à jour d&apos;un coup : utile après une première configuration, une suppression à la main dans Google Agenda ou
+          une synchronisation qui a échoué.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            className={btn.primary}
+            disabled={syncing}
+            onClick={async () => {
+              setSyncing(true);
+              setSyncMsg("");
+              const n = await syncCalendar();
+              setSyncing(false);
+              setSyncMsg(n === undefined ? "" : `Agenda à jour (${n} événement${n > 1 ? "s" : ""}).`);
+            }}
+          >
+            <CalendarSync className="h-4 w-4" /> {syncing ? "Synchronisation…" : "Synchroniser l'agenda"}
+          </button>
+          {syncMsg && (
+            <span role="status" className="text-sm text-ink-soft">
+              {syncMsg}
+            </span>
+          )}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
         <h2 className="font-display text-lg uppercase tracking-wide text-ink">E-mails aux clients</h2>
         <div className="divide-y divide-brand-light/60">
           <Toggle

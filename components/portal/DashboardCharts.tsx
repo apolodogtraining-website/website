@@ -44,3 +44,40 @@ export function ShareBars({ items, empty }: { items: { label: string; value: num
     </ul>
   );
 }
+
+const PIE_COLORS = ["#ff7a1a", "#ffb072", "#c85a0a", "#f4efe6", "#a6a7a2", "#7a3a10", "#ffd9bb", "#5c5d59"];
+
+/** Camembert (conic-gradient) avec légende : montant et part de chaque tranche. */
+export function PieChart({ items, total, totalLabel, empty }: { items: { label: string; value: number }[]; total: number; totalLabel: string; empty: string }) {
+  if (total <= 0 || items.length === 0) return <p className="text-sm text-ink-soft">{empty}</p>;
+  const stops = items.map((it, i) => {
+    const before = items.slice(0, i).reduce((n, x) => n + x.value, 0);
+    return `${PIE_COLORS[i % PIE_COLORS.length]} ${(before / total) * 100}% ${((before + it.value) / total) * 100}%`;
+  });
+  return (
+    <div className="flex flex-col items-center gap-6 sm:flex-row">
+      <div
+        role="img"
+        aria-label={items.map((it) => `${it.label} : ${money(it.value)}`).join(", ")}
+        className="h-44 w-44 shrink-0 rounded-full"
+        style={{ background: `conic-gradient(${stops.join(", ")})` }}
+      />
+      <div className="min-w-0 flex-1 self-stretch">
+        <ul className="space-y-2.5">
+          {items.map((it, i) => (
+            <li key={it.label} className="flex items-center gap-2.5 text-sm">
+              <span aria-hidden className="h-3 w-3 shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
+              <span className="min-w-0 flex-1 truncate text-ink">{it.label}</span>
+              <span className="shrink-0 text-ink-soft">
+                {money(it.value)} · {Math.round((it.value / total) * 100)} %
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 border-t border-brand-light/60 pt-3 text-sm text-ink-soft">
+          {totalLabel} : <span className="font-semibold text-ink">{money(total)}</span>
+        </p>
+      </div>
+    </div>
+  );
+}
