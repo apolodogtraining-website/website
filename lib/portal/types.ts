@@ -120,6 +120,8 @@ export type ClientRequest = {
   status: RequestStatus;
   contractId: string | null;
   copySentAt?: string | null;
+  /** Date de la demande expresse de début de prestation avant la fin des 14 jours de rétractation (null = non demandée). */
+  earlyStartAt?: string | null;
 };
 
 export type PortalSession = { role: "admin" } | { role: "partner"; partnerId: string };

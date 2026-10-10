@@ -1,7 +1,7 @@
 import type { Client } from "@libsql/client";
 import { clientContractArticles, contractArticles, CLIENT_CONTRACT_VERSION, CONTRACT_VERSION } from "../contract-text";
 import { contractDocumentHtml, mailIntro } from "../contract-html";
-import { toLocalInput } from "../format";
+import { fmtDateTime, toLocalInput } from "../format";
 import { type MailResult, sendMail } from "./mailer";
 
 /**
@@ -47,6 +47,9 @@ export async function deliverRequestCopy(client: Client, requestId: string): Pro
     signedBy: String(row.signed_by),
     signedAt: String(row.signed_at),
     version: String(row.contract_version ?? CLIENT_CONTRACT_VERSION),
+    notice: row.early_start_at
+      ? `Le Client a expressément demandé, le ${fmtDateTime(String(row.early_start_at))}, que la prestation commence avant la fin du délai de rétractation de 14 jours ; s'il se rétracte, il règle les séances déjà réalisées.`
+      : "Le Client n'a pas demandé de début de prestation avant la fin du délai de rétractation de 14 jours.",
   });
   const res = await sendMail({
     to: String(row.email),
