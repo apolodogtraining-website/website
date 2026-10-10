@@ -14,6 +14,9 @@
  * Après toute modification du script : Déployer → Gérer les déploiements → modifier → nouvelle version.
  * Quota Gmail gratuit : environ 100 e-mails par jour.
  *
+ * VERSION 3 (inclut la v2)
+ *  - sans pdfName ni pdfHtml : e-mail simple, sans pièce jointe (confirmation d'acceptation du contrat).
+ *
  * VERSION 2
  *  - pdfHtml : PDF joint généré depuis un document distinct du corps du mail (études de comportement).
  *  - ping : sonde de version, sans aucun envoi. Le portail la vérifie avant d'envoyer.
@@ -29,7 +32,7 @@ function doPost(e) {
     // Sans secret configuré, ou secret incorrect : on refuse (l'URL est publique).
     if (!secret || data.secret !== secret) return out_({ ok: false, error: "Accès refusé." });
 
-    if (data.ping) return out_({ ok: true, v: 2 });
+    if (data.ping) return out_({ ok: true, v: 3 });
 
     var to = String(data.to || "");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return out_({ ok: false, error: "Destinataire invalide." });
@@ -53,18 +56,22 @@ function doPost(e) {
 }
 
 function send_(data, to) {
-  // PDF généré depuis pdfHtml s'il est fourni (ex. étude de comportement), sinon depuis le corps du mail (contrats).
-  var pdf = Utilities.newBlob(String(data.pdfHtml || data.html), "text/html", "document.html")
-    .getAs("application/pdf")
-    .setName(String(data.pdfName || "document.pdf"));
-
-  GmailApp.sendEmail(to, String(data.subject), String(data.text), {
+  var options = {
     htmlBody: String(data.html),
     name: "Apolo Dog Training",
     bcc: data.bcc ? String(data.bcc) : "",
     replyTo: data.replyTo ? String(data.replyTo) : "",
-    attachments: [pdf],
-  });
+  };
+  // PDF généré depuis pdfHtml s'il est fourni (ex. étude de comportement), sinon depuis le corps du mail (contrats).
+  // Sans pdfName ni pdfHtml : aucun PDF joint.
+  if (data.pdfName || data.pdfHtml) {
+    options.attachments = [
+      Utilities.newBlob(String(data.pdfHtml || data.html), "text/html", "document.html")
+        .getAs("application/pdf")
+        .setName(String(data.pdfName || "document.pdf")),
+    ];
+  }
+  GmailApp.sendEmail(to, String(data.subject), String(data.text), options);
 }
 
 function out_(obj) {

@@ -10,8 +10,8 @@ type Mail = {
   html: string;
   /** Si fourni : source du PDF joint, distincte du corps du mail (nécessite la version 2 du script). */
   pdfHtml?: string;
-  /** Nom du PDF généré à partir du HTML et joint au message. */
-  pdfName: string;
+  /** Nom du PDF généré à partir du HTML et joint au message. Absent : aucun PDF joint (script v3 ; sinon un PDF du corps est joint). */
+  pdfName?: string;
 };
 
 type Reply = { ok?: boolean; error?: string; v?: number };
@@ -73,7 +73,10 @@ export async function sendMail(mail: Mail): Promise<MailResult> {
     return { ok: false, reason: "Le script d'envoi Google doit être mis à jour (nouvelle version du script « Envoi des contrats »)." };
   }
 
-  const payload = { secret, ...mail, bcc: site.email, replyTo: site.email, requestId: uid("m") };
+  const v3 = probe.out.ok === true && (probe.out.v ?? 1) >= 3;
+  // Un script antérieur à la v3 joint toujours un PDF : on lui en donne un nom plutôt qu'un « document.pdf ».
+  const pdfName = mail.pdfName ?? (v3 ? undefined : "Confirmation.pdf");
+  const payload = { secret, ...mail, pdfName, bcc: site.email, replyTo: site.email, requestId: uid("m") };
   try {
     const { status, out } = safeToRetry ? await callWithRetry(url, payload) : await call(url, payload);
     if (out?.ok) return { ok: true };

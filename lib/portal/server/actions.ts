@@ -5,7 +5,7 @@ import type { Contract, Frequency, PortalSession, Session } from "../types";
 import { after } from "next/server";
 import { hashPassword, tempPassword } from "./auth";
 import { collectEventIds, deleteEvents, syncAll, syncContract, syncPartner, syncRequest, syncSessions } from "./calendar";
-import { deliverPartnerCopy, deliverRequestCopy } from "./copies";
+import { deliverAcceptance, deliverPartnerCopy, deliverRequestCopy } from "./copies";
 import { assertContractAccess } from "./fiches";
 import { SELF_ID } from "./db";
 import { snapshot } from "./repo";
@@ -270,6 +270,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
         await syncContract(client, newId);
         if (req) await syncRequest(client, String(req.id)); // la demande est traitée : son événement « DEMANDE » disparaît
       });
+      if (req) after(() => deliverAcceptance(client, newId)); // confirmation au client : contrat accepté
       return { id: newId };
     }
     case "deleteContract": {
