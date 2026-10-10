@@ -4,6 +4,7 @@ import { addDaysISO, billableSessions, generateSessions, splitAmount, todayISO, 
 import type { Contract, Frequency, PortalSession, Session } from "../types";
 import { after } from "next/server";
 import { hashPassword, tempPassword } from "./auth";
+import { collectEventIds, deleteEvents, syncAll, syncContract, syncPartner, syncRequest, syncSessions } from "./calendar";
 import { deliverPartnerCopy, deliverRequestCopy } from "./copies";
 import { SELF_ID } from "./db";
 import { snapshot } from "./repo";
@@ -110,6 +111,7 @@ const ADMIN_ONLY = new Set([
   "deleteRequest",
   "resendPartnerContract",
   "resendRequestContract",
+  "syncCalendar",
 ]);
 
 /** Exécute une action métier avec les droits de la session et renvoie un éventuel résultat. */
@@ -130,6 +132,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
           sql: "UPDATE partners SET company=?, contact=?, email=?, phone=?, siret=?, specialties=?, commission_rate=?, active=? WHERE id=?",
           args: [f.company, f.contact, f.email, f.phone, f.siret, f.specialties, f.commissionRate, f.active ? 1 : 0, id],
         });
+        after(() => syncPartner(client, id)); // le nom de l'entreprise figure dans le titre des événements
         return { id };
       }
       const newId = uid("p");
@@ -143,6 +146,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
     case "deletePartner": {
       const id = text(b.id, "Le partenaire", { max: 80 });
       if (id === SELF_ID) throw new ActionError("Le partenaire interne ne peut pas être supprimé.");
+      const eventIds = await collectEventIds(client, { sessions: "c.partner_id = ?" }, [id]);
       await client.batch(
         [
           { sql: "DELETE FROM sessions WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
@@ -153,6 +157,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
         ],
         "write",
       );
+      after(() => deleteEvents(eventIds));
       return null;
     }
     case "resetPartnerPassword": {
@@ -195,6 +200,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
           sql: "UPDATE contracts SET partner_id=?, type=?, client_name=?, client_email=?, client_phone=?, address=?, service=?, price=?, commission_rate=?, frequency=?, notes=? WHERE id=?",
           args: [f.partnerId, f.type, f.clientName, f.clientEmail, f.clientPhone, f.address, f.service, f.price, f.commissionRate, f.frequency, f.notes, id],
         });
+        after(() => syncContract(client, id)); // client, adresse ou partenaire peuvent avoir changé
         return { id };
       }
       const requestId = typeof b.requestId === "string" ? b.requestId : null;
@@ -215,14 +221,19 @@ export async function runAction(client: Client, session: PortalSession, type: st
           sql: "INSERT INTO contracts VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           args: [newId, f.partnerId, f.type, f.clientName, f.clientEmail, f.clientPhone, f.address, f.service, f.price, f.commissionRate, f.frequency, f.notes, todayISO(), req ? String(req.signed_at) : null, req ? String(req.signed_by) : null],
         },
-        ...sessions.map((x): InStatement => ({ sql: "INSERT INTO sessions VALUES (?,?,?,?,?)", args: [x.id, newId, x.date, x.status, null] })),
+        ...sessions.map((x): InStatement => ({ sql: "INSERT INTO sessions (id, contract_id, date, status, invoice_id) VALUES (?,?,?,?,?)", args: [x.id, newId, x.date, x.status, null] })),
       ];
       if (req) stmts.push({ sql: "UPDATE requests SET status='converted', contract_id=? WHERE id=?", args: [newId, String(req.id)] });
       await client.batch(stmts, "write");
+      after(async () => {
+        await syncContract(client, newId);
+        if (req) await syncRequest(client, String(req.id)); // la demande est traitée : son événement « DEMANDE » disparaît
+      });
       return { id: newId };
     }
     case "deleteContract": {
       const id = text(b.id, "Le contrat", { max: 80 });
+      const eventIds = await collectEventIds(client, { sessions: "c.id = ?" }, [id]);
       await client.batch(
         [
           { sql: "DELETE FROM invoices WHERE contract_id = ?", args: [id] },
@@ -232,6 +243,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
         ],
         "write",
       );
+      after(() => deleteEvents(eventIds));
       return null;
     }
 
@@ -239,7 +251,9 @@ export async function runAction(client: Client, session: PortalSession, type: st
     case "addSession": {
       const contractId = text(b.contractId, "Le contrat", { max: 80 });
       await loadContract(client, contractId);
-      await client.execute({ sql: "INSERT INTO sessions VALUES (?,?,?,?,?)", args: [uid("s"), contractId, datetime(b.date, "La date"), "planned", null] });
+      const sessionId = uid("s");
+      await client.execute({ sql: "INSERT INTO sessions (id, contract_id, date, status, invoice_id) VALUES (?,?,?,?,?)", args: [sessionId, contractId, datetime(b.date, "La date"), "planned", null] });
+      after(() => syncSessions(client, [sessionId]));
       return null;
     }
     case "setSessionStatus": {
@@ -255,10 +269,15 @@ export async function runAction(client: Client, session: PortalSession, type: st
       }
       if (row.invoice_id) throw new ActionError("Cette séance est déjà facturée.");
       await client.execute({ sql: "UPDATE sessions SET status = ? WHERE id = ?", args: [status, String(row.id)] });
+      const sessionId = String(row.id);
+      after(() => syncSessions(client, [sessionId])); // annulée : événement supprimé ; réalisée : marqué ✅
       return null;
     }
     case "removeSession": {
-      await client.execute({ sql: "DELETE FROM sessions WHERE id = ? AND invoice_id IS NULL", args: [text(b.sessionId, "La séance", { max: 80 })] });
+      const sessionId = text(b.sessionId, "La séance", { max: 80 });
+      const eventIds = await collectEventIds(client, { sessions: "s.id = ? AND s.invoice_id IS NULL" }, [sessionId]);
+      await client.execute({ sql: "DELETE FROM sessions WHERE id = ? AND invoice_id IS NULL", args: [sessionId] });
+      after(() => deleteEvents(eventIds));
       return null;
     }
 
@@ -297,12 +316,22 @@ export async function runAction(client: Client, session: PortalSession, type: st
 
     /* ---------- inscriptions clients ---------- */
     case "declineRequest": {
-      await client.execute({ sql: "UPDATE requests SET status='declined' WHERE id = ? AND status = 'pending'", args: [text(b.id, "L'inscription", { max: 80 })] });
+      const id = text(b.id, "L'inscription", { max: 80 });
+      await client.execute({ sql: "UPDATE requests SET status='declined' WHERE id = ? AND status = 'pending'", args: [id] });
+      after(() => syncRequest(client, id)); // refusée : plus d'événement « DEMANDE »
       return null;
     }
     case "deleteRequest": {
-      await client.execute({ sql: "DELETE FROM requests WHERE id = ?", args: [text(b.id, "L'inscription", { max: 80 })] });
+      const id = text(b.id, "L'inscription", { max: 80 });
+      const eventIds = await collectEventIds(client, { requests: "id = ?" }, [id]);
+      await client.execute({ sql: "DELETE FROM requests WHERE id = ?", args: [id] });
+      after(() => deleteEvents(eventIds));
       return null;
+    }
+    case "syncCalendar": {
+      const res = await syncAll(client);
+      if (!res.ok) throw new ActionError(`Synchronisation impossible : ${res.reason}`, 502);
+      return { events: res.events };
     }
     case "resendPartnerContract": {
       const res = await deliverPartnerCopy(client, text(b.id, "Le partenaire", { max: 80 }));

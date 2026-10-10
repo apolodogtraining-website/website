@@ -2,6 +2,7 @@ import { after } from "next/server";
 import { CLIENT_CONTRACT_VERSION } from "@/lib/portal/contract-text";
 import { toLocalInput, uid } from "@/lib/portal/format";
 import { ActionError } from "@/lib/portal/server/actions";
+import { syncRequest } from "@/lib/portal/server/calendar";
 import { deliverRequestCopy } from "@/lib/portal/server/copies";
 import { db } from "@/lib/portal/server/db";
 import { handleError, json, readBody, sameOrigin } from "@/lib/portal/server/http";
@@ -57,6 +58,8 @@ export async function POST(req: Request) {
     });
     // Exemplaire du contrat par e-mail, après la réponse : un échec n'annule pas l'inscription (l'admin peut renvoyer).
     after(() => deliverRequestCopy(client, requestId));
+    // Date souhaitée au calendrier, marquée « DEMANDE à confirmer » (distincte des rendez-vous planifiés).
+    after(() => syncRequest(client, requestId));
     return json({ ok: true });
   } catch (e) {
     return handleError(e);

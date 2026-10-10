@@ -26,7 +26,7 @@ export async function seedDemoIfEmpty(client: Client) {
     })),
     ...d.contracts.flatMap((c) =>
       c.sessions.map((s) => ({
-        sql: "INSERT INTO sessions VALUES (?,?,?,?,?)",
+        sql: "INSERT INTO sessions (id, contract_id, date, status, invoice_id) VALUES (?,?,?,?,?)",
         args: [s.id, c.id, s.date, s.status, s.invoiceId],
       })),
     ),
