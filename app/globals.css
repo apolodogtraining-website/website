@@ -10,6 +10,7 @@
   --color-ink-soft: #5c6f7a;
 
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-anton), Impact, ui-sans-serif, system-ui, sans-serif;
 
   --shadow-soft: 0 18px 50px -24px rgba(22, 35, 44, 0.27);
   --shadow-brand: 0 18px 42px -18px rgba(14, 95, 130, 0.48);
@@ -232,5 +233,70 @@ details[open] > .faq-a-wrap {
   }
   .faq-a-wrap {
     transition: none;
+  }
+}
+
+/* Thème sombre du portail (/portail) : on redéfinit les jetons de couleur dans ce périmètre, les
+   composants gardent leurs classes (bg-white = surface des cartes, text-ink = texte principal…).
+   `text-white` y devient le texte foncé posé sur l'orange, comme sur le site vitrine. */
+.portal-theme {
+  color-scheme: dark;
+  --color-brand: #ff7a1a;
+  --color-brand-dark: #ff9347;
+  --color-brand-darker: #ffb072;
+  --color-brand-light: #33383b;
+  --color-brand-tint: #151718;
+  --color-ink: #f4efe6;
+  --color-ink-soft: #a6a7a2;
+  --color-white: #1e2123;
+  --color-gray-100: #2a2e31;
+  --color-gray-700: #cbcbc6;
+  --color-red-50: #3b1d1b;
+  --color-red-200: #6b2f2a;
+  --color-red-600: #ff6b5e;
+  --color-red-700: #ff8a80;
+  --color-amber-50: #392c13;
+  --color-amber-800: #ffcf7a;
+  --color-amber-900: #ffd98f;
+  --color-emerald-50: #12301f;
+  --color-emerald-600: #5fd29a;
+  --color-emerald-700: #5fd29a;
+  --color-emerald-800: #7ee0ae;
+  --shadow-soft: 0 0 0 transparent;
+  --shadow-brand: 0 0 0 transparent;
+  background: #151718;
+  color: var(--color-ink);
+}
+.portal-theme ::selection {
+  background: var(--color-brand);
+  color: #151718;
+}
+
+/* Impression (facture, contrat, étude de comportement) : toujours sur fond clair. */
+@media print {
+  .portal-theme {
+    color-scheme: light;
+    --color-brand: #2aa9e1;
+    --color-brand-dark: #1985b4;
+    --color-brand-darker: #0e5f82;
+    --color-brand-light: #d5e6ed;
+    --color-brand-tint: #f3f7f9;
+    --color-ink: #16232c;
+    --color-ink-soft: #5c6f7a;
+    --color-white: #ffffff;
+    --color-gray-100: #f3f4f6;
+    --color-gray-700: #374151;
+    --color-red-50: #fef2f2;
+    --color-red-200: #fecaca;
+    --color-red-600: #dc2626;
+    --color-red-700: #b91c1c;
+    --color-amber-50: #fffbeb;
+    --color-amber-800: #92400e;
+    --color-amber-900: #78350f;
+    --color-emerald-50: #ecfdf5;
+    --color-emerald-600: #059669;
+    --color-emerald-700: #047857;
+    --color-emerald-800: #065f46;
+    background: #ffffff;
   }
 }

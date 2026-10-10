@@ -55,10 +55,10 @@ function LoginView() {
     <main className="grid min-h-screen-mobile place-items-center bg-brand-tint px-4 py-10">
       <div className="w-full max-w-md">
         <Link href="/" className="mx-auto mb-6 block w-fit" aria-label={`${site.name} — retour au site`}>
-          <Image src="/logo/logo-header.png" alt={site.name} width={160} height={55} priority className="h-12 w-auto" />
+          <Image src="/logo/logo-white.png" alt={site.name} width={160} height={55} priority className="h-12 w-auto" />
         </Link>
-        <div className="rounded-3xl border border-brand-light bg-white p-6 shadow-soft sm:p-8">
-          <h1 className="text-2xl font-bold text-ink">Portail partenaires</h1>
+        <div className="rounded-sm border border-brand-light bg-white p-6 shadow-soft sm:p-8">
+          <h1 className="font-display uppercase tracking-wide text-2xl font-normal text-ink">Portail partenaires</h1>
           <p className="mt-1 text-sm text-ink-soft">Connectez-vous pour suivre vos contrats et votre facturation.</p>
           <a href="/api/portal/google/start" className={`${btn.secondary} mt-6 w-full gap-3 py-3`}>
             <GoogleIcon /> Se connecter avec Google
@@ -88,7 +88,7 @@ function LoginView() {
               )}
             </Field>
             {error && (
-              <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+              <p role="alert" className="rounded-sm bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
                 {error}
               </p>
             )}
@@ -106,7 +106,7 @@ function LoginView() {
         </p>
 
         {process.env.NODE_ENV !== "production" && (
-          <div className="mt-4 rounded-2xl border border-dashed border-brand/40 bg-white/70 p-4 text-sm">
+          <div className="mt-4 rounded-sm border border-dashed border-brand/40 bg-white/70 p-4 text-sm">
             <p className="font-semibold text-brand-darker">Environnement de développement</p>
             <p className="mt-1 text-ink-soft">Données de démonstration, base locale. Comptes de test :</p>
             <div className="mt-3 flex flex-wrap gap-2">

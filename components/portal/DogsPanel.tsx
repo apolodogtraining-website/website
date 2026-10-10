@@ -111,11 +111,11 @@ export default function DogsPanel({ contract, area, embedded }: { contract: Cont
                   <Link href={ficheHref(d)} className={btn.primary}>
                     <ClipboardList className="h-4 w-4" /> {d.ficheStatus === "none" ? "Remplir l'étude" : "Ouvrir l'étude"}
                   </Link>
-                  <button type="button" aria-label={`Modifier ${d.name}`} className="rounded-full p-2 text-ink-soft hover:bg-brand-tint" onClick={() => setEditing(d)}>
+                  <button type="button" aria-label={`Modifier ${d.name}`} className="rounded-sm p-2 text-ink-soft hover:bg-brand-tint" onClick={() => setEditing(d)}>
                     <Pencil className="h-4 w-4" />
                   </button>
                   {area === "admin" && (
-                    <button type="button" aria-label={`Supprimer ${d.name}`} className="rounded-full p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(d)}>
+                    <button type="button" aria-label={`Supprimer ${d.name}`} className="rounded-sm p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(d)}>
                       <Trash2 className="h-4 w-4" />
                     </button>
                   )}

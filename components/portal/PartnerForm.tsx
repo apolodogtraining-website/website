@@ -30,7 +30,7 @@ export default function PartnerForm({ partner, onClose }: { partner?: Partner; o
           Transmettez ces identifiants au partenaire. À sa première connexion, il devra lire et signer son contrat avant
           d&apos;accéder à la plateforme.
         </p>
-        <dl className="mt-4 space-y-2 rounded-xl bg-brand-tint p-4 text-sm">
+        <dl className="mt-4 space-y-2 rounded-sm bg-brand-tint p-4 text-sm">
           <div className="flex justify-between gap-3">
             <dt className="text-ink-soft">Identifiant</dt>
             <dd className="font-semibold">{created.email}</dd>
@@ -97,7 +97,7 @@ export default function PartnerForm({ partner, onClose }: { partner?: Partner; o
           </label>
         )}
         {error && (
-          <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+          <p role="alert" className="rounded-sm bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
             {error}
           </p>
         )}

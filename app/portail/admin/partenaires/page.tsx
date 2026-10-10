@@ -54,10 +54,10 @@ export default function AdminPartners() {
                   <td className="whitespace-nowrap text-right">
                     {!p.isSelf && (
                       <>
-                    <button type="button" aria-label={`Modifier ${p.company}`} className="rounded-full p-2 text-ink-soft hover:bg-brand-tint" onClick={() => setEditing(p)}>
+                    <button type="button" aria-label={`Modifier ${p.company}`} className="rounded-sm p-2 text-ink-soft hover:bg-brand-tint" onClick={() => setEditing(p)}>
                       <Pencil className="h-4 w-4" />
                     </button>
-                    <button type="button" aria-label={`Supprimer ${p.company}`} className="rounded-full p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(p)}>
+                    <button type="button" aria-label={`Supprimer ${p.company}`} className="rounded-sm p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(p)}>
                       <Trash2 className="h-4 w-4" />
                     </button>
                       </>

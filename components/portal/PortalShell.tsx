@@ -58,7 +58,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
       {error && (
         <div role="alert" className="fixed inset-x-0 top-0 z-[80] flex items-center justify-center gap-3 bg-red-600 px-4 py-2.5 text-sm font-medium text-white">
           <span>{error}</span>
-          <button type="button" onClick={clearError} className="rounded-full bg-white/20 px-3 py-0.5 text-xs font-semibold hover:bg-white/30">
+          <button type="button" onClick={clearError} className="rounded-sm bg-white/20 px-3 py-0.5 text-xs font-semibold hover:bg-white/30">
             Fermer
           </button>
         </div>
@@ -66,7 +66,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
       <aside className="border-b border-brand-light bg-white print:hidden md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:border-b-0 md:border-r">
         <div className="flex items-center justify-between gap-3 px-4 py-3 md:block md:px-5 md:py-6">
           <Link href={role === "admin" ? "/portail/admin" : "/portail/partenaire"} aria-label={site.name}>
-            <Image src="/logo/logo-header.png" alt={site.name} width={140} height={48} className="h-9 w-auto md:h-11" />
+            <Image src="/logo/logo-white.png" alt={site.name} width={140} height={48} className="h-9 w-auto md:h-11" />
           </Link>
           <div className="min-w-0 text-right md:mt-4 md:text-left">
             <p className="truncate text-sm font-semibold text-ink">{who}</p>
@@ -82,7 +82,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
                 key={href}
                 href={locked ? contractPath : href}
                 aria-current={active ? "page" : undefined}
-                className={`flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium transition ${
+                className={`flex shrink-0 items-center gap-2.5 rounded-sm px-3.5 py-2.5 text-sm font-medium transition ${
                   active ? "bg-brand text-white shadow-brand" : "text-ink-soft hover:bg-brand-tint hover:text-brand-darker"
                 }`}
               >
@@ -99,7 +99,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
               await logout();
               router.replace("/portail");
             }}
-            className="flex w-full items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-ink-soft hover:bg-brand-tint"
+            className="flex w-full items-center gap-2.5 rounded-sm px-3.5 py-2.5 text-sm font-medium text-ink-soft hover:bg-brand-tint"
           >
             <LogOut className="h-4 w-4" aria-hidden /> Se déconnecter
           </button>
