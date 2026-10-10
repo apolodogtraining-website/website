@@ -4,7 +4,7 @@ import { MapPin, Phone } from "lucide-react";
 import PortalShell from "@/components/portal/PortalShell";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, Card, Empty, PageHeader } from "@/components/portal/ui";
-import { contractBilling, frequencyLabel, money, splitAmount } from "@/lib/portal/format";
+import { contractBilling, fmtPhone, frequencyLabel, money, splitAmount } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 
 export default function PartnerContracts() {
@@ -39,8 +39,8 @@ export default function PartnerContracts() {
                     <MapPin className="h-4 w-4" aria-hidden /> {c.address}
                   </span>
                   {c.clientPhone && (
-                    <a href={`tel:${c.clientPhone.replace(/\s/g, "")}`} className="inline-flex items-center gap-1.5 hover:text-brand-dark">
-                      <Phone className="h-4 w-4" aria-hidden /> {c.clientPhone}
+                    <a href={`tel:${c.clientPhone.replace(/\D/g, "")}`} className="inline-flex items-center gap-1.5 hover:text-brand-dark">
+                      <Phone className="h-4 w-4" aria-hidden /> {fmtPhone(c.clientPhone)}
                     </a>
                   )}
                 </div>

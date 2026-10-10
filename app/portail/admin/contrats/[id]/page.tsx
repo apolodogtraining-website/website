@@ -9,7 +9,7 @@ import InvoiceTable from "@/components/portal/InvoiceTable";
 import PortalShell from "@/components/portal/PortalShell";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, btn, Card, ConfirmModal, Field, inputCls, PageHeader } from "@/components/portal/ui";
-import { billableSessions, fmtDateTime, frequencyLabel, money, splitAmount, toLocalInput } from "@/lib/portal/format";
+import { billableSessions, fmtDateTime, fmtPhone, frequencyLabel, money, splitAmount, toLocalInput } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 
 export default function AdminContractDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -62,7 +62,7 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
           <dl className="space-y-2 text-sm">
             <Row k="Type">{contract.type === "recurring" ? <Badge tone="blue">Récurrent · {contract.frequency ? frequencyLabel[contract.frequency] : ""}</Badge> : <Badge>Ponctuel</Badge>}</Row>
             <Row k="Adresse">{contract.address}</Row>
-            <Row k="Téléphone">{contract.clientPhone || "—"}</Row>
+            <Row k="Téléphone">{contract.clientPhone ? fmtPhone(contract.clientPhone) : "—"}</Row>
             <Row k="E-mail">{contract.clientEmail || "—"}</Row>
             {contract.notes && <Row k="Notes">{contract.notes}</Row>}
             <Row k="Contrat client">

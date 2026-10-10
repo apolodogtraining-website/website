@@ -97,3 +97,19 @@ export function nextSession(c: Contract) {
     .filter((s) => s.status === "planned" && s.date >= now)
     .sort((a, b) => a.date.localeCompare(b.date))[0];
 }
+
+/** Garde uniquement les chiffres (champs téléphone). */
+export const onlyDigits = (s: string) => s.replace(/\D/g, "");
+
+/** « 0612345678 » → « 06 12 34 56 78 » ; les autres formats sont laissés tels quels. */
+export const fmtPhone = (s: string) => {
+  const d = onlyDigits(s);
+  return d.length === 10 ? d.replace(/(\d{2})(?=\d)/g, "$1 ") : s;
+};
+
+/** Nom complet d'un client : « Prénom NOM ». Même règle côté formulaire et côté serveur. */
+export const composeName = (firstName: string, lastName: string) =>
+  firstName.trim() ? `${firstName.trim()} ${lastName.trim().toUpperCase()}`.trim() : lastName.trim(); // sans prénom (famille, M. X…) : nom tel que saisi
+
+/** Nombre saisi dans un champ texte (virgule ou point) ; NaN si vide ou invalide. */
+export const parseDecimal = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));

@@ -1,4 +1,5 @@
 import type { Client, InValue } from "@libsql/client";
+import { fmtPhone } from "../format";
 import { site } from "@/lib/site";
 
 /**
@@ -111,7 +112,7 @@ function sessionOp(s: SessionRow): Op | null {
       s.isSelf ? "Rendez-vous que vous assurez vous-même." : `Rendez-vous confié au partenaire : ${s.partnerCompany}.`,
       "",
       `Client : ${s.clientName}`,
-      s.clientPhone && `Téléphone : ${s.clientPhone}`,
+      s.clientPhone && `Téléphone : ${fmtPhone(s.clientPhone)}`,
       s.clientEmail && `E-mail : ${s.clientEmail}`,
       `Adresse : ${s.address}`,
       s.notes && `Notes : ${s.notes}`,
@@ -158,7 +159,7 @@ function requestOp(r: RequestRow): Op | null {
       "Inscription en ligne : date souhaitée par le client, PAS ENCORE CONFIRMÉE ni affectée à un partenaire.",
       "",
       `Client : ${r.name}`,
-      `Téléphone : ${r.phone}`,
+      `Téléphone : ${fmtPhone(r.phone)}`,
       `E-mail : ${r.email}`,
       `Adresse : ${r.address}`,
       r.dog && `Chien : ${r.dog}`,
