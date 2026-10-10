@@ -1,6 +1,6 @@
 "use client";
 
-import { fmtDateTime, money, toLocalInput } from "@/lib/portal/format";
+import { fmtDateTime, money, toLocalInput, isPackage } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 import type { Contract, SessionStatus } from "@/lib/portal/types";
 import { Badge, type Tone } from "./ui";
@@ -23,7 +23,7 @@ export default function SessionList({ contract, admin }: { contract: Contract; a
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-medium text-ink">{fmtDateTime(s.date)}</span>
               <Badge tone={tone[s.status]}>{label[s.status]}</Badge>
-              <span className="text-ink-soft">{money(contract.price)}</span>
+              {!isPackage(contract) && <span className="text-ink-soft">{money(contract.price)}</span>}
               {invoice && <span className="text-xs text-ink-soft">· facture {invoice.number}</span>}
             </div>
             {!locked && (

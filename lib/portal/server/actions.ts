@@ -1,7 +1,7 @@
 import type { Client, InStatement } from "@libsql/client";
 import { CONTRACT_VERSION } from "../contract-text";
-import { addDaysISO, billableSessions, composeName, generateSessions, splitAmount, todayISO, toLocalInput, uid } from "../format";
-import type { Contract, Frequency, PortalSession, Session } from "../types";
+import { addDaysISO, billingTodo, composeName, generateSessions, splitAmount, todayISO, toLocalInput, uid } from "../format";
+import type { Contract, Frequency, PortalSession } from "../types";
 import { after } from "next/server";
 import { hashPassword, tempPassword } from "./auth";
 import { collectEventIds, deleteEvents, syncAll, syncContract, syncPartner, syncRequest, syncSessions } from "./calendar";
@@ -90,6 +90,7 @@ function contractFields(b: Body) {
     clientPhone: phoneDigits(b.clientPhone, "Le téléphone du client"),
     address: text(b.address, "L'adresse", { max: 300 }),
     service: text(b.service, "La prestation"),
+    pricing: oneOf(b.pricing ?? "session", "Le mode de tarification", ["session", "package"] as const),
     price: num(b.price, "Le prix", 0, 100000),
     commissionRate: num(b.commissionRate, "La commission", 0, 100),
     frequency: type === "recurring" ? oneOf(b.frequency, "La fréquence", FREQUENCIES) : null,
@@ -231,10 +232,12 @@ export async function runAction(client: Client, session: PortalSession, type: st
       if (f.partnerId === SELF_ID) f.commissionRate = 0;
       const id = typeof b.id === "string" ? b.id : null;
       if (id) {
-        await loadContract(client, id);
+        const current = await loadContract(client, id);
+        const hasInvoice = Boolean(await one(client, "SELECT id FROM invoices WHERE contract_id = ? LIMIT 1", [id]));
+        if (hasInvoice && (current.pricing ?? "session") !== f.pricing) throw new ActionError("Ce contrat a déjà une facture : son mode de tarification ne peut plus changer.");
         await client.execute({
-          sql: "UPDATE contracts SET partner_id=?, type=?, client_name=?, client_first_name=?, client_last_name=?, client_email=?, client_phone=?, address=?, service=?, price=?, commission_rate=?, frequency=?, notes=? WHERE id=?",
-          args: [f.partnerId, f.type, composeName(f.clientFirstName, f.clientLastName), f.clientFirstName, f.clientLastName, f.clientEmail, f.clientPhone, f.address, f.service, f.price, f.commissionRate, f.frequency, f.notes, id],
+          sql: "UPDATE contracts SET partner_id=?, type=?, client_name=?, client_first_name=?, client_last_name=?, client_email=?, client_phone=?, address=?, service=?, pricing=?, price=?, commission_rate=?, frequency=?, notes=? WHERE id=?",
+          args: [f.partnerId, f.type, composeName(f.clientFirstName, f.clientLastName), f.clientFirstName, f.clientLastName, f.clientEmail, f.clientPhone, f.address, f.service, f.pricing, f.price, f.commissionRate, f.frequency, f.notes, id],
         });
         after(() => syncContract(client, id)); // client, adresse ou partenaire peuvent avoir changé
         return { id };
@@ -254,8 +257,8 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const newId = uid("c");
       const stmts: InStatement[] = [
         {
-          sql: "INSERT INTO contracts (id, partner_id, type, client_name, client_first_name, client_last_name, client_email, client_phone, address, service, price, commission_rate, frequency, notes, created_at, client_signed_at, client_signed_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-          args: [newId, f.partnerId, f.type, composeName(f.clientFirstName, f.clientLastName), f.clientFirstName, f.clientLastName, f.clientEmail, f.clientPhone, f.address, f.service, f.price, f.commissionRate, f.frequency, f.notes, todayISO(), req ? String(req.signed_at) : null, req ? String(req.signed_by) : null],
+          sql: "INSERT INTO contracts (id, partner_id, type, client_name, client_first_name, client_last_name, client_email, client_phone, address, service, pricing, price, commission_rate, frequency, notes, created_at, client_signed_at, client_signed_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+          args: [newId, f.partnerId, f.type, composeName(f.clientFirstName, f.clientLastName), f.clientFirstName, f.clientLastName, f.clientEmail, f.clientPhone, f.address, f.service, f.pricing, f.price, f.commissionRate, f.frequency, f.notes, todayISO(), req ? String(req.signed_at) : null, req ? String(req.signed_by) : null],
         },
         ...sessions.map((x): InStatement => ({ sql: "INSERT INTO sessions (id, contract_id, date, status, invoice_id) VALUES (?,?,?,?,?)", args: [x.id, newId, x.date, x.status, null] })),
       ];
@@ -370,9 +373,10 @@ export async function runAction(client: Client, session: PortalSession, type: st
     /* ---------- facturation ---------- */
     case "invoiceContract": {
       const contract = await loadContract(client, text(b.contractId, "Le contrat", { max: 80 }));
-      const todo = billableSessions(contract);
-      if (todo.length === 0) throw new ActionError("Aucune séance réalisée à facturer.");
-      const { gross, commission, net } = splitAmount(todo.length * contract.price, contract.commissionRate);
+      const existing = (await client.execute({ sql: "SELECT id, contract_id FROM invoices WHERE contract_id = ?", args: [contract.id] })).rows;
+      const todo = billingTodo(contract, existing.map((r) => ({ contractId: String(r.contract_id) })));
+      if (todo.units === 0) throw new ActionError(contract.pricing === "package" ? "Le forfait est déjà facturé (ou n'a aucune séance)." : "Aucune séance réalisée à facturer.");
+      const { gross, commission, net } = splitAmount(todo.amount, contract.commissionRate);
       const issuedAt = todayISO();
       const id = uid("i");
       // Numéro = plus grand numéro de l'année + 1 (jamais le nombre de factures : une suppression créerait un doublon).
@@ -380,7 +384,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const number = `F-${issuedAt.slice(0, 4)}-${String(Number(last?.n ?? 0) + 1).padStart(4, "0")}`;
       const stmts: InStatement[] = [
         { sql: "INSERT INTO invoices (id, number, contract_id, partner_id, issued_at, due_at, gross, commission, net, client_paid_at, payout_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)", args: [id, number, contract.id, contract.partnerId, issuedAt, addDaysISO(issuedAt, 14), gross, commission, net, null, null] },
-        ...todo.map((x: Session): InStatement => ({ sql: "UPDATE sessions SET invoice_id = ? WHERE id = ? AND invoice_id IS NULL", args: [id, x.id] })),
+        ...todo.sessionIds.map((sid): InStatement => ({ sql: "UPDATE sessions SET invoice_id = ? WHERE id = ? AND invoice_id IS NULL", args: [id, sid] })),
       ];
       await client.batch(stmts, "write");
       return { id };

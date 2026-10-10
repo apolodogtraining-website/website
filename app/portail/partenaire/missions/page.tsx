@@ -5,7 +5,7 @@ import PortalShell from "@/components/portal/PortalShell";
 import DogsPanel from "@/components/portal/DogsPanel";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, Card, Empty, PageHeader } from "@/components/portal/ui";
-import { contractBilling, fmtPhone, frequencyLabel, money, splitAmount } from "@/lib/portal/format";
+import { contractBilling, fmtPhone, frequencyLabel, money, priceLabel, splitAmount } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 
 export default function PartnerContracts() {
@@ -46,7 +46,7 @@ export default function PartnerContracts() {
                   )}
                 </div>
                 <p className="mt-3 text-sm text-ink">
-                  {money(c.price)} / séance · <strong>{money(splitAmount(c.price, c.commissionRate).net)} net pour vous</strong>{" "}
+                  {priceLabel(c)} · <strong>{money(splitAmount(c.price, c.commissionRate).net)} net pour vous</strong>{" "}
                   <span className="text-ink-soft">(commission {c.commissionRate} %)</span>
                 </p>
                 {c.notes && <p className="mt-2 rounded-sm bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{c.notes}</p>}

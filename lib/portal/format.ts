@@ -60,6 +60,25 @@ export function generateSessions(start: string, frequency: Frequency | null, cou
 export const billableSessions = (c: Contract) =>
   c.sessions.filter((s) => s.status === "done" && !s.invoiceId);
 
+export const isPackage = (c: Contract) => c.pricing === "package";
+
+/**
+ * Ce qui reste à facturer sur un contrat. Par séance : les séances réalisées sans facture. Forfait : le
+ * forfait entier, une seule fois (dès qu'il a une séance non annulée), sans lier les séances à la facture.
+ */
+export function billingTodo(c: Contract, invoices: Pick<Invoice, "contractId">[]) {
+  if (isPackage(c)) {
+    const billed = invoices.some((i) => i.contractId === c.id);
+    const ready = !billed && c.sessions.some((s) => s.status !== "cancelled");
+    return { units: ready ? 1 : 0, amount: ready ? round2(c.price) : 0, sessionIds: [] as string[] };
+  }
+  const ids = billableSessions(c).map((s) => s.id);
+  return { units: ids.length, amount: round2(ids.length * c.price), sessionIds: ids };
+}
+
+/** « 60,00 € / séance » ou « 300,00 € (forfait) ». */
+export const priceLabel = (c: Contract) => (isPackage(c) ? `${money(c.price)} (forfait)` : `${money(c.price)} / séance`);
+
 export function splitAmount(gross: number, rate: number) {
   const commission = round2((gross * rate) / 100);
   return { gross: round2(gross), commission, net: round2(gross - commission) };
@@ -81,11 +100,12 @@ export const invoiceStatusLabel: Record<InvoiceStatus, string> = {
 /** Libellé de l'état de facturation d'un contrat, vu du suivi global. */
 export function contractBilling(c: Contract, invoices: Invoice[]) {
   const own = invoices.filter((i) => i.contractId === c.id);
-  const toBill = billableSessions(c).length;
+  const todo = billingTodo(c, invoices);
+  const toBill = todo.units;
   const late = own.some((i) => invoiceStatus(i) === "late");
   const open = own.some((i) => !i.clientPaidAt);
   if (late) return { tone: "red" as const, label: "Facture en retard" };
-  if (toBill > 0) return { tone: "amber" as const, label: `${toBill} séance${toBill > 1 ? "s" : ""} à facturer` };
+  if (toBill > 0) return { tone: "amber" as const, label: isPackage(c) ? "Forfait à facturer" : `${toBill} séance${toBill > 1 ? "s" : ""} à facturer` };
   if (open) return { tone: "blue" as const, label: "En attente de paiement" };
   if (own.length > 0) return { tone: "green" as const, label: "À jour" };
   return { tone: "gray" as const, label: "Rien à facturer" };
