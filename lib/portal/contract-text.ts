@@ -1,8 +1,9 @@
 import { site } from "@/lib/site";
+import { CGV_URL, CGV_VERSION } from "@/lib/cgv";
 import type { Partner } from "./types";
 
 export const CONTRACT_VERSION = "2026-06";
-export const CLIENT_CONTRACT_VERSION = "2026-06";
+export const CLIENT_CONTRACT_VERSION = "2026-10";
 
 /**
  * Trame du contrat de partenariat signé à la première connexion.
@@ -55,47 +56,52 @@ export function contractArticles(p: Pick<Partner, "company" | "contact" | "siret
 }
 
 /**
- * Contrat de prestation signé par le client à l'inscription.
- * ⚠️ Trame à faire relire par un juriste (droit de rétractation, annulation,
- * responsabilité, mandat de la plateforme pour déléguer à un partenaire).
+ * Contrat de prestation signé par le client à l'inscription. Version courte : les règles de détail
+ * (annulation, paiement, rétractation, garanties…) sont dans les CGV (`lib/cgv.ts`, page /cgv),
+ * acceptées en même temps que le contrat.
+ * ⚠️ Trame à faire relire par un juriste.
  */
 export function clientContractArticles(c: { name: string; service: string }) {
   return [
     {
       title: "Article 1 — Objet",
-      body: `Le présent contrat est conclu entre ${site.name} (${site.legal.publisherLegalName}, SIRET ${site.siret}), ci-après « le Prestataire », et ${c.name}, ci-après « le Client », pour la prestation suivante : ${c.service}.`,
+      body: `Le présent contrat est conclu entre ${site.name} (${site.legal.publisherLegalName}, SIRET ${site.siret}), ci-après « le Prestataire », et ${c.name}, ci-après « le Client », pour la prestation suivante : ${c.service}. Chaque chien fait l'objet d'une étude de comportement individuelle.`,
     },
     {
-      title: "Article 2 — Exécution et délégation",
+      title: "Article 2 — Conditions générales de vente",
+      body: `Le Client reconnaît avoir pris connaissance des Conditions générales de vente (version ${CGV_VERSION}), consultables à l'adresse ${CGV_URL}, et les accepte sans réserve. Elles font partie du contrat ; en cas de contradiction, le présent contrat prévaut pour les points qu'il précise.`,
+    },
+    {
+      title: "Article 3 — Exécution et délégation",
       body: "Le Prestataire peut confier tout ou partie de la prestation à un éducateur canin partenaire qualifié, qui intervient sous sa coordination. Le Client est informé de l'identité et des coordonnées du partenaire avant la première séance. Le Prestataire reste son interlocuteur pour toute question ou réclamation.",
     },
     {
-      title: "Article 3 — Rendez-vous",
-      body: "Les dates et lieux d'intervention sont convenus avec le Client après son inscription. Toute annulation ou report doit être signalé au moins 48 heures à l'avance ; à défaut, la séance peut être facturée.",
+      title: "Article 4 — Rendez-vous et annulation",
+      body: "Les dates et lieux d'intervention sont convenus avec le Client après son inscription. Les règles d'annulation, de report et d'absence (notamment le délai de 48 heures) sont celles de l'article 7 des CGV.",
     },
     {
-      title: "Article 4 — Prix et paiement",
-      body: "Le prix de chaque séance est communiqué au Client avant la première intervention. Les séances réalisées sont facturées par le Prestataire et payables sous 14 jours par virement, quel que soit le partenaire intervenant.",
+      title: "Article 5 — Prix et paiement",
+      body: "Le prix de la formule est communiqué au Client avant la première intervention (fiche tarifs ou devis). Les séances sont facturées par le Prestataire, quel que soit le partenaire intervenant. Le paiement peut se faire en une ou plusieurs fois, avec acompte le cas échéant, selon l'article 6 des CGV.",
     },
     {
-      title: "Article 5 — Engagements du Client",
-      body: "Le Client s'engage à fournir des informations exactes sur son chien (comportement, santé, antécédents de morsure), à tenir l'animal en sécurité pendant les séances et à justifier de la vaccination et de l'assurance responsabilité civile propriétaire de l'animal.",
+      title: "Article 6 — Engagements du Client",
+      body: "Le Client s'engage à fournir des informations exactes sur son chien (comportement, santé, antécédents de morsure), à le tenir en sécurité pendant les séances, à faire le travail personnel demandé entre les séances, et à justifier de la vaccination et de l'assurance responsabilité civile propriétaire de l'animal.",
     },
     {
-      title: "Article 6 — Responsabilité",
-      body: "Le Client demeure responsable de son animal. L'éducateur met en œuvre les moyens nécessaires pour accompagner le chien et son maître, sans garantie de résultat, le comportement d'un animal dépendant de nombreux facteurs.",
+      title: "Article 7 — Responsabilité",
+      body: "Le Client demeure responsable de son animal. Le Prestataire est tenu d'une obligation de moyens et non de résultat, le comportement d'un animal dépendant de nombreux facteurs. Les limites de responsabilité figurent à l'article 10 des CGV.",
     },
     {
-      title: "Article 7 — Données personnelles",
+      title: "Article 8 — Données personnelles",
       body: `Les données saisies sont utilisées pour organiser et facturer la prestation et sont transmises au seul partenaire en charge. Pour exercer vos droits, écrivez à ${site.email}. Voir la politique de confidentialité du site.`,
     },
     {
-      title: "Article 8 — Droit de rétractation",
-      body: "Le Client dispose de 14 jours à compter de la signature pour se rétracter. S'il demande que la prestation commence avant la fin de ce délai, il règle les séances déjà réalisées.",
+      title: "Article 9 — Droit de rétractation",
+      body: "Le Client dispose de 14 jours à compter de la signature pour se rétracter, au moyen du formulaire annexé aux CGV ou par simple courriel. S'il demande expressément que la prestation commence avant la fin de ce délai, il règle les séances déjà réalisées (article 12 des CGV).",
     },
     {
-      title: "Article 9 — Signature électronique",
-      body: `La saisie du nom du Client (${c.name}) et la validation de la case d'acceptation valent signature électronique. La date et l'heure sont conservées.`,
+      title: "Article 10 — Signature électronique",
+      body: `La saisie du nom du Client (${c.name}) et la validation de la case d'acceptation valent signature électronique du contrat et acceptation des CGV. La date et l'heure sont conservées.`,
     },
   ];
 }
