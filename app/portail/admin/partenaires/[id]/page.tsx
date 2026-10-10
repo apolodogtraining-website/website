@@ -130,7 +130,7 @@ export default function AdminPartnerDetail({ params }: { params: Promise<{ id: s
       {newPassword && (
         <Modal title="Nouveau mot de passe" onClose={() => setNewPassword(null)}>
           <p className="text-sm text-ink-soft">Transmettez-le au partenaire :</p>
-          <p className="mt-3 rounded-xl bg-brand-tint p-4 text-center font-mono text-base font-semibold">{newPassword}</p>
+          <p className="mt-3 rounded-sm bg-brand-tint p-4 text-center font-mono text-base font-semibold">{newPassword}</p>
           <div className="mt-5 flex justify-end">
             <button type="button" className={btn.primary} onClick={() => setNewPassword(null)}>
               Terminé

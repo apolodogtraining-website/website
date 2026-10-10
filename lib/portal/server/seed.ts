@@ -48,7 +48,7 @@ export async function seedDemoIfEmpty(client: Client) {
       ],
     },
     ...d.invoices.map((i) => ({
-      sql: "INSERT INTO invoices VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+      sql: "INSERT INTO invoices (id, number, contract_id, partner_id, issued_at, due_at, gross, commission, net, client_paid_at, payout_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
       args: [i.id, i.number, i.contractId, i.partnerId, i.issuedAt, i.dueAt, i.gross, i.commission, i.net, i.clientPaidAt, i.payoutAt],
     })),
     ...d.requests.map((r) => ({

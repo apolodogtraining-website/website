@@ -53,10 +53,10 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
         </button>
       </div>
 
-      <article className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-soft sm:p-10 print:rounded-none print:shadow-none">
+      <article className="mx-auto max-w-3xl rounded-sm bg-white p-6 shadow-soft sm:p-10 print:rounded-none print:shadow-none">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <Image src="/logo/logo-header.png" alt={site.name} width={140} height={48} className="h-10 w-auto" />
+            <Image src="/logo/logo-white.png" alt={site.name} width={140} height={48} className="h-10 w-auto" />
             <address className="mt-3 text-sm not-italic leading-relaxed text-ink-soft">
               {site.legal.publisherLegalName}
               <br />
@@ -66,7 +66,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
             </address>
           </div>
           <div className="text-right">
-            <h1 className="text-2xl font-bold text-ink">Facture {inv.number}</h1>
+            <h1 className="font-display uppercase tracking-wide text-2xl font-normal text-ink">Facture {inv.number}</h1>
             <p className="mt-1 text-sm text-ink-soft">Émise le {fmtDate(inv.issuedAt)}</p>
             <p className="text-sm text-ink-soft">Échéance : {fmtDate(inv.dueAt)}</p>
             <div className="mt-2 print:hidden">
@@ -118,7 +118,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
         <p className="mt-3 text-xs text-ink-soft">TVA non applicable. Pénalités de retard et indemnité forfaitaire de recouvrement de 40 € applicables en cas de retard de paiement.</p>
 
         {/* Ventilation commission : visible dans le portail, retirée à l'impression (document client). */}
-        <aside className="mt-6 rounded-xl bg-brand-tint p-4 text-sm print:hidden">
+        <aside className="mt-6 rounded-sm bg-brand-tint p-4 text-sm print:hidden">
           <h2 className="mb-2 font-semibold text-ink">{isPartner ? "Votre règlement" : "Ventilation interne"}</h2>
           <dl className="space-y-1">
             <div className="flex justify-between">

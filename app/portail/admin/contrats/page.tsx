@@ -58,7 +58,7 @@ export default function AdminContracts() {
             type="button"
             aria-pressed={filter === k}
             onClick={() => setFilter(k)}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${filter === k ? "bg-brand text-white" : "bg-white text-ink-soft ring-1 ring-brand-light hover:bg-brand-tint"}`}
+            className={`rounded-sm px-4 py-1.5 text-sm font-semibold transition ${filter === k ? "bg-brand text-white" : "bg-white text-ink-soft ring-1 ring-brand-light hover:bg-brand-tint"}`}
           >
             {l}
           </button>

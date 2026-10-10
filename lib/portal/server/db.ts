@@ -99,6 +99,10 @@ const SCHEMA = [
     updated_at TEXT NOT NULL,
     updated_by TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  )`,
   `CREATE INDEX IF NOT EXISTS idx_dogs_contract ON dogs(contract_id)`,
   `CREATE INDEX IF NOT EXISTS idx_contracts_partner ON contracts(partner_id)`,
   `CREATE INDEX IF NOT EXISTS idx_sessions_contract ON sessions(contract_id)`,
@@ -136,6 +140,8 @@ export function db(): Promise<Client> {
         "ALTER TABLE partners ADD COLUMN is_self INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE partners ADD COLUMN copy_sent_at TEXT", // exemplaire du contrat envoyé par e-mail
         "ALTER TABLE requests ADD COLUMN copy_sent_at TEXT",
+        "ALTER TABLE sessions ADD COLUMN reminder_sent_at TEXT", // rappel de rendez-vous envoyé au client
+        "ALTER TABLE invoices ADD COLUMN last_reminder_at TEXT", // dernière relance de paiement
         "ALTER TABLE requests ADD COLUMN early_start_at TEXT", // demande expresse de début avant la fin du délai de rétractation
         "ALTER TABLE sessions ADD COLUMN calendar_event_id TEXT", // événement Google Agenda lié
         "ALTER TABLE requests ADD COLUMN calendar_event_id TEXT",
