@@ -71,22 +71,22 @@ export default function ClientSignup() {
             >
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Nom">
-                  {(id) => <input id={id} required autoComplete="family-name" maxLength={60} className={inputCls} value={f.lastName} onChange={(e) => set("lastName", e.target.value)} />}
+                  {(id) => <input id={id} required autoComplete="family-name" maxLength={60} placeholder="Ex. Dupont" className={inputCls} value={f.lastName} onChange={(e) => set("lastName", e.target.value)} />}
                 </Field>
                 <Field label="Prénom">
-                  {(id) => <input id={id} required autoComplete="given-name" maxLength={60} className={inputCls} value={f.firstName} onChange={(e) => set("firstName", e.target.value)} />}
+                  {(id) => <input id={id} required autoComplete="given-name" maxLength={60} placeholder="Ex. Marie" className={inputCls} value={f.firstName} onChange={(e) => set("firstName", e.target.value)} />}
                 </Field>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Téléphone" hint="Chiffres uniquement.">
+                <Field label="Téléphone">
                   {(id) => <PhoneInput id={id} required value={f.phone} onValueChange={(v) => set("phone", v)} />}
                 </Field>
                 <Field label="Adresse e-mail">
-                  {(id) => <input id={id} type="email" required autoComplete="email" className={inputCls} value={f.email} onChange={(e) => set("email", e.target.value)} />}
+                  {(id) => <input id={id} type="email" required autoComplete="email" placeholder="marie.dupont@exemple.fr" className={inputCls} value={f.email} onChange={(e) => set("email", e.target.value)} />}
                 </Field>
               </div>
               <Field label="Adresse d'intervention">
-                {(id) => <input id={id} required autoComplete="street-address" className={inputCls} value={f.address} onChange={(e) => set("address", e.target.value)} />}
+                {(id) => <input id={id} required autoComplete="street-address" placeholder="Ex. 12 rue des Lilas, 33000 Bordeaux" className={inputCls} value={f.address} onChange={(e) => set("address", e.target.value)} />}
               </Field>
               {f.dogs.map((dog, i) => (
                 <div key={i} className="rounded-sm border border-brand-light/70 p-3 sm:p-4">
@@ -101,7 +101,7 @@ export default function ClientSignup() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label="Nom du chien">
                       {(id) => (
-                        <input id={id} required maxLength={60} className={inputCls} value={dog.name} onChange={(e) => set("dogs", f.dogs.map((d, k) => (k === i ? { ...d, name: e.target.value } : d)))} />
+                        <input id={id} required maxLength={60} placeholder="Ex. Max" className={inputCls} value={dog.name} onChange={(e) => set("dogs", f.dogs.map((d, k) => (k === i ? { ...d, name: e.target.value } : d)))} />
                       )}
                     </Field>
                     <Field label="Race et âge">
@@ -142,7 +142,7 @@ export default function ClientSignup() {
                 {(id) => <input id={id} type="datetime-local" min={toLocalInput(new Date())} className={inputCls} value={f.preferredDate} onChange={(e) => set("preferredDate", e.target.value)} />}
               </Field>
               <Field label="Précisions (comportement, disponibilités…)">
-                {(id) => <textarea id={id} rows={3} className={inputCls} value={f.notes} onChange={(e) => set("notes", e.target.value)} />}
+                {(id) => <textarea id={id} rows={3} placeholder="Ex. Il tire en laisse et aboie quand je pars. Disponible le samedi matin." className={inputCls} value={f.notes} onChange={(e) => set("notes", e.target.value)} />}
               </Field>
               <button type="submit" className={`${btn.primary} w-full sm:w-auto`}>
                 Continuer vers le contrat
