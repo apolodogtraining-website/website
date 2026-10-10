@@ -1,7 +1,10 @@
 import type { Client } from "@libsql/client";
-import { FICHE_FIELDS, type FicheAnswers, type FicheStatus, sanitizeAnswers } from "../fiche";
+import { FICHE_FIELDS, type FicheAnswers, type FicheStatus, answeredCount, sanitizeAnswers } from "../fiche";
+import { ficheDocumentHtml, ficheEmail } from "../fiche-html";
 import type { PortalSession } from "../types";
 import { ActionError } from "./actions";
+import { site } from "@/lib/site";
+import { sendMail } from "./mailer";
 
 /**
  * Droits d'accès aux chiens et aux études de comportement :
@@ -14,7 +17,7 @@ import { ActionError } from "./actions";
 export async function assertContractAccess(client: Client, session: PortalSession, contractId: string) {
   const row = (
     await client.execute({
-      sql: `SELECT c.id, c.partner_id, c.client_name, c.client_phone, c.client_email, c.address, p.contract_signed_at, p.active
+      sql: `SELECT c.id, c.partner_id, c.client_name, c.client_first_name, c.client_phone, c.client_email, c.address, p.contract_signed_at, p.active
             FROM contracts c JOIN partners p ON p.id = c.partner_id WHERE c.id = ?`,
       args: [contractId],
     })
@@ -28,6 +31,7 @@ export async function assertContractAccess(client: Client, session: PortalSessio
     contractId: String(row.id),
     client: {
       name: String(row.client_name),
+      firstName: String(row.client_first_name ?? ""),
       phone: String(row.client_phone ?? ""),
       email: String(row.client_email ?? ""),
       address: String(row.address ?? ""),
@@ -55,6 +59,8 @@ export type FicheView = {
   status: FicheStatus;
   updatedAt: string | null;
   updatedBy: string | null;
+  lastSentAt: string | null;
+  lastSentTo: string | null;
 };
 
 export async function getFiche(client: Client, session: PortalSession, dogId: string): Promise<FicheView> {
@@ -70,11 +76,13 @@ export async function getFiche(client: Client, session: PortalSession, dogId: st
   }
   return {
     dog: { id: String(dog.id), name: String(dog.name), breed: String(dog.breed), sex: String(dog.sex), age: String(dog.age), chip: String(dog.chip) },
-    owner,
+    owner: { name: owner.name, phone: owner.phone, email: owner.email, address: owner.address },
     answers,
     status: f ? (String(f.status) as FicheStatus) : "draft",
     updatedAt: f ? String(f.updated_at) : null,
     updatedBy: f ? String(f.updated_by) : null,
+    lastSentAt: f?.last_sent_at ? String(f.last_sent_at) : null,
+    lastSentTo: f?.last_sent_to ? String(f.last_sent_to) : null,
   };
 }
 
@@ -103,4 +111,50 @@ export async function saveFiche(
     args: [input.dogId, JSON.stringify(answers), status, updatedAt, by],
   });
   return { updatedAt, updatedBy: by, status, fields: FICHE_FIELDS.length };
+}
+
+const MIN_RESEND_MS = 30_000;
+const slug = (s: string) =>
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "chien";
+
+/**
+ * Envoie au client son étude de comportement : e-mail soigné + PDF de la fiche telle qu'enregistrée.
+ * Même contrôle d'accès que la lecture ; le gérant reçoit une copie cachée (journal de ce qui part).
+ */
+export async function sendFicheByEmail(client: Client, session: PortalSession, dogId: string) {
+  const { dog, client: owner } = await dogWithAccess(client, session, dogId);
+  const to = owner.email.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+    throw new ActionError("Ce client n'a pas d'adresse e-mail valide : ajoutez-la dans sa fiche contrat.");
+  }
+  const f = (await client.execute({ sql: "SELECT * FROM fiches WHERE dog_id = ?", args: [dogId] })).rows[0];
+  if (!f) throw new ActionError("La fiche est vide : remplissez-la avant de l'envoyer.");
+  let answers: FicheAnswers = {};
+  try {
+    answers = sanitizeAnswers(JSON.parse(String(f.data)));
+  } catch {
+    throw new ActionError("La fiche est illisible.");
+  }
+  // « date » est préremplie : une fiche qui n'a que cette réponse est considérée comme vide.
+  if (answeredCount(answers) - (answers.date ? 1 : 0) < 1) throw new ActionError("La fiche est vide : remplissez-la avant de l'envoyer.");
+
+  const last = f.last_sent_at ? Date.parse(String(f.last_sent_at)) : 0;
+  if (Date.now() - last < MIN_RESEND_MS) throw new ActionError("Cette fiche vient d'être envoyée. Patientez quelques secondes avant de la renvoyer.");
+
+  const dogInfo = { name: String(dog.name), breed: String(dog.breed), sex: String(dog.sex), age: String(dog.age), chip: String(dog.chip) };
+  const senderLabel = session.role === "admin" ? site.name : `${await author(client, session)} pour ${site.name}`;
+  const mail = ficheEmail({ firstName: owner.firstName, dogName: dogInfo.name, answers, senderLabel });
+  const res = await sendMail({
+    to,
+    subject: mail.subject,
+    text: mail.text,
+    html: mail.html,
+    pdfHtml: ficheDocumentHtml({ dog: dogInfo, owner, answers }),
+    pdfName: `Etude-de-comportement-${slug(dogInfo.name)}.pdf`,
+  });
+  if (!res.ok) throw new ActionError(`Envoi impossible : ${res.reason}`, 502);
+
+  const sentAt = new Date().toISOString();
+  await client.execute({ sql: "UPDATE fiches SET last_sent_at = ?, last_sent_to = ? WHERE dog_id = ?", args: [sentAt, to, dogId] });
+  return { sentTo: to, sentAt };
 }

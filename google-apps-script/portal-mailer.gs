@@ -21,10 +21,15 @@ function doPost(e) {
     // Sans secret configuré, ou secret incorrect : on refuse (l'URL est publique).
     if (!secret || data.secret !== secret) return out_({ ok: false, error: "Accès refusé." });
 
+    // Sonde de version : le portail vérifie que ce script sait générer un PDF distinct du corps du mail
+    // avant d'envoyer quoi que ce soit (sinon l'ancien script enverrait un PDF erroné).
+    if (data.ping) return out_({ ok: true, v: 2 });
+
     var to = String(data.to || "");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return out_({ ok: false, error: "Destinataire invalide." });
 
-    var pdf = Utilities.newBlob(String(data.html), "text/html", "contrat.html")
+    // PDF généré depuis pdfHtml s'il est fourni (ex. fiche d'étude), sinon depuis le corps du mail (contrats).
+    var pdf = Utilities.newBlob(String(data.pdfHtml || data.html), "text/html", "document.html")
       .getAs("application/pdf")
       .setName(String(data.pdfName || "contrat.pdf"));
 
