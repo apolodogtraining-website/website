@@ -81,10 +81,9 @@ export const SEANCES = 10;
 export const FICHE_SECTIONS: FicheSection[] = [
   {
     id: "proprietaire",
-    title: "Étude de comportement",
+    title: "Propriétaire",
     blocks: [
       {
-        title: "Propriétaire",
         hint: "Nom, téléphone, e-mail et adresse viennent de la fiche client.",
         columns: 2,
         fields: [
