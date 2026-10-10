@@ -6,6 +6,7 @@ import type {
   Frequency,
   Partner,
   PortalData,
+  Pricing,
   PortalSession,
   SessionStatus,
 } from "./types";
@@ -25,6 +26,8 @@ export type ContractInput = {
   clientPhone: string;
   address: string;
   service: string;
+  /** Par séance (défaut) ou forfait global. */
+  pricing: Pricing;
   price: number;
   commissionRate: number;
   frequency: Frequency | null;

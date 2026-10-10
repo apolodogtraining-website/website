@@ -98,13 +98,21 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
             </tr>
           </thead>
           <tbody className="divide-y divide-brand-light/60">
-            {sessions.map((s) => (
-              <tr key={s.id}>
-                <td className="py-2.5">{contract?.service}</td>
-                <td className="py-2.5 text-ink-soft">{fmtDateTime(s.date)}</td>
-                <td className="py-2.5 text-right">{money(contract?.price ?? 0)}</td>
+            {contract?.pricing === "package" ? (
+              <tr>
+                <td className="py-2.5">{contract.service}</td>
+                <td className="py-2.5 text-ink-soft">Forfait global</td>
+                <td className="py-2.5 text-right">{money(inv.gross)}</td>
               </tr>
-            ))}
+            ) : (
+              sessions.map((s) => (
+                <tr key={s.id}>
+                  <td className="py-2.5">{contract?.service}</td>
+                  <td className="py-2.5 text-ink-soft">{fmtDateTime(s.date)}</td>
+                  <td className="py-2.5 text-right">{money(contract?.price ?? 0)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
           <tfoot>
             <tr className="border-t border-brand-light">

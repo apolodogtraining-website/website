@@ -140,6 +140,7 @@ export function db(): Promise<Client> {
         "ALTER TABLE partners ADD COLUMN is_self INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE partners ADD COLUMN copy_sent_at TEXT", // exemplaire du contrat envoyé par e-mail
         "ALTER TABLE requests ADD COLUMN copy_sent_at TEXT",
+        "ALTER TABLE contracts ADD COLUMN pricing TEXT NOT NULL DEFAULT 'session'", // « session » (prix par séance) ou « package » (forfait global)
         "ALTER TABLE sessions ADD COLUMN reminder_sent_at TEXT", // rappel de rendez-vous envoyé au client
         "ALTER TABLE invoices ADD COLUMN last_reminder_at TEXT", // dernière relance de paiement
         "ALTER TABLE requests ADD COLUMN early_start_at TEXT", // demande expresse de début avant la fin du délai de rétractation

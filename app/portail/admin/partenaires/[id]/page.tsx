@@ -8,7 +8,7 @@ import InvoiceTable from "@/components/portal/InvoiceTable";
 import PartnerForm from "@/components/portal/PartnerForm";
 import PortalShell from "@/components/portal/PortalShell";
 import { Badge, btn, Card, Empty, Modal, PageHeader, Stat, Table } from "@/components/portal/ui";
-import { contractBilling, fmtDate, fmtDateTime, money, nextSession } from "@/lib/portal/format";
+import { contractBilling, fmtDate, fmtDateTime, money, nextSession, priceLabel } from "@/lib/portal/format";
 import { partnerOverview } from "@/lib/portal/stats";
 import { usePortal } from "@/lib/portal/store";
 
@@ -95,7 +95,7 @@ export default function AdminPartnerDetail({ params }: { params: Promise<{ id: s
         {o.contracts.length === 0 ? (
           <Empty>Aucun contrat client pour ce partenaire.</Empty>
         ) : (
-          <Table head={["Client", "Type", "Prochain rendez-vous", "Prix / séance", "Facturation"]}>
+          <Table head={["Client", "Type", "Prochain rendez-vous", "Prix", "Facturation"]}>
             {o.contracts.map((c) => {
               const next = nextSession(c);
               const b = contractBilling(c, invoices);
@@ -109,7 +109,7 @@ export default function AdminPartnerDetail({ params }: { params: Promise<{ id: s
                   </td>
                   <td>{c.type === "recurring" ? <Badge tone="blue">Récurrent</Badge> : <Badge>Ponctuel</Badge>}</td>
                   <td className="whitespace-nowrap">{next ? fmtDateTime(next.date) : "—"}</td>
-                  <td className="whitespace-nowrap">{money(c.price)}</td>
+                  <td className="whitespace-nowrap">{priceLabel(c)}</td>
                   <td>
                     <Badge tone={b.tone}>{b.label}</Badge>
                   </td>
