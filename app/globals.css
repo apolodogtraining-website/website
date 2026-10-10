@@ -241,6 +241,8 @@ details[open] > .faq-a-wrap {
    `text-white` y devient le texte foncé posé sur l'orange, comme sur le site vitrine. */
 .portal-theme {
   color-scheme: dark;
+  /* Redéfini ici : --font-anton n'existe que sous ce wrapper, pas à la racine où @theme résout --font-display. */
+  --font-display: var(--font-anton), Impact, ui-sans-serif, system-ui, sans-serif;
   --color-brand: #ff7a1a;
   --color-brand-dark: #ff9347;
   --color-brand-darker: #ffb072;
