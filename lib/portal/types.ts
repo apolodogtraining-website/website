@@ -79,7 +79,10 @@ export type RequestStatus = "pending" | "converted" | "declined";
 export type ClientRequest = {
   id: string;
   createdAt: string;
+  /** Nom complet « Prénom NOM » (pour les anciennes inscriptions, tel que saisi). */
   name: string;
+  firstName?: string | null;
+  lastName?: string | null;
   email: string;
   phone: string;
   address: string;

@@ -28,9 +28,21 @@ const text = (v: unknown, label: string, { max = 200, required = true } = {}) =>
   return x;
 };
 const num = (v: unknown, label: string, min: number, max: number) => {
+  // Number(null) et Number("") valent 0 : un champ vide ne doit pas passer pour un zéro.
+  if (v === null || v === undefined || (typeof v === "string" && v.trim() === "")) throw new ActionError(`${label} est requis.`);
   const x = Number(v);
   if (!Number.isFinite(x) || x < min || x > max) throw new ActionError(`${label} est invalide.`);
   return x;
+};
+/** Téléphone : seuls les chiffres sont conservés (8 à 15), le reste est retiré. Vide accepté si facultatif. */
+export const phoneDigits = (v: unknown, label: string, required = false) => {
+  const d = typeof v === "string" ? v.replace(/\D/g, "") : "";
+  if (!d) {
+    if (required) throw new ActionError(`${label} est requis.`);
+    return "";
+  }
+  if (d.length < 8 || d.length > 15) throw new ActionError(`${label} doit contenir entre 8 et 15 chiffres.`);
+  return d;
 };
 const oneOf = <T extends string>(v: unknown, label: string, allowed: readonly T[]): T => {
   if (typeof v !== "string" || !allowed.includes(v as T)) throw new ActionError(`${label} est invalide.`);
@@ -54,7 +66,7 @@ function partnerFields(b: Body) {
     company: text(b.company, "L'entreprise"),
     contact: text(b.contact, "Le contact"),
     email: email(b.email, "L'e-mail"),
-    phone: text(b.phone, "Le téléphone", { max: 40, required: false }),
+    phone: phoneDigits(b.phone, "Le téléphone"),
     siret: text(b.siret, "Le SIRET", { max: 40 }),
     specialties: text(b.specialties, "Les spécialités", { max: 300, required: false }),
     commissionRate: num(b.commissionRate, "La commission", 0, 100),
@@ -69,7 +81,7 @@ function contractFields(b: Body) {
     type,
     clientName: text(b.clientName, "Le client"),
     clientEmail: email(b.clientEmail, "L'e-mail du client", false),
-    clientPhone: text(b.clientPhone, "Le téléphone du client", { max: 40, required: false }),
+    clientPhone: phoneDigits(b.clientPhone, "Le téléphone du client"),
     address: text(b.address, "L'adresse", { max: 300 }),
     service: text(b.service, "La prestation"),
     price: num(b.price, "Le prix", 0, 100000),

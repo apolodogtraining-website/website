@@ -49,6 +49,8 @@ const toRequest = (r: Row): ClientRequest => ({
   id: s(r.id),
   createdAt: s(r.created_at),
   name: s(r.name),
+  firstName: sn(r.first_name),
+  lastName: sn(r.last_name),
   email: s(r.email),
   phone: s(r.phone),
   address: s(r.address),

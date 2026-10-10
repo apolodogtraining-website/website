@@ -35,8 +35,8 @@ export async function seedDemoIfEmpty(client: Client) {
       args: [i.id, i.number, i.contractId, i.partnerId, i.issuedAt, i.dueAt, i.gross, i.commission, i.net, i.clientPaidAt, i.payoutAt],
     })),
     ...d.requests.map((r) => ({
-      sql: "INSERT INTO requests (id, created_at, name, email, phone, address, dog_name, dog_breed, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-      args: [r.id, r.createdAt, r.name, r.email, r.phone, r.address, r.dogName, r.dogBreed, r.service, r.type, r.preferredDate, r.notes, r.signedAt, r.signedBy, r.contractVersion, r.status, r.contractId],
+      sql: "INSERT INTO requests (id, created_at, name, first_name, last_name, email, phone, address, dog_name, dog_breed, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      args: [r.id, r.createdAt, r.name, r.firstName ?? null, r.lastName ?? null, r.email, r.phone, r.address, r.dogName, r.dogBreed, r.service, r.type, r.preferredDate, r.notes, r.signedAt, r.signedBy, r.contractVersion, r.status, r.contractId],
     })),
   ];
   await client.batch(stmts, "write");

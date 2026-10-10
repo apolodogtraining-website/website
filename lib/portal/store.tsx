@@ -37,7 +37,8 @@ export type ContractInput = {
 };
 
 export type RequestInput = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   address: string;

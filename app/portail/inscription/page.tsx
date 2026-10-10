@@ -5,14 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import Turnstile, { turnstileSiteKey } from "@/components/portal/Turnstile";
-import { btn, Card, Field, inputCls } from "@/components/portal/ui";
+import { btn, Card, Field, inputCls, PhoneInput } from "@/components/portal/ui";
 import { CLIENT_CONTRACT_VERSION, clientContractArticles } from "@/lib/portal/contract-text";
-import { toLocalInput } from "@/lib/portal/format";
+import { composeName, toLocalInput } from "@/lib/portal/format";
 import { type RequestInput, submitClientRequest } from "@/lib/portal/store";
 import { services, site } from "@/lib/site";
 
 const empty: RequestInput = {
-  name: "",
+  firstName: "",
+  lastName: "",
   email: "",
   phone: "",
   address: "",
@@ -34,7 +35,8 @@ export default function ClientSignup() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const set = <K extends keyof RequestInput>(k: K, v: RequestInput[K]) => setF((x) => ({ ...x, [k]: v }));
-  const nameOk = signature.trim().toLowerCase() === f.name.trim().toLowerCase();
+  const fullName = composeName(f.firstName, f.lastName); // « Prénom NOM », identique à ce que stocke le serveur
+  const nameOk = signature.trim().toLowerCase() === fullName.toLowerCase();
 
   return (
     <main className="min-h-screen-mobile bg-brand-tint px-4 py-8">
@@ -67,16 +69,21 @@ export default function ClientSignup() {
               }}
             >
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nom et prénom">
-                  {(id) => <input id={id} required autoComplete="name" className={inputCls} value={f.name} onChange={(e) => set("name", e.target.value)} />}
+                <Field label="Nom">
+                  {(id) => <input id={id} required autoComplete="family-name" maxLength={60} className={inputCls} value={f.lastName} onChange={(e) => set("lastName", e.target.value)} />}
                 </Field>
-                <Field label="Téléphone">
-                  {(id) => <input id={id} type="tel" required autoComplete="tel" className={inputCls} value={f.phone} onChange={(e) => set("phone", e.target.value)} />}
+                <Field label="Prénom">
+                  {(id) => <input id={id} required autoComplete="given-name" maxLength={60} className={inputCls} value={f.firstName} onChange={(e) => set("firstName", e.target.value)} />}
                 </Field>
               </div>
-              <Field label="Adresse e-mail">
-                {(id) => <input id={id} type="email" required autoComplete="email" className={inputCls} value={f.email} onChange={(e) => set("email", e.target.value)} />}
-              </Field>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Téléphone" hint="Chiffres uniquement.">
+                  {(id) => <PhoneInput id={id} required value={f.phone} onValueChange={(v) => set("phone", v)} />}
+                </Field>
+                <Field label="Adresse e-mail">
+                  {(id) => <input id={id} type="email" required autoComplete="email" className={inputCls} value={f.email} onChange={(e) => set("email", e.target.value)} />}
+                </Field>
+              </div>
               <Field label="Adresse d'intervention">
                 {(id) => <input id={id} required autoComplete="street-address" className={inputCls} value={f.address} onChange={(e) => set("address", e.target.value)} />}
               </Field>
@@ -129,7 +136,7 @@ export default function ClientSignup() {
               <h1 className="text-2xl font-bold text-ink">Contrat de prestation</h1>
               <p className="mt-1 text-sm text-ink-soft">Étape 2 sur 2 · Lisez puis signez pour valider votre dossier.</p>
               <div className="mt-5 space-y-4 text-sm leading-relaxed">
-                {clientContractArticles(f).map((a) => (
+                {clientContractArticles({ name: fullName, service: f.service }).map((a) => (
                   <div key={a.title}>
                     <h2 className="font-bold text-ink">{a.title}</h2>
                     <p className="mt-1 text-ink-soft">{a.body}</p>
@@ -159,7 +166,7 @@ export default function ClientSignup() {
                   <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-brand" />
                   J&apos;ai lu le contrat (version {CLIENT_CONTRACT_VERSION}) et j&apos;en accepte les conditions.
                 </label>
-                <Field label={`Pour signer, saisissez votre nom complet : ${f.name}`}>
+                <Field label={`Pour signer, saisissez votre nom complet : ${fullName}`}>
                   {(id) => <input id={id} autoComplete="off" className={inputCls} value={signature} onChange={(e) => setSignature(e.target.value)} />}
                 </Field>
                 <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">

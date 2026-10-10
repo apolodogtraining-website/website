@@ -192,9 +192,11 @@ const requests: ClientRequest[] = [
   {
     id: "r1",
     createdAt: "2026-10-07T20:14",
-    name: "Camille Fabre",
+    name: "Camille FABRE",
+    firstName: "Camille",
+    lastName: "FABRE",
     email: "camille.fabre@example.com",
-    phone: "06 31 41 59 26",
+    phone: "0631415926",
     address: "9 rue Sainte-Catherine, 33000 Bordeaux",
     dogName: "Nala",
     dogBreed: "Border collie, 2 ans",
