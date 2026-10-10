@@ -6,8 +6,8 @@
  * 1. script.google.com → Nouveau projet → collez ce fichier.
  * 2. Paramètres du projet (engrenage) → Fuseau horaire : Europe/Paris
  *    (Propriétés du script) → ajoutez SECRET = une longue valeur aléatoire (32 caractères ou plus).
- *    Facultatif : CALENDAR_ID = identifiant de l'agenda (Paramètres de l'agenda > Intégrer l'agenda).
- *    Sans CALENDAR_ID, le script cherche un agenda nommé « Apolo ».
+ *    Facultatif : CALENDAR_ID = identifiant d'un agenda précis (Paramètres de l'agenda > Intégrer l'agenda).
+ *    Sans CALENDAR_ID : agenda secondaire nommé « Apolo » s'il existe, sinon agenda principal du compte.
  * 3. Déployer → Nouveau déploiement → « Application Web » :
  *      Exécuter en tant que : Moi    ·    Qui a accès : Tout le monde
  *    Autorisez l'accès à Google Agenda quand Google le demande.
@@ -31,7 +31,7 @@ function doPost(e) {
     if (!secret || data.secret !== secret) return out_({ ok: false, error: "forbidden" });
 
     var cal = findCalendar_(props.getProperty("CALENDAR_ID"));
-    if (!cal) return out_({ ok: false, error: "Agenda introuvable : créez un agenda nommé « Apolo » ou renseignez CALENDAR_ID." });
+    if (!cal) return out_({ ok: false, error: "Agenda introuvable : vérifiez CALENDAR_ID." });
 
     var results = {};
     var errors = {};
@@ -54,10 +54,11 @@ function doPost(e) {
   }
 }
 
+// Ordre : CALENDAR_ID, sinon un agenda secondaire nommé « Apolo », sinon l'agenda principal du compte.
 function findCalendar_(id) {
   if (id) return CalendarApp.getCalendarById(id);
   var found = CalendarApp.getCalendarsByName("Apolo");
-  return found.length ? found[0] : null;
+  return found.length ? found[0] : CalendarApp.getDefaultCalendar();
 }
 
 // « 2026-10-15T10:00 » en heure locale du script (réglée sur Europe/Paris).
