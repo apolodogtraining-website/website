@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Printer } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Mail, Printer, Send } from "lucide-react";
 import { answeredCount, FICHE_FIELDS, FICHE_SECTIONS, type FicheAnswers, type FicheStatus, type FieldDef } from "@/lib/portal/fiche";
 import { fmtDateTime, fmtPhone, toLocalInput } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
-import { Badge, btn, Card, inputCls, NumberInput } from "./ui";
+import { site } from "@/lib/site";
+import { Badge, btn, Card, inputCls, Modal, NumberInput } from "./ui";
 
 type View = {
   dog: { id: string; name: string; breed: string; sex: string; age: string; chip: string };
@@ -15,6 +16,8 @@ type View = {
   status: FicheStatus;
   updatedAt: string | null;
   updatedBy: string | null;
+  lastSentAt: string | null;
+  lastSentTo: string | null;
 };
 
 const SAVE_DELAY = 1500;
@@ -47,6 +50,10 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
   const conflictRef = useRef(false); // lisible depuis les minuteurs sans valeur périmée
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [confirmSend, setConfirmSend] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [lastSent, setLastSent] = useState<{ at: string; to: string } | null>(null);
 
   const base = useRef<string | null>(null); // version ouverte (contrôle de conflit)
   const dirty = useRef(false);
@@ -75,6 +82,7 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
         setAnswers(a);
         setStatus(v.status);
         setSavedAt(v.updatedAt);
+        setLastSent(v.lastSentAt && v.lastSentTo ? { at: v.lastSentAt, to: v.lastSentTo } : null);
       })
       .catch((e: Error) => !cancelled && setError(e.message));
     return () => {
@@ -120,6 +128,38 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
   useEffect(() => {
     saveRef.current = save;
   });
+
+  /** Enregistre les dernières modifications et attend la fin de toute sauvegarde en cours. */
+  const flush = async () => {
+    if (timer.current) clearTimeout(timer.current);
+    if (dirty.current) await save();
+    for (let i = 0; i < 100 && inFlight.current; i++) await new Promise((r) => setTimeout(r, 100));
+  };
+
+  const send = async () => {
+    setSending(true);
+    setNotice("");
+    setError("");
+    try {
+      await flush();
+      if (conflictRef.current || dirty.current) throw new Error("Les dernières modifications n'ont pas pu être enregistrées : l'envoi est annulé.");
+      const res = await fetch("/api/portal/fiche/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dogId }),
+      });
+      const p = await res.json();
+      if (!res.ok) throw new Error(p.error ?? "Envoi impossible.");
+      setLastSent({ at: p.sentAt, to: p.sentTo });
+      setNotice(`L'étude de ${view?.dog.name ?? "votre chien"} a bien été envoyée à ${p.sentTo}.`);
+      setConfirmSend(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Envoi impossible.");
+      setConfirmSend(false);
+    } finally {
+      setSending(false);
+    }
+  };
 
   const change = (key: string, value: string | string[]) => {
     setAnswers((a) => {
@@ -179,12 +219,26 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
           <button type="button" className={btn.secondary} onClick={() => window.print()}>
             <Printer className="h-4 w-4" /> Imprimer / PDF
           </button>
+          <button
+            type="button"
+            className={btn.secondary}
+            disabled={conflict || sending || !view.owner.email}
+            title={view.owner.email ? undefined : "Ce client n'a pas d'adresse e-mail : ajoutez-la dans sa fiche contrat."}
+            onClick={() => setConfirmSend(true)}
+          >
+            <Mail className="h-4 w-4" /> Envoyer au client
+          </button>
           <button type="button" className={completed ? btn.secondary : btn.primary} disabled={conflict || saving} onClick={() => save({ status: completed ? "draft" : "completed" })}>
             <CheckCircle2 className="h-4 w-4" /> {completed ? "Rouvrir la fiche" : "Marquer comme terminée"}
           </button>
         </div>
       </div>
 
+      {notice && (
+        <p role="status" className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800 print:hidden">
+          {notice}
+        </p>
+      )}
       {error && (
         <div role="alert" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 print:hidden">
           <span>{error}</span>
@@ -223,11 +277,37 @@ export default function FicheEditor({ dogId, backHref }: { dogId: string; backHr
           <span>
             {done} champ{done > 1 ? "s" : ""} renseigné{done > 1 ? "s" : ""} sur {total}
           </span>
+          {lastSent && (
+            <span>
+              Envoyée à {lastSent.to} le {fmtDateTime(lastSent.at)}
+            </span>
+          )}
           <span aria-live="polite">
             {saving ? "Enregistrement…" : savedAt ? `Enregistré le ${fmtDateTime(savedAt)}${view.updatedBy && savedAt === view.updatedAt ? ` par ${view.updatedBy}` : ""}` : "Pas encore enregistrée"}
           </span>
         </div>
       </Card>
+
+      {confirmSend && (
+        <Modal title="Envoyer l'étude au client ?" onClose={() => !sending && setConfirmSend(false)}>
+          <p className="text-sm text-ink-soft">
+            L&apos;étude de comportement de <strong className="text-ink">{view.dog.name}</strong> sera envoyée en PDF, avec un message de présentation, à :
+          </p>
+          <p className="mt-3 rounded-xl bg-brand-tint px-4 py-3 text-center text-sm font-semibold text-ink">{view.owner.email}</p>
+          <p className="mt-3 text-xs text-ink-soft">
+            Vos dernières modifications sont enregistrées avant l&apos;envoi. Le document contient les informations que vous avez saisies (santé, comportement) : relisez-le au besoin avant d&apos;envoyer.
+            Une copie est adressée à {site.email}.
+          </p>
+          <div className="mt-5 flex justify-end gap-2">
+            <button type="button" className={btn.secondary} disabled={sending} onClick={() => setConfirmSend(false)}>
+              Annuler
+            </button>
+            <button type="button" className={btn.primary} disabled={sending} onClick={send}>
+              <Send className="h-4 w-4" /> {sending ? "Envoi en cours…" : "Envoyer"}
+            </button>
+          </div>
+        </Modal>
+      )}
 
       {FICHE_SECTIONS.map((section) => (
         <Card key={section.id} className="mt-4 break-inside-avoid-page print:border-0 print:shadow-none">

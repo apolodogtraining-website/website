@@ -140,6 +140,8 @@ export function db(): Promise<Client> {
         "ALTER TABLE requests ADD COLUMN calendar_event_id TEXT",
         "ALTER TABLE requests ADD COLUMN first_name TEXT", // nom et prénom saisis séparément
         "ALTER TABLE contracts ADD COLUMN client_first_name TEXT",
+        "ALTER TABLE fiches ADD COLUMN last_sent_at TEXT", // dernier envoi de l'étude par e-mail
+        "ALTER TABLE fiches ADD COLUMN last_sent_to TEXT",
         "ALTER TABLE requests ADD COLUMN dogs_json TEXT", // tous les chiens déclarés à l'inscription
         "ALTER TABLE contracts ADD COLUMN client_last_name TEXT",
         "ALTER TABLE requests ADD COLUMN last_name TEXT",
