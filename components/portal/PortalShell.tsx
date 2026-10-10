@@ -63,7 +63,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
           </button>
         </div>
       )}
-      <aside className="border-b border-brand-light bg-white md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:border-b-0 md:border-r">
+      <aside className="border-b border-brand-light bg-white print:hidden md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:border-b-0 md:border-r">
         <div className="flex items-center justify-between gap-3 px-4 py-3 md:block md:px-5 md:py-6">
           <Link href={role === "admin" ? "/portail/admin" : "/portail/partenaire"} aria-label={site.name}>
             <Image src="/logo/logo-header.png" alt={site.name} width={140} height={48} className="h-9 w-auto md:h-11" />
@@ -105,7 +105,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
           </button>
         </div>
       </aside>
-      <main className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-9">
+      <main className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-9 print:p-0">
         <div className="mx-auto max-w-5xl">{children}</div>
         <div className="mt-8 md:hidden">
           <button

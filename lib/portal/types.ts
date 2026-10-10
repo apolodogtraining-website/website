@@ -57,6 +57,23 @@ export type Contract = {
   /** Signature du contrat de prestation par le client (inscription en ligne). */
   clientSignedAt?: string | null;
   clientSignedBy?: string | null;
+  dogs?: Dog[];
+};
+
+export type Sex = "M" | "F" | "";
+
+/** Un chien appartient à un contrat client (un client peut en avoir plusieurs). */
+export type Dog = {
+  id: string;
+  contractId: string;
+  name: string;
+  breed: string;
+  sex: Sex;
+  age: string;
+  chip: string;
+  /** État de l'étude de comportement : « none » tant qu'aucune fiche n'a été ouverte. */
+  ficheStatus: "none" | "draft" | "completed";
+  ficheUpdatedAt: string | null;
 };
 
 export type Invoice = {
@@ -91,6 +108,8 @@ export type ClientRequest = {
   address: string;
   dogName: string;
   dogBreed: string;
+  /** Tous les chiens déclarés (le premier reprend dogName / dogBreed). */
+  dogs?: { name: string; breed: string }[];
   service: string;
   type: ContractType;
   preferredDate: string;

@@ -2,6 +2,7 @@
 
 import { MapPin, Phone } from "lucide-react";
 import PortalShell from "@/components/portal/PortalShell";
+import DogsPanel from "@/components/portal/DogsPanel";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, Card, Empty, PageHeader } from "@/components/portal/ui";
 import { contractBilling, fmtPhone, frequencyLabel, money, splitAmount } from "@/lib/portal/format";
@@ -52,6 +53,7 @@ export default function PartnerContracts() {
                 <div className="mt-4 border-t border-brand-light/60 pt-2">
                   <SessionList contract={c} />
                 </div>
+                <DogsPanel contract={c} area="partner" embedded />
               </Card>
             );
           })}

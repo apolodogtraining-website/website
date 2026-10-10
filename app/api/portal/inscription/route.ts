@@ -40,6 +40,16 @@ export async function POST(req: Request) {
     const name = composeName(firstName, lastName); // « Prénom NOM », stocké aussi séparément
     const email = str(b.email, "L'e-mail", 200).toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ActionError("L'e-mail est invalide.");
+    // Un ou plusieurs chiens (5 au maximum) ; l'ancien format à un seul chien reste accepté.
+    const rawDogs = Array.isArray(b.dogs) ? b.dogs : [{ name: b.dogName, breed: b.dogBreed }];
+    const dogs = rawDogs
+      .slice(0, 5)
+      .map((d) => {
+        const o = (d && typeof d === "object" ? d : {}) as Record<string, unknown>;
+        return { name: str(o.name, "Le nom du chien", 60, false), breed: str(o.breed, "La race", 80, false) };
+      })
+      .filter((d) => d.name);
+    if (dogs.length === 0) throw new ActionError("Indiquez au moins un chien.");
     const service = str(b.service, "La prestation", 200);
     if (!services.some((s) => s.title === service)) throw new ActionError("La prestation est invalide.");
     const type = b.type === "recurring" ? "recurring" : "oneoff";
@@ -55,8 +65,8 @@ export async function POST(req: Request) {
     const signedAt = toLocalInput(new Date());
     const requestId = uid("r");
     await client.execute({
-      sql: "INSERT INTO requests (id, created_at, name, first_name, last_name, email, phone, address, dog_name, dog_breed, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-      args: [requestId, signedAt, name, firstName, lastName, email, phoneDigits(b.phone, "Le téléphone", true), str(b.address, "L'adresse", 300), str(b.dogName, "Le nom du chien", 80), str(b.dogBreed, "La race", 120, false), service, type, preferred, str(b.notes, "Les précisions", 1000, false), signedAt, name, CLIENT_CONTRACT_VERSION, "pending", null],
+      sql: "INSERT INTO requests (id, created_at, name, first_name, last_name, email, phone, address, dog_name, dog_breed, dogs_json, service, type, preferred_date, notes, signed_at, signed_by, contract_version, status, contract_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      args: [requestId, signedAt, name, firstName, lastName, email, phoneDigits(b.phone, "Le téléphone", true), str(b.address, "L'adresse", 300), dogs[0].name, dogs[0].breed, JSON.stringify(dogs), service, type, preferred, str(b.notes, "Les précisions", 1000, false), signedAt, name, CLIENT_CONTRACT_VERSION, "pending", null],
     });
     // Exemplaire du contrat par e-mail, après la réponse : un échec n'annule pas l'inscription (l'admin peut renvoyer).
     after(() => deliverRequestCopy(client, requestId));
