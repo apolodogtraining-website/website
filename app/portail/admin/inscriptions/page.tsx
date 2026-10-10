@@ -24,6 +24,57 @@ export default function AdminRequests() {
   const [addingExisting, setAddingExisting] = useState(false);
 
   const sorted = [...requests].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  // « À créer » : inscriptions en attente (puis refusées) ; « Créés » : celles qui ont déjà leur contrat.
+  const todo = sorted.filter((r) => r.status !== "converted").sort((a, b) => Number(a.status === "declined") - Number(b.status === "declined"));
+  const done = sorted.filter((r) => r.status === "converted");
+
+  const card = (r: ClientRequest) => (
+    <Card key={r.id}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-bold text-ink">{r.name}</h3>
+          <p className="text-sm text-ink-soft">
+            {r.service} · {r.type === "recurring" ? "suivi régulier" : "séance ponctuelle"}
+          </p>
+        </div>
+        {statusBadge[r.status]}
+      </div>
+      <dl className="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+        <Info k="E-mail" v={r.email} />
+        <Info k="Téléphone" v={fmtPhone(r.phone)} />
+        <Info k="Adresse" v={r.address} />
+        <Info k={(r.dogs?.length ?? 0) > 1 ? "Chiens" : "Chien"} v={(r.dogs?.length ? r.dogs : [{ name: r.dogName, breed: r.dogBreed }]).map((d) => [d.name, d.breed].filter(Boolean).join(" — ")).join(" ; ")} />
+        <Info k="Date souhaitée" v={r.preferredDate ? fmtDateTime(r.preferredDate) : "—"} />
+        <Info k="Contrat signé" v={`${r.signedBy}, le ${fmtDateTime(r.signedAt)} (v. ${r.contractVersion})`} />
+        <Info k="Début avant 14 jours" v={r.earlyStartAt ? `demandé le ${fmtDateTime(r.earlyStartAt)}` : "non demandé : attendre la fin du délai de rétractation"} />
+        <Info k="Exemplaire par e-mail" v={r.copySentAt ? `envoyé le ${fmtDateTime(r.copySentAt)}` : "pas encore envoyé"} />
+      </dl>
+      {r.notes && <p className="mt-3 rounded-sm bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{r.notes}</p>}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {r.status === "pending" && (
+          <>
+            <button type="button" className={btn.primary} onClick={() => setConverting(r)} disabled={!partners.some((p) => p.active)}>
+              Créer le contrat
+            </button>
+            <button type="button" className={btn.secondary} onClick={() => declineRequest(r.id)}>
+              Refuser
+            </button>
+          </>
+        )}
+        <button type="button" className={btn.ghost} onClick={() => resendRequestContract(r.id)}>
+          {r.copySentAt ? "Renvoyer l'exemplaire" : "Envoyer l'exemplaire"}
+        </button>
+        {r.contractId && (
+          <Link href={`/portail/admin/contrats/${r.contractId}`} className={btn.ghost}>
+            Voir le contrat
+          </Link>
+        )}
+        <button type="button" aria-label={`Supprimer l'inscription de ${r.name}`} className="ml-auto rounded-sm p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(r)}>
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+    </Card>
+  );
 
   return (
     <PortalShell role="admin">
@@ -52,54 +103,31 @@ export default function AdminRequests() {
           <Empty>Aucune inscription. Partagez le lien d&apos;inscription avec vos clients.</Empty>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {sorted.map((r) => (
-            <Card key={r.id}>
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-bold text-ink">{r.name}</h2>
-                  <p className="text-sm text-ink-soft">
-                    {r.service} · {r.type === "recurring" ? "suivi régulier" : "séance ponctuelle"}
-                  </p>
-                </div>
-                {statusBadge[r.status]}
-              </div>
-              <dl className="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
-                <Info k="E-mail" v={r.email} />
-                <Info k="Téléphone" v={fmtPhone(r.phone)} />
-                <Info k="Adresse" v={r.address} />
-                <Info k={(r.dogs?.length ?? 0) > 1 ? "Chiens" : "Chien"} v={(r.dogs?.length ? r.dogs : [{ name: r.dogName, breed: r.dogBreed }]).map((d) => [d.name, d.breed].filter(Boolean).join(" — ")).join(" ; ")} />
-                <Info k="Date souhaitée" v={r.preferredDate ? fmtDateTime(r.preferredDate) : "—"} />
-                <Info k="Contrat signé" v={`${r.signedBy}, le ${fmtDateTime(r.signedAt)} (v. ${r.contractVersion})`} />
-                <Info k="Début avant 14 jours" v={r.earlyStartAt ? `demandé le ${fmtDateTime(r.earlyStartAt)}` : "non demandé : attendre la fin du délai de rétractation"} />
-                <Info k="Exemplaire par e-mail" v={r.copySentAt ? `envoyé le ${fmtDateTime(r.copySentAt)}` : "pas encore envoyé"} />
-              </dl>
-              {r.notes && <p className="mt-3 rounded-sm bg-brand-tint px-3.5 py-2.5 text-sm text-ink-soft">{r.notes}</p>}
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                {r.status === "pending" && (
-                  <>
-                    <button type="button" className={btn.primary} onClick={() => setConverting(r)} disabled={!partners.some((p) => p.active)}>
-                      Créer le contrat
-                    </button>
-                    <button type="button" className={btn.secondary} onClick={() => declineRequest(r.id)}>
-                      Refuser
-                    </button>
-                  </>
-                )}
-                <button type="button" className={btn.ghost} onClick={() => resendRequestContract(r.id)}>
-                  {r.copySentAt ? "Renvoyer l'exemplaire" : "Envoyer l'exemplaire"}
-                </button>
-                {r.contractId && (
-                  <Link href={`/portail/admin/contrats/${r.contractId}`} className={btn.ghost}>
-                    Voir le contrat
-                  </Link>
-                )}
-                <button type="button" aria-label={`Supprimer l'inscription de ${r.name}`} className="ml-auto rounded-sm p-2 text-red-600 hover:bg-red-50" onClick={() => setDeleting(r)}>
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </Card>
-          ))}
+        <div className="space-y-10">
+          <section aria-labelledby="todo-title">
+            <h2 id="todo-title" className="mb-3 font-display text-xl uppercase tracking-wide text-ink">
+              Contrats à créer <span className="text-ink-soft">({todo.length})</span>
+            </h2>
+            {todo.length === 0 ? (
+              <Card>
+                <Empty>Aucune inscription en attente : tous les dossiers ont un contrat.</Empty>
+              </Card>
+            ) : (
+              <div className="space-y-4">{todo.map(card)}</div>
+            )}
+          </section>
+          <section aria-labelledby="done-title">
+            <h2 id="done-title" className="mb-3 font-display text-xl uppercase tracking-wide text-ink">
+              Contrats créés <span className="text-ink-soft">({done.length})</span>
+            </h2>
+            {done.length === 0 ? (
+              <Card>
+                <Empty>Aucun contrat créé à partir d&apos;une inscription pour l&apos;instant.</Empty>
+              </Card>
+            ) : (
+              <div className="space-y-4">{done.map(card)}</div>
+            )}
+          </section>
         </div>
       )}
       {converting && <ContractForm request={converting} onClose={() => setConverting(null)} />}
