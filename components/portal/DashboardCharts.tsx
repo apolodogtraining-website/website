@@ -45,7 +45,7 @@ export function ShareBars({ items, empty }: { items: { label: string; value: num
   );
 }
 
-const PIE_COLORS = ["#ff7a1a", "#ffb072", "#c85a0a", "#f4efe6", "#a6a7a2", "#7a3a10", "#ffd9bb", "#5c5d59"];
+const PIE_COLORS = ["#2aa9e1", "#8fd3f2", "#1985b4", "#f4efe6", "#a6a7a2", "#0e5f82", "#d5e6ed", "#5c5d59"];
 
 /** Camembert (conic-gradient) avec légende : montant et part de chaque tranche. */
 export function PieChart({ items, total, totalLabel, empty }: { items: { label: string; value: number }[]; total: number; totalLabel: string; empty: string }) {
