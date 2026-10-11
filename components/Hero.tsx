@@ -34,7 +34,7 @@ export default function Hero() {
       <div className="apolo-scene" data-hero-scene>
         <header className="apolo-header">
           <Link href="/" aria-label="Apolo Dog Training, accueil">
-            <Image src="/hero/logo-apolo.png" alt="Apolo Dog Training" width={1168} height={412} priority className="apolo-logo" />
+            <Image src="/hero/logo-apolo.webp" alt="Apolo Dog Training" width={1200} height={474} priority quality={90} className="apolo-logo" />
           </Link>
           <nav aria-label="Navigation principale">
             {NAV.map((n) => (

@@ -529,11 +529,11 @@ details[open] > .faq-a-wrap {
   }
   .apolo-header > a:first-child {
     position: absolute;
-    left: calc(68.4 * var(--u));
-    top: calc(22.4 * var(--u));
+    left: calc(63.9 * var(--u));
+    top: calc(15.6 * var(--u));
   }
   .apolo-logo {
-    width: calc(221.6 * var(--u));
+    width: calc(227.5 * var(--u));
     max-height: none;
   }
   .apolo-header nav {
