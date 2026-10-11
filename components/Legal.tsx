@@ -21,7 +21,7 @@ type LegalProps = {
 export default function Legal({ title, intro, updatedAt, sections }: LegalProps) {
   return (
     <>
-      <section className="bg-brand-tint py-14 md:py-20">
+      <section className="bg-brand-tint py-10 md:py-14">
         <div className="mx-auto max-w-3xl px-5">
           <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
             Informations légales
