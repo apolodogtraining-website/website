@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
+import Image from "next/image";
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
 import { site } from "@/lib/site";
@@ -98,7 +99,36 @@ function PhoneTile() {
   );
 }
 
+/** Colonne de droite : photo, tuiles de contact, puis zone d'intervention ; elle prend la hauteur du formulaire. */
+function Aside() {
+  return (
+    <div className="flex h-full min-w-0 flex-col gap-4">
+      <div className="relative min-h-72 flex-1 overflow-hidden rounded-2xl lg:min-h-40">
+        <Image
+          src="/photos/a-propos.jpg"
+          alt="Frédéric avec son chien, un berger belge, en haut d'une colline face à la mer"
+          fill
+          sizes="(min-width: 1024px) 40vw, 100vw"
+          className="object-cover object-[50%_70%]"
+        />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12 text-white">
+          <p className="font-semibold">
+            {site.trainer} · {site.role}
+          </p>
+          <p className="text-sm text-white/80">Je vous réponds rapidement.</p>
+        </div>
+      </div>
+      <PhoneTile />
+      <Tile href={`mailto:${site.email}?subject=Demande%20d%27accompagnement%20canin`} icon={<MailIcon className="h-6 w-6" />} label="Email" value={site.email} />
+      <Tile href={site.instagram.url} icon={<InstagramIcon className="h-6 w-6" />} label="Instagram" value={site.instagram.handle} external />
+      <Tile href={site.facebook.url} icon={<FacebookIcon className="h-6 w-6" />} label="Facebook" value={site.facebook.handle} external />
+      <ZoneModal variant="tile" />
+    </div>
+  );
+}
+
 export default function ContactPage() {
+
   return (
     <>
       <script
@@ -130,36 +160,10 @@ export default function ContactPage() {
                   <ContactForm />
                 </div>
 
-                <div className="flex min-w-0 flex-col justify-center gap-4">
-                  <h2 className="text-2xl font-bold text-white">Ou contactez-moi directement</h2>
-                  <PhoneTile />
-                  <Tile
-                    href={`mailto:${site.email}?subject=Demande%20d%27accompagnement%20canin`}
-                    icon={<MailIcon className="h-6 w-6" />}
-                    label="Email"
-                    value={site.email}
-                  />
-                  <Tile
-                    href={site.instagram.url}
-                    icon={<InstagramIcon className="h-6 w-6" />}
-                    label="Instagram"
-                    value={site.instagram.handle}
-                    external
-                  />
-                  <Tile
-                    href={site.facebook.url}
-                    icon={<FacebookIcon className="h-6 w-6" />}
-                    label="Facebook"
-                    value={site.facebook.handle}
-                    external
-                  />
-                </div>
+                <Aside />
               </div>
             </Reveal>
 
-            <div className="mx-auto mt-6 max-w-4xl">
-              <ZoneModal variant="banner" />
-            </div>
           </div>
         </section>
       </main>
