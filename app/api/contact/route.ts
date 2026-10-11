@@ -2,7 +2,7 @@ import { site } from "@/lib/site";
 import {
   LIMITS,
   SITUATIONS,
-  isEmail,
+  onlyDigits,
   validateContact,
   type ContactInput,
 } from "@/lib/contact";
@@ -53,12 +53,15 @@ const block = (value: unknown, max: number) =>
 
 function buildEmail(input: ContactInput): { subject: string; text: string } {
   const dog = [input.dogName, input.dogInfo].filter(Boolean).join(" — ");
-  const subject = `Demande de ${input.firstName}${input.dogName ? ` (chien : ${input.dogName})` : ""}`;
+  const phone = onlyDigits(input.phone).replace(/(\d{2})(?=\d)/g, "$1 ");
+  const subject = `Demande de ${input.firstName} ${input.lastName.toUpperCase()} (chien : ${input.dogName})`;
   const text = [
     "Nouvelle demande via le formulaire du site",
     "",
+    `Nom : ${input.lastName.toUpperCase()}`,
     `Prénom : ${input.firstName}`,
-    `Contact : ${input.contact}`,
+    `Téléphone : ${phone}`,
+    `E-mail : ${input.email}`,
     `Chien : ${dog || "non précisé"}`,
     `Situation : ${input.situations.join(", ") || "non précisée"}`,
     "",
@@ -99,8 +102,10 @@ export async function POST(req: Request) {
     : [];
 
   const input: ContactInput = {
+    lastName: line(body.lastName, LIMITS.lastName),
     firstName: line(body.firstName, LIMITS.firstName),
-    contact: line(body.contact, LIMITS.contact),
+    phone: onlyDigits(line(body.phone, 40)).slice(0, LIMITS.phone),
+    email: line(body.email, LIMITS.email),
     dogName: line(body.dogName, LIMITS.dogName),
     dogInfo: line(body.dogInfo, LIMITS.dogInfo),
     situations,
@@ -131,7 +136,7 @@ export async function POST(req: Request) {
         secret: webhookSecret,
         subject,
         text,
-        ...(isEmail(input.contact) ? { replyTo: input.contact } : {}),
+        replyTo: input.email,
       }),
       signal: AbortSignal.timeout(15_000),
     });
