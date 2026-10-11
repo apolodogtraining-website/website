@@ -106,13 +106,13 @@ function Aside() {
       <div className="relative min-h-72 flex-1 overflow-hidden rounded-2xl lg:min-h-40">
         <Image
           src="/photos/contact.jpg"
-          alt="Frédéric accroupi en forêt, souriant, avec un berger belge et un petit chien"
+          alt="Un berger belge assis sur la plage face à un coucher de soleil rouge et orange"
           fill
           sizes="(min-width: 1024px) 40vw, 100vw"
-          className="object-cover object-[50%_40%]"
+          className="object-cover object-[50%_55%]"
         />
-        <div className="absolute bottom-3 right-3 max-w-[62%] rounded-xl bg-brand-darker/85 px-3.5 py-2.5 text-white shadow-soft backdrop-blur">
-          <p className="text-sm font-semibold leading-snug">{site.trainer}, éducateur canin</p>
+        <div className="absolute left-3 top-3 max-w-[62%] rounded-xl bg-brand-darker/85 px-3.5 py-2.5 text-white shadow-soft backdrop-blur">
+          <p className="text-sm font-semibold leading-snug">{site.name}</p>
           <p className="mt-0.5 text-xs leading-snug text-white/85">Je vous réponds rapidement.</p>
         </div>
       </div>
