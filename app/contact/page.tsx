@@ -62,31 +62,38 @@ function Tile({
 }
 
 /**
- * Téléphone et WhatsApp sur le même numéro : une seule tuile, au gabarit des autres, coupée en deux zones
- * cliquables — appel à gauche, WhatsApp à droite (logo seul, séparé par un filet).
+ * Téléphone et WhatsApp sur le même numéro : une tuile au gabarit des autres, avec le numéro en haut
+ * et deux boutons dessous — « Appeler » (tel:) et « WhatsApp » (ouvre la conversation).
  */
 function PhoneTile() {
   return (
-    <div className="flex items-stretch overflow-hidden rounded-2xl bg-white transition-transform hover:-translate-y-0.5">
-      <a href={`tel:${site.phoneIntl}`} className="flex min-w-0 flex-1 items-center gap-4 p-4 transition-colors hover:bg-brand-tint sm:p-5">
+    <div className="rounded-2xl bg-white p-4 sm:p-5">
+      <div className="flex items-center gap-4">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-light text-brand">
           <PhoneIcon className="h-6 w-6" />
         </span>
         <span className="min-w-0">
-          <span className="block text-xs font-medium uppercase tracking-wide text-ink-soft">Téléphone</span>
+          <span className="block text-xs font-medium uppercase tracking-wide text-ink-soft">Téléphone &amp; WhatsApp</span>
           <span className="block break-words text-base font-semibold text-ink sm:text-lg">{site.phone}</span>
         </span>
-      </a>
-      <a
-        href={site.whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Écrire sur WhatsApp au ${site.phone}`}
-        className="flex w-20 shrink-0 flex-col items-center justify-center gap-1 border-l border-brand-light transition-colors hover:bg-[#25D366]/10 sm:w-24"
-      >
-        <WhatsAppIcon className="h-7 w-7 text-[#25D366]" />
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">WhatsApp</span>
-      </a>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <a
+          href={`tel:${site.phoneIntl}`}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+        >
+          <PhoneIcon className="h-4 w-4" /> Appeler
+        </a>
+        <a
+          href={site.whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Écrire sur WhatsApp au ${site.phone}`}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1ebe5b]"
+        >
+          <WhatsAppIcon className="h-4 w-4" /> WhatsApp
+        </a>
+      </div>
     </div>
   );
 }
