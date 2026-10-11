@@ -99,23 +99,43 @@ function PhoneTile() {
   );
 }
 
-/** Colonne de droite : photo, tuiles de contact, puis zone d'intervention ; elle prend la hauteur du formulaire. */
+const STEPS = [
+  ["1", "Vous m'écrivez", "Quelques lignes sur votre chien et votre quotidien."],
+  ["2", "Je vous réponds", "Je vous oriente vers l'accompagnement adapté."],
+  ["3", "On fait le point", "Étude de comportement, puis programme sur mesure."],
+] as const;
+
+/** Photo avec les trois étapes en surimpression, sur un fond flou et translucide comme le menu du site. */
+function Photo({ className = "" }: { className?: string }) {
+  return (
+    <div className={`relative overflow-hidden ${className}`}>
+      <Image
+        src="/photos/contact.jpg"
+        alt="Un berger belge assis sur la plage face à un coucher de soleil rouge et orange"
+        fill
+        sizes="(min-width: 1024px) 40vw, 100vw"
+        className="object-cover object-top"
+      />
+      <ol className="absolute inset-x-3 bottom-3 grid gap-2 rounded-2xl bg-white/65 p-3 sm:gap-2.5 shadow-soft backdrop-blur-md sm:grid-cols-3">
+        {STEPS.map(([n, t, d]) => (
+          <li key={n} className="flex gap-2.5 text-ink sm:block">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">{n}</span>
+            <span className="block sm:mt-1.5">
+              <span className="block text-sm font-semibold leading-snug">{t}</span>
+              <span className="hidden text-xs leading-snug text-ink/70 sm:block">{d}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+/** Colonne de droite : photo avec étapes en surimpression, tuiles de contact, puis zone d'intervention. */
 function Aside() {
   return (
     <div className="flex h-full min-w-0 flex-col gap-4">
-      <div className="relative min-h-72 flex-1 overflow-hidden rounded-2xl lg:min-h-40">
-        <Image
-          src="/photos/contact.jpg"
-          alt="Un berger belge assis sur la plage face à un coucher de soleil rouge et orange"
-          fill
-          sizes="(min-width: 1024px) 40vw, 100vw"
-          className="object-cover object-[50%_55%]"
-        />
-        <div className="absolute left-3 top-3 max-w-[62%] rounded-xl bg-brand-darker/85 px-3.5 py-2.5 text-white shadow-soft backdrop-blur">
-          <p className="text-sm font-semibold leading-snug">{site.name}</p>
-          <p className="mt-0.5 text-xs leading-snug text-white/85">Je vous réponds rapidement.</p>
-        </div>
-      </div>
+      <Photo className="min-h-96 flex-1 rounded-2xl lg:min-h-56" />
       <PhoneTile />
       <Tile href={`mailto:${site.email}?subject=Demande%20d%27accompagnement%20canin`} icon={<MailIcon className="h-6 w-6" />} label="Email" value={site.email} />
       <Tile href={site.instagram.url} icon={<InstagramIcon className="h-6 w-6" />} label="Instagram" value={site.instagram.handle} external />
