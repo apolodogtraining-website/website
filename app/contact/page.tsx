@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
+import Image from "next/image";
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
 import { site } from "@/lib/site";
@@ -98,7 +99,54 @@ function PhoneTile() {
   );
 }
 
+const STEPS = [
+  ["1", "Vous m'écrivez", "Quelques lignes sur votre chien et votre quotidien."],
+  ["2", "Je vous réponds", "Je vous oriente vers l'accompagnement adapté."],
+  ["3", "On fait le point", "Étude de comportement, puis programme sur mesure."],
+] as const;
+
+/** Photo avec les trois étapes en surimpression, sur un fond flou et translucide comme le menu du site. */
+function Photo({ className = "" }: { className?: string }) {
+  return (
+    <div className={`relative overflow-hidden ${className}`}>
+      <Image
+        src="/photos/contact.jpg"
+        alt="Un berger belge assis sur la plage face à un coucher de soleil rouge et orange"
+        fill
+        sizes="(min-width: 1024px) 40vw, 100vw"
+        className="object-cover object-top"
+      />
+      <ol className="absolute inset-x-3 bottom-3 grid gap-2 rounded-2xl bg-white/65 p-3 sm:gap-2.5 shadow-soft backdrop-blur-md sm:grid-cols-3">
+        {STEPS.map(([n, t, d]) => (
+          <li key={n} className="flex gap-2.5 text-ink sm:block">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">{n}</span>
+            <span className="block sm:mt-1.5">
+              <span className="block text-sm font-semibold leading-snug">{t}</span>
+              <span className="hidden text-xs leading-snug text-ink/70 sm:block">{d}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+/** Colonne de droite : photo avec étapes en surimpression, tuiles de contact, puis zone d'intervention. */
+function Aside() {
+  return (
+    <div className="flex h-full min-w-0 flex-col gap-4">
+      <Photo className="min-h-96 flex-1 rounded-2xl lg:min-h-56" />
+      <PhoneTile />
+      <Tile href={`mailto:${site.email}?subject=Demande%20d%27accompagnement%20canin`} icon={<MailIcon className="h-6 w-6" />} label="Email" value={site.email} />
+      <Tile href={site.instagram.url} icon={<InstagramIcon className="h-6 w-6" />} label="Instagram" value={site.instagram.handle} external />
+      <Tile href={site.facebook.url} icon={<FacebookIcon className="h-6 w-6" />} label="Facebook" value={site.facebook.handle} external />
+      <ZoneModal variant="tile" />
+    </div>
+  );
+}
+
 export default function ContactPage() {
+
   return (
     <>
       <script
@@ -130,36 +178,10 @@ export default function ContactPage() {
                   <ContactForm />
                 </div>
 
-                <div className="flex min-w-0 flex-col justify-center gap-4">
-                  <h2 className="text-2xl font-bold text-white">Ou contactez-moi directement</h2>
-                  <PhoneTile />
-                  <Tile
-                    href={`mailto:${site.email}?subject=Demande%20d%27accompagnement%20canin`}
-                    icon={<MailIcon className="h-6 w-6" />}
-                    label="Email"
-                    value={site.email}
-                  />
-                  <Tile
-                    href={site.instagram.url}
-                    icon={<InstagramIcon className="h-6 w-6" />}
-                    label="Instagram"
-                    value={site.instagram.handle}
-                    external
-                  />
-                  <Tile
-                    href={site.facebook.url}
-                    icon={<FacebookIcon className="h-6 w-6" />}
-                    label="Facebook"
-                    value={site.facebook.handle}
-                    external
-                  />
-                </div>
+                <Aside />
               </div>
             </Reveal>
 
-            <div className="mx-auto mt-6 max-w-4xl">
-              <ZoneModal variant="banner" />
-            </div>
           </div>
         </section>
       </main>
