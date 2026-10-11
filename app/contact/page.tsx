@@ -61,6 +61,36 @@ function Tile({
   );
 }
 
+/**
+ * Téléphone et WhatsApp sur le même numéro : une seule tuile, au gabarit des autres, coupée en deux zones
+ * cliquables — appel à gauche, WhatsApp à droite (logo seul, séparé par un filet).
+ */
+function PhoneTile() {
+  return (
+    <div className="flex items-stretch overflow-hidden rounded-2xl bg-white transition-transform hover:-translate-y-0.5">
+      <a href={`tel:${site.phoneIntl}`} className="flex min-w-0 flex-1 items-center gap-4 p-4 transition-colors hover:bg-brand-tint sm:p-5">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-light text-brand">
+          <PhoneIcon className="h-6 w-6" />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-xs font-medium uppercase tracking-wide text-ink-soft">Téléphone</span>
+          <span className="block break-words text-base font-semibold text-ink sm:text-lg">{site.phone}</span>
+        </span>
+      </a>
+      <a
+        href={site.whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Écrire sur WhatsApp au ${site.phone}`}
+        className="flex w-20 shrink-0 flex-col items-center justify-center gap-1 border-l border-brand-light transition-colors hover:bg-[#25D366]/10 sm:w-24"
+      >
+        <WhatsAppIcon className="h-7 w-7 text-[#25D366]" />
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">WhatsApp</span>
+      </a>
+    </div>
+  );
+}
+
 export default function ContactPage() {
   return (
     <>
@@ -95,12 +125,7 @@ export default function ContactPage() {
 
                 <div className="flex min-w-0 flex-col justify-center gap-4">
                   <h2 className="text-2xl font-bold text-white">Ou contactez-moi directement</h2>
-                  <Tile
-                    href={`tel:${site.phoneIntl}`}
-                    icon={<PhoneIcon className="h-6 w-6" />}
-                    label="Téléphone"
-                    value={site.phone}
-                  />
+                  <PhoneTile />
                   <Tile
                     href={`mailto:${site.email}?subject=Demande%20d%27accompagnement%20canin`}
                     icon={<MailIcon className="h-6 w-6" />}
@@ -119,13 +144,6 @@ export default function ContactPage() {
                     icon={<FacebookIcon className="h-6 w-6" />}
                     label="Facebook"
                     value={site.facebook.handle}
-                    external
-                  />
-                  <Tile
-                    href={site.whatsappUrl}
-                    icon={<WhatsAppIcon className="h-6 w-6" />}
-                    label="WhatsApp"
-                    value={site.phone}
                     external
                   />
                 </div>
