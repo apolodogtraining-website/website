@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
 import Reviews from "@/components/Reviews";
@@ -73,9 +72,8 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
-      <Header />
       <main className="flex-1">
-        <Hero rating={reviews.rating} total={reviews.total} />
+        <Hero />
         <Qualification />
         <Services />
         <Method />

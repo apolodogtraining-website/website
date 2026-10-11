@@ -302,3 +302,252 @@ details[open] > .faq-a-wrap {
     background: #ffffff;
   }
 }
+
+/* ---------- Hero de l'accueil (kit Apolo) ---------- */
+.apolo-hero {
+  --apolo-accent: #1293fb;
+  --apolo-accent-hover: #45adff;
+  --apolo-bg: #1f2222;
+  --apolo-bg-deep: #191c1c;
+  --apolo-ivory: #f4eee7;
+  --apolo-muted: #a4a49f;
+  --apolo-cta-ink: #101717;
+  --apolo-gutter: clamp(24px, 4.3vw, 72px);
+  --apolo-body: var(--font-barlow), Arial, sans-serif;
+  --apolo-display: var(--font-barlow-condensed), Impact, sans-serif;
+  position: relative;
+  background: var(--apolo-bg);
+  color: var(--apolo-ivory);
+  font-family: var(--apolo-body);
+}
+.apolo-scene {
+  position: relative;
+  height: max(720px, 100svh);
+  max-height: 1100px;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 60% 40%, #252929, var(--apolo-bg-deep));
+}
+/* Scène haute et sticky : les calques bougent pendant qu'elle reste à l'écran. Pas de JS requis pour la hauteur. */
+@media (prefers-reduced-motion: no-preference) {
+  .apolo-hero {
+    height: 190svh;
+    min-height: 1400px;
+  }
+  .apolo-scene {
+    position: sticky;
+    top: 0;
+  }
+}
+.apolo-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding: 27px var(--apolo-gutter);
+  height: 115px;
+}
+.apolo-logo {
+  display: block;
+  width: 214px;
+  height: auto;
+  max-height: 75px;
+  object-fit: contain;
+}
+.apolo-header nav {
+  display: flex;
+  gap: 60px;
+  font-size: 17px;
+  color: #cccbc6;
+}
+.apolo-header nav a:hover {
+  color: var(--apolo-accent-hover);
+}
+.apolo-location {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  font-size: 17px;
+  color: var(--apolo-muted);
+  white-space: nowrap;
+}
+.apolo-location svg {
+  width: 17px;
+  height: 22px;
+  color: var(--apolo-accent);
+}
+.apolo-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 35px;
+  background: var(--apolo-accent);
+  color: var(--apolo-cta-ink);
+  font-weight: 600;
+  font-size: 21px;
+  padding: 20px 28px;
+  min-height: 60px;
+  transition: background 0.18s, transform 0.18s;
+}
+.apolo-cta:hover {
+  background: var(--apolo-accent-hover);
+  transform: translateY(-2px);
+}
+.apolo-hero a:focus-visible {
+  outline: 3px solid var(--apolo-ivory);
+  outline-offset: 5px;
+}
+.apolo-arrow {
+  width: 23px;
+  height: 23px;
+}
+.apolo-header-cta {
+  font-size: 18px;
+  padding: 14px 30px;
+  min-height: 56px;
+}
+.apolo-back {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--apolo-accent);
+  clip-path: polygon(23% 100%, 100% 9.6%, 100% 100%);
+  transform: translate3d(var(--rear-x, 0px), var(--rear-y, 0px), 0);
+}
+.apolo-ground {
+  max-width: none; /* le preflight Tailwind plafonne les images à 100 % : le sol dépasse volontairement sur mobile */
+  position: absolute;
+  width: 100%;
+  height: auto;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+  transform: translateY(var(--ground-y, 0px));
+  mask-image: linear-gradient(90deg, transparent 13%, #000 32%);
+}
+.apolo-dog {
+  max-width: none;
+  position: absolute;
+  z-index: 3;
+  left: 27.3%;
+  top: 10.6%;
+  width: 73%;
+  height: auto;
+  pointer-events: none;
+  transform: translate3d(0, var(--dog-y, 0px), 0) scale(var(--dog-scale, 1));
+  transform-origin: 78% 90%;
+}
+.apolo-front {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  clip-path: inset(0 0 0 49%);
+  pointer-events: none;
+}
+.apolo-front-band {
+  position: absolute;
+  inset: 0;
+  background: var(--apolo-accent);
+  clip-path: polygon(78.8% 100%, 100% 82.5%, 100% 100%);
+  transform: translateY(var(--front-y, 0px));
+}
+.apolo-copy {
+  position: relative;
+  z-index: 5;
+  margin: 28px 0 0 var(--apolo-gutter);
+  width: 49%;
+}
+.apolo-copy h1 {
+  font: 800 clamp(86px, 11.25vw, 188px) / 0.85 var(--apolo-display);
+  letter-spacing: -0.025em;
+  margin: 0;
+  white-space: nowrap;
+}
+.apolo-dot {
+  display: inline-block;
+  background: var(--apolo-accent);
+  width: 0.16em;
+  height: 0.16em;
+  margin-left: 0.04em;
+}
+.apolo-copy p {
+  font-size: clamp(22px, 1.55vw, 26px);
+  line-height: 1.24;
+  margin: 34px 0 28px;
+  color: #e9e4dd;
+}
+.apolo-caption {
+  position: absolute;
+  z-index: 5;
+  left: 2.2%;
+  bottom: -30px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.apolo-number {
+  font: 800 clamp(200px, 17vw, 290px) / 0.85 var(--apolo-display);
+  color: transparent;
+  -webkit-text-stroke: 1.8px var(--apolo-accent);
+  transform: skew(-9deg);
+}
+.apolo-rule {
+  display: block;
+  width: 48px;
+  height: 2px;
+  background: var(--apolo-accent);
+}
+.apolo-labels {
+  font-size: 11px;
+  color: var(--apolo-muted);
+  line-height: 2.3;
+  letter-spacing: 0.14em;
+}
+@media (max-width: 1350px) {
+  .apolo-header nav { gap: 25px; }
+  .apolo-location { display: none; }
+  .apolo-logo { width: 180px; }
+  .apolo-header { height: 100px; }
+  .apolo-copy { margin-top: 35px; }
+}
+@media (max-width: 1099px) {
+  .apolo-header nav { display: none; }
+  .apolo-scene { height: max(760px, 100svh); }
+  .apolo-copy { width: 54%; }
+  .apolo-copy h1 { font-size: 11.3vw; }
+  .apolo-dog { left: 20%; width: 83%; top: 20%; }
+  .apolo-caption { bottom: 8px; }
+  .apolo-number { font-size: 200px; }
+  .apolo-labels { font-size: 9px; }
+  .apolo-header-cta { font-size: 16px; }
+}
+@media (max-width: 700px) {
+  .apolo-scene { height: max(850px, 100svh); max-height: none; }
+  .apolo-header { height: 85px; padding: 20px 24px; }
+  .apolo-logo { width: 130px; max-height: 46px; }
+  .apolo-header-cta { padding: 12px; font-size: 12px; min-height: 44px; gap: 8px; }
+  .apolo-header-cta .apolo-arrow { width: 17px; height: 17px; }
+  .apolo-copy { margin: 18px 24px 0; width: calc(100% - 48px); }
+  .apolo-copy h1 { font-size: clamp(58px, 14.8vw, 103px); line-height: 0.9; }
+  .apolo-copy p { font-size: 19px; margin: 24px 0; }
+  .apolo-copy .apolo-cta { font-size: 17px; padding: 16px 20px; min-height: 56px; }
+  .apolo-dog { width: 145%; left: -32%; top: auto; bottom: 55px; }
+  .apolo-ground { width: 190%; left: -70%; bottom: 35px; }
+  .apolo-back { clip-path: polygon(0 78%, 100% 48%, 100% 100%); }
+  .apolo-front { clip-path: inset(50% 0 0 0); }
+  .apolo-front-band { clip-path: polygon(60% 100%, 100% 85%, 100% 100%); }
+  .apolo-caption { left: 24px; bottom: 15px; gap: 14px; }
+  .apolo-number { display: none; }
+  .apolo-labels { font-size: 9px; }
+  .apolo-rule { width: 30px; }
+}
+@media (max-width: 700px) and (prefers-reduced-motion: no-preference) {
+  .apolo-hero { height: 155svh; min-height: 1100px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apolo-cta { transition: none; }
+  .apolo-dog, .apolo-ground, .apolo-back, .apolo-front-band { transform: none; }
+}
