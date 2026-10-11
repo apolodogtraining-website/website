@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent, t
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { CheckIcon } from "./icons";
-import { LIMITS, SITUATIONS, validateContact, type ContactErrors } from "@/lib/contact";
+import { LIMITS, onlyDigits, SITUATIONS, validateContact, type ContactErrors } from "@/lib/contact";
 
 type Status = "idle" | "sending" | "sent" | "failed";
 
@@ -15,12 +15,14 @@ function FieldShell({
   id,
   label,
   optional,
+  required,
   error,
   children,
 }: {
   id: string;
   label: string;
   optional?: boolean;
+  required?: boolean;
   error?: string;
   children: ReactNode;
 }) {
@@ -28,6 +30,11 @@ function FieldShell({
     <div>
       <label htmlFor={id} className="block text-sm font-semibold text-ink">
         {label}
+        {required && (
+          <span aria-hidden="true" className="ml-0.5 text-brand-dark">
+            *
+          </span>
+        )}
         {optional && <span className="font-normal text-ink-soft"> (facultatif)</span>}
       </label>
       <div className="mt-1.5">{children}</div>
@@ -40,6 +47,26 @@ function FieldShell({
   );
 }
 
+type FieldKey = "lastName" | "firstName" | "phone" | "email" | "dogName" | "dogInfo";
+
+const FIELDS: {
+  key: FieldKey;
+  label: string;
+  required: boolean;
+  type: "text" | "email" | "tel";
+  inputMode?: "numeric" | "email";
+  autoComplete?: string;
+  maxLength: number;
+  placeholder: string;
+}[] = [
+  { key: "lastName", label: "Nom", required: true, type: "text", autoComplete: "family-name", maxLength: LIMITS.lastName, placeholder: "Ex. Dupont" },
+  { key: "firstName", label: "Prénom", required: true, type: "text", autoComplete: "given-name", maxLength: LIMITS.firstName, placeholder: "Ex. Marie" },
+  { key: "phone", label: "Téléphone", required: true, type: "tel", inputMode: "numeric", autoComplete: "tel", maxLength: LIMITS.phone, placeholder: "0612345678" },
+  { key: "email", label: "E-mail", required: true, type: "email", inputMode: "email", autoComplete: "email", maxLength: LIMITS.email, placeholder: "marie.dupont@exemple.fr" },
+  { key: "dogName", label: "Nom du chien", required: true, type: "text", maxLength: LIMITS.dogName, placeholder: "Ex. Max" },
+  { key: "dogInfo", label: "Race et âge", required: false, type: "text", maxLength: LIMITS.dogInfo, placeholder: "Ex. Labrador, 5 mois" },
+];
+
 export default function ContactForm() {
   const uid = useId();
   const id = (name: string) => `${uid}-${name}`;
@@ -50,8 +77,10 @@ export default function ContactForm() {
   }, []);
 
   const [values, setValues] = useState({
+    lastName: "",
     firstName: "",
-    contact: "",
+    phone: "",
+    email: "",
     dogName: "",
     dogInfo: "",
     message: "",
@@ -73,8 +102,10 @@ export default function ContactForm() {
 
   const onField =
     (key: keyof typeof values) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setValues((prev) => ({ ...prev, [key]: e.target.value }));
-      if (key === "firstName" || key === "contact" || key === "message") clearError(key);
+      // Téléphone : seuls les chiffres sont conservés.
+      const value = key === "phone" ? onlyDigits(e.target.value).slice(0, LIMITS.phone) : e.target.value;
+      setValues((prev) => ({ ...prev, [key]: value }));
+      if (key in errors) clearError(key as keyof ContactErrors);
     };
 
   const toggleSituation = (s: string) =>
@@ -87,7 +118,7 @@ export default function ContactForm() {
     const found = validateContact({ ...values, situations, consent });
     if (Object.keys(found).length > 0) {
       setErrors(found);
-      const first = (["firstName", "contact", "message", "consent"] as const).find((k) => found[k]);
+      const first = (["lastName", "firstName", "phone", "email", "dogName", "message", "consent"] as const).find((k) => found[k]);
       if (first) document.getElementById(id(first))?.focus();
       return;
     }
@@ -153,57 +184,29 @@ export default function ContactForm() {
         </p>
       </div>
 
+      <p className="text-sm text-ink-soft">
+        Les champs marqués d&apos;un <span className="text-brand-dark">*</span> sont obligatoires.
+      </p>
+
       <div className="grid gap-5 sm:grid-cols-2">
-        <FieldShell id={id("firstName")} label="Prénom" error={errors.firstName}>
-          <input
-            id={id("firstName")}
-            type="text"
-            autoComplete="given-name"
-            maxLength={LIMITS.firstName}
-            value={values.firstName}
-            onChange={onField("firstName")}
-            aria-required="true"
-            aria-invalid={!!errors.firstName}
-            aria-describedby={errors.firstName ? `${id("firstName")}-error` : undefined}
-            className={inputClass}
-          />
-        </FieldShell>
-        <FieldShell id={id("contact")} label="Email ou téléphone" error={errors.contact}>
-          <input
-            id={id("contact")}
-            type="text"
-            autoComplete="email"
-            maxLength={LIMITS.contact}
-            value={values.contact}
-            onChange={onField("contact")}
-            placeholder="Email ou 06 12 34 56 78"
-            aria-required="true"
-            aria-invalid={!!errors.contact}
-            aria-describedby={errors.contact ? `${id("contact")}-error` : undefined}
-            className={inputClass}
-          />
-        </FieldShell>
-        <FieldShell id={id("dogName")} label="Nom du chien" optional>
-          <input
-            id={id("dogName")}
-            type="text"
-            maxLength={LIMITS.dogName}
-            value={values.dogName}
-            onChange={onField("dogName")}
-            className={inputClass}
-          />
-        </FieldShell>
-        <FieldShell id={id("dogInfo")} label="Âge et race" optional>
-          <input
-            id={id("dogInfo")}
-            type="text"
-            maxLength={LIMITS.dogInfo}
-            value={values.dogInfo}
-            onChange={onField("dogInfo")}
-            placeholder="2 ans, berger belge"
-            className={inputClass}
-          />
-        </FieldShell>
+        {FIELDS.map((f) => (
+          <FieldShell key={f.key} id={id(f.key)} label={f.label} required={f.required} optional={!f.required} error={errors[f.key as keyof ContactErrors]}>
+            <input
+              id={id(f.key)}
+              type={f.type}
+              inputMode={f.inputMode}
+              autoComplete={f.autoComplete}
+              maxLength={f.maxLength}
+              value={values[f.key]}
+              onChange={onField(f.key)}
+              placeholder={f.placeholder}
+              aria-required={f.required}
+              aria-invalid={!!errors[f.key as keyof ContactErrors]}
+              aria-describedby={errors[f.key as keyof ContactErrors] ? `${id(f.key)}-error` : undefined}
+              className={inputClass}
+            />
+          </FieldShell>
+        ))}
       </div>
 
       <fieldset>
@@ -227,7 +230,7 @@ export default function ContactForm() {
         </div>
       </fieldset>
 
-      <FieldShell id={id("message")} label="Votre message" error={errors.message}>
+      <FieldShell id={id("message")} label="Votre message" required error={errors.message}>
         <textarea
           id={id("message")}
           rows={5}
