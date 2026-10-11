@@ -105,17 +105,15 @@ function Aside() {
     <div className="flex h-full min-w-0 flex-col gap-4">
       <div className="relative min-h-72 flex-1 overflow-hidden rounded-2xl lg:min-h-40">
         <Image
-          src="/photos/a-propos.jpg"
-          alt="Frédéric avec son chien, un berger belge, en haut d'une colline face à la mer"
+          src="/photos/contact.jpg"
+          alt="Frédéric accroupi en forêt, souriant, avec un berger belge et un petit chien"
           fill
           sizes="(min-width: 1024px) 40vw, 100vw"
-          className="object-cover object-[50%_70%]"
+          className="object-cover object-[50%_40%]"
         />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12 text-white">
-          <p className="font-semibold">
-            {site.trainer} · {site.role}
-          </p>
-          <p className="text-sm text-white/80">Je vous réponds rapidement.</p>
+        <div className="absolute bottom-3 right-3 max-w-[62%] rounded-xl bg-brand-darker/85 px-3.5 py-2.5 text-white shadow-soft backdrop-blur">
+          <p className="text-sm font-semibold leading-snug">{site.trainer}, éducateur canin</p>
+          <p className="mt-0.5 text-xs leading-snug text-white/85">Je vous réponds rapidement.</p>
         </div>
       </div>
       <PhoneTile />
