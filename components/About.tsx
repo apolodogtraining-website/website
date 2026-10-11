@@ -25,10 +25,10 @@ type AboutProps = {
 
 export default function About({ as: Heading = "h2", heading }: AboutProps) {
   return (
-    <section id="a-propos" className="bg-white py-20 md:py-28">
+    <section id="a-propos" className="bg-surface py-20 md:py-28">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-2 lg:gap-16">
         <Reveal className="relative">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-soft lg:aspect-[4/5]">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-none shadow-soft lg:aspect-[4/5]">
             <Image
               src="/photos/a-propos.jpg"
               alt={`${site.trainer}, ${site.role}`}
@@ -37,9 +37,9 @@ export default function About({ as: Heading = "h2", heading }: AboutProps) {
               className="object-cover"
             />
           </div>
-          <div className="absolute -bottom-6 -right-4 hidden rounded-2xl bg-brand px-6 py-5 text-white shadow-brand sm:block lg:-right-6">
+          <div className="absolute -bottom-6 -right-4 hidden rounded-2xl bg-brand px-6 py-5 text-cta shadow-brand sm:block lg:-right-6">
             <p className="text-3xl font-bold leading-none">100%</p>
-            <p className="mt-1 text-sm font-medium text-white/90">
+            <p className="mt-1 text-sm font-medium text-cta/85">
               méthodes
               <br />
               positives

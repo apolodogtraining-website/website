@@ -89,7 +89,7 @@ function CityGrid({ cities }: { cities: string[] }) {
       {cities.map((city) => (
         <li
           key={city}
-          className="flex items-center gap-1.5 rounded-full bg-brand-tint px-4 py-2 text-sm font-medium text-ink"
+          className="flex items-center gap-1.5 rounded-none bg-brand-tint px-4 py-2 text-sm font-medium text-ink"
         >
           <MapPinIcon className="h-3.5 w-3.5 text-brand" />
           {city}
@@ -113,7 +113,7 @@ export default function ZoneInterventionPage() {
             <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Zone d&apos;intervention
             </span>
-            <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
+            <h1 className="mt-3 text-balance text-5xl font-semibold leading-tight text-ink md:text-6xl">
               Éducateur canin et activités de flair à Bordeaux, Bassens et dans
               toute la métropole
             </h1>
@@ -133,9 +133,9 @@ export default function ZoneInterventionPage() {
           </div>
         </section>
 
-        <section className="bg-white py-14 md:py-20">
+        <section className="bg-surface py-14 md:py-20">
           <div className="mx-auto max-w-3xl px-5">
-            <h2 className="text-2xl font-semibold text-ink">
+            <h2 className="text-3xl font-semibold text-ink">
               Bassens et la Rive Droite
             </h2>
             <p className="mt-3 leading-relaxed text-ink-soft">
@@ -146,7 +146,7 @@ export default function ZoneInterventionPage() {
             </p>
             <CityGrid cities={riveDroite} />
 
-            <h2 className="mt-12 text-2xl font-semibold text-ink">
+            <h2 className="mt-12 text-3xl font-semibold text-ink">
               Bordeaux et le reste de la métropole
             </h2>
             <p className="mt-3 leading-relaxed text-ink-soft">
@@ -162,13 +162,13 @@ export default function ZoneInterventionPage() {
 
         <section className="bg-brand-tint py-14 md:py-20">
           <div className="mx-auto max-w-3xl px-5">
-            <h2 className="text-2xl font-semibold text-ink">
+            <h2 className="text-3xl font-semibold text-ink">
               Questions fréquentes sur la zone d&apos;intervention
             </h2>
             <div className="mt-8 flex flex-col gap-8">
               {faq.map(({ q, a }) => (
                 <div key={q}>
-                  <h3 className="text-lg font-semibold text-ink">{q}</h3>
+                  <h3 className="text-xl font-semibold text-ink">{q}</h3>
                   <p className="mt-2 leading-relaxed text-ink-soft">{a}</p>
                 </div>
               ))}
@@ -176,18 +176,18 @@ export default function ZoneInterventionPage() {
           </div>
         </section>
 
-        <section className="bg-white py-16">
+        <section className="bg-surface py-16">
           <div className="mx-auto max-w-3xl px-5 text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Votre commune n&apos;apparaît pas dans la liste ?
             </p>
-            <h2 className="mt-3 text-3xl font-semibold text-ink">
+            <h2 className="mt-3 text-4xl font-semibold text-ink">
               Contactez-moi : une extension du rayon d&apos;intervention est
               souvent possible.
             </h2>
             <Link
               href="/contact"
-              className="mt-7 inline-flex rounded-full bg-brand px-6 py-3.5 font-semibold text-white shadow-brand hover:bg-brand-dark"
+              className="mt-7 inline-flex rounded-none bg-brand px-6 py-3.5 font-semibold text-cta shadow-brand hover:bg-brand-dark"
             >
               Prendre contact
             </Link>

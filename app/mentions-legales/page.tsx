@@ -14,7 +14,7 @@ export default function MentionsLegalesPage() {
   return (
     <>
       <Header />
-      <main className="pt-28">
+      <main className="pt-20">
         <Legal
           title="Mentions légales"
           updatedAt={site.legal.lastUpdated}

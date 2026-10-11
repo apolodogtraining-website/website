@@ -26,7 +26,7 @@ export default function ReviewsColumn({ reviews, duration = 24, className = "" }
       {[...reviews, ...reviews].map((r, i) => (
         <div
           key={i}
-          className="flex w-full max-w-xs flex-col rounded-3xl border border-brand-light bg-white p-7 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)]"
+          className="flex w-full max-w-xs flex-col rounded-3xl border border-brand-light bg-surface p-7"
         >
           <Stars rating={r.rating} />
           <p className="mt-4 text-sm leading-relaxed text-ink-soft">&ldquo;{r.text}&rdquo;</p>
@@ -40,7 +40,7 @@ export default function ReviewsColumn({ reviews, duration = 24, className = "" }
                 className="h-10 w-10 shrink-0 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-cta">
                 {r.author.charAt(0).toUpperCase()}
               </div>
             )}

@@ -83,7 +83,7 @@ export default async function ServicePage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: jsonLdScript(buildJsonLd(service)) }}
       />
       <Header />
-      <main className="pt-28">
+      <main className="pt-20">
         {/* ── En-tête ──────────────────────────────────────────────────────── */}
         <section className="bg-brand-tint py-10 md:py-14">
           <div className="mx-auto max-w-4xl px-5">
@@ -113,7 +113,7 @@ export default async function ServicePage({ params }: Props) {
             <p className="mt-7 text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               {site.area}
             </p>
-            <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
+            <h1 className="mt-3 text-balance text-5xl font-semibold leading-tight text-ink md:text-6xl">
               {service.h1 ?? service.title}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
@@ -121,7 +121,7 @@ export default async function ServicePage({ params }: Props) {
             </p>
             <Link
               href="/contact"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3.5 font-semibold text-white shadow-brand hover:bg-brand-dark"
+              className="mt-8 inline-flex items-center gap-2 rounded-none bg-brand px-6 py-3.5 font-semibold text-cta shadow-brand hover:bg-brand-dark"
             >
               Échanger sur mon chien <ArrowIcon className="h-5 w-5" />
             </Link>
@@ -131,7 +131,7 @@ export default async function ServicePage({ params }: Props) {
         {hasLongForm ? (
           <>
             {/* ── En quoi ça consiste ──────────────────────────────────────── */}
-            <section className="bg-white py-16 md:py-24">
+            <section className="bg-surface py-16 md:py-24">
               <div className="mx-auto max-w-2xl px-5">
                 <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
                   En quoi ça consiste
@@ -151,16 +151,16 @@ export default async function ServicePage({ params }: Props) {
                   <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
                     Pour quel chien
                   </span>
-                  <h2 className="mt-3 max-w-2xl text-balance text-3xl font-semibold leading-tight text-ink md:text-4xl">
+                  <h2 className="mt-3 max-w-2xl text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
                     À qui cet accompagnement s&apos;adresse vraiment.
                   </h2>
                   <div className="mt-10 grid gap-4 md:grid-cols-2">
                     {service.forWhom.map((item) => (
                       <div
                         key={item.title}
-                        className="rounded-3xl border border-brand-light bg-white p-6"
+                        className="rounded-3xl border border-brand-light bg-surface p-6"
                       >
-                        <h3 className="text-lg font-semibold text-ink">{item.title}</h3>
+                        <h3 className="text-xl font-semibold text-ink">{item.title}</h3>
                         <p className="mt-3 leading-relaxed text-ink-soft">{item.text}</p>
                       </div>
                     ))}
@@ -171,12 +171,12 @@ export default async function ServicePage({ params }: Props) {
 
             {/* ── Déroulé d'une séance : une vraie séquence, d'où la numérotation ── */}
             {service.sessionFlow?.length ? (
-              <section className="bg-ink py-16 text-white md:py-24">
+              <section className="bg-deep py-16 text-white md:py-24">
                 <div className="mx-auto max-w-4xl px-5">
                   <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
                     Déroulé d&apos;une séance
                   </span>
-                  <h2 className="mt-3 max-w-2xl text-balance text-3xl font-semibold leading-tight md:text-4xl">
+                  <h2 className="mt-3 max-w-2xl text-balance text-4xl font-semibold leading-tight md:text-5xl">
                     Ce qui se passe, dans l&apos;ordre.
                   </h2>
                   <ol className="mt-10 divide-y divide-white/15">
@@ -186,7 +186,7 @@ export default async function ServicePage({ params }: Props) {
                           {String(i + 1).padStart(2, "0")}
                         </span>
                         <div>
-                          <h3 className="text-lg font-semibold">{step.title}</h3>
+                          <h3 className="text-xl font-semibold">{step.title}</h3>
                           <p className="mt-2 leading-relaxed text-white/70">{step.text}</p>
                         </div>
                       </li>
@@ -198,7 +198,7 @@ export default async function ServicePage({ params }: Props) {
 
             {/* ── Bénéfices ────────────────────────────────────────────────── */}
             {service.benefits?.length ? (
-              <section className="bg-white py-16 md:py-24">
+              <section className="bg-surface py-16 md:py-24">
                 <div className="mx-auto max-w-3xl px-5">
                   <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
                     Ce que ça change
@@ -222,7 +222,7 @@ export default async function ServicePage({ params }: Props) {
                   <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
                     Questions fréquentes
                   </span>
-                  <h2 className="mt-3 text-balance text-3xl font-semibold leading-tight text-ink md:text-4xl">
+                  <h2 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
                     Ce qu&apos;on me demande le plus souvent.
                   </h2>
                   <div className="mt-8 divide-y divide-brand-light border-y border-brand-light">
@@ -244,10 +244,10 @@ export default async function ServicePage({ params }: Props) {
           </>
         ) : (
           /* Gabarit court, tant que le contenu long n'est pas rédigé. */
-          <section className="bg-white py-16 md:py-24">
+          <section className="bg-surface py-16 md:py-24">
             <div className="mx-auto grid max-w-4xl gap-12 px-5 md:grid-cols-2">
               <div>
-                <h2 className="text-2xl font-semibold text-ink">
+                <h2 className="text-3xl font-semibold text-ink">
                   Un accompagnement qui part de votre réalité.
                 </h2>
                 <p className="mt-4 leading-relaxed text-ink-soft">
@@ -257,7 +257,7 @@ export default async function ServicePage({ params }: Props) {
                 </p>
               </div>
               <div className="rounded-3xl bg-brand-tint p-7">
-                <h2 className="text-xl font-semibold text-ink">Comment commencer ?</h2>
+                <h2 className="text-2xl font-semibold text-ink">Comment commencer ?</h2>
                 <ol className="mt-5 space-y-4 text-ink-soft">
                   <li>
                     <span className="font-semibold text-brand">01 — </span>Prendre contact et
@@ -279,9 +279,9 @@ export default async function ServicePage({ params }: Props) {
 
         {/* ── Maillage interne ───────────────────────────────────────────────── */}
         {related.length ? (
-          <section className="bg-white py-16 md:py-24">
+          <section className="bg-surface py-16 md:py-24">
             <div className="mx-auto max-w-5xl px-5">
-              <h2 className="text-2xl font-semibold text-ink">
+              <h2 className="text-3xl font-semibold text-ink">
                 Ces accompagnements vont souvent avec.
               </h2>
               <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -294,7 +294,7 @@ export default async function ServicePage({ params }: Props) {
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-light text-brand">
                       <ServiceIcon name={item.icon} className="h-5 w-5" />
                     </div>
-                    <h3 className="mt-4 text-lg font-semibold text-ink">{item.title}</h3>
+                    <h3 className="mt-4 text-xl font-semibold text-ink">{item.title}</h3>
                     <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">
                       {item.description}
                     </p>
@@ -315,12 +315,12 @@ export default async function ServicePage({ params }: Props) {
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Un doute sur le bon point de départ ?
             </p>
-            <h2 className="mt-3 text-balance text-3xl font-semibold text-ink">
+            <h2 className="mt-3 text-balance text-4xl font-semibold text-ink">
               Parlons de votre chien avant de choisir.
             </h2>
             <Link
               href="/contact"
-              className="mt-7 inline-flex rounded-full bg-brand px-6 py-3.5 font-semibold text-white shadow-brand hover:bg-brand-dark"
+              className="mt-7 inline-flex rounded-none bg-brand px-6 py-3.5 font-semibold text-cta shadow-brand hover:bg-brand-dark"
             >
               Réserver une évaluation
             </Link>

@@ -27,13 +27,13 @@ export default function PartenairesPage() {
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <Header />
-      <main className="pt-28">
+      <main className="pt-20">
         <section className="bg-brand-tint py-10 md:py-14">
           <div className="mx-auto max-w-3xl px-5 text-center">
             <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Réseau de confiance
             </span>
-            <h1 className="mt-2 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
+            <h1 className="mt-2 text-balance text-5xl font-semibold leading-tight text-ink md:text-6xl">
               Mes partenaires
             </h1>
             <p className="mt-4 text-lg leading-relaxed text-ink-soft">
@@ -43,15 +43,15 @@ export default function PartenairesPage() {
           </div>
         </section>
 
-        <section className="bg-white pb-16 pt-8 md:pb-24 md:pt-10">
+        <section className="bg-surface pb-16 pt-8 md:pb-24 md:pt-10">
           <div className="mx-auto grid max-w-7xl gap-6 px-5 sm:grid-cols-2 xl:grid-cols-4">
             {partners.map((partner, i) => (
               <Reveal key={partner.name} delay={(i % 4) * 80} variant="scale" className="h-full">
                 <TiltCard
                   as="article"
-                  className="group flex h-full flex-col rounded-3xl border border-brand-light bg-white p-5 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)] transition-colors duration-300 hover:border-brand/40 hover:shadow-brand"
+                  className="group flex h-full flex-col rounded-3xl border border-brand-light bg-surface p-5 transition-colors duration-300 hover:border-brand/40 hover:shadow-brand"
                 >
-                  <div className="tilt-card-pop flex h-36 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-tint to-brand-light/60">
+                  <div className="tilt-card-pop flex h-36 items-center justify-center rounded-2xl bg-ink">
                     {partner.logo ? (
                       <Image
                         src={partner.logo}
@@ -68,7 +68,7 @@ export default function PartenairesPage() {
                   </div>
 
                   <div className="flex flex-1 flex-col px-1 pb-1 pt-5">
-                    <h2 className="text-lg font-semibold leading-snug text-ink">{partner.name}</h2>
+                    <h2 className="text-xl font-semibold leading-snug text-ink">{partner.name}</h2>
                     <div className="mt-1 flex flex-wrap items-center gap-2">
                       <span className="text-xs font-semibold text-brand-darker">{partner.tag}</span>
                       <span className="flex items-center gap-1 text-xs text-ink-soft">
@@ -96,17 +96,17 @@ export default function PartenairesPage() {
 
         <section className="bg-brand-tint py-16 md:py-24">
           <div className="mx-auto max-w-4xl px-5">
-            <div className="overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand to-brand-darker px-6 py-14 text-center text-white shadow-brand sm:px-10">
-              <h2 className="text-balance text-2xl font-bold uppercase md:text-3xl">
+            <div className="overflow-hidden rounded-none bg-brand px-6 py-14 text-center text-cta shadow-brand sm:px-10">
+              <h2 className="text-balance text-3xl font-bold uppercase md:text-4xl">
                 Vous ne savez pas vers qui vous tourner ?
               </h2>
-              <p className="mx-auto mt-4 max-w-md leading-relaxed text-white/85">
+              <p className="mx-auto mt-4 max-w-md leading-relaxed text-cta/85">
                 Contactez-moi, je vous orienterai vers le bon professionnel
                 selon votre situation.
               </p>
               <Link
                 href="/contact"
-                className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 font-semibold text-brand-darker shadow-soft transition-transform hover:-translate-y-0.5"
+                className="mt-7 inline-flex items-center gap-2 rounded-none bg-deep px-6 py-3.5 font-semibold text-ink transition-transform hover:-translate-y-0.5"
               >
                 Me contacter
               </Link>

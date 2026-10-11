@@ -39,7 +39,7 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur transition-colors hover:bg-white/20"
+          className="mt-10 inline-flex items-center gap-2 rounded-none border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-white backdrop-blur transition-colors hover:bg-white/20"
         >
           <MapPinIcon className="h-3.5 w-3.5" />
           Zone d&apos;intervention
@@ -48,7 +48,7 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex w-full items-center gap-4 rounded-2xl bg-ink p-4 text-left text-white transition-transform hover:-translate-y-0.5 sm:p-5"
+          className="flex w-full items-center gap-4 rounded-2xl bg-deep p-4 text-left text-white transition-transform hover:-translate-y-0.5 sm:p-5"
         >
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-brand">
             <MapPinIcon className="h-6 w-6" />
@@ -63,7 +63,7 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="mx-auto flex w-full max-w-4xl items-center gap-3 rounded-3xl bg-ink p-7 text-left text-white transition-colors hover:bg-ink/90"
+          className="mx-auto flex w-full max-w-4xl items-center gap-3 rounded-3xl bg-deep p-7 text-left text-white transition-colors hover:bg-deep/90"
         >
           <MapPinIcon className="h-6 w-6 shrink-0 text-brand" />
           <p className="flex-1">
@@ -85,7 +85,7 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
           // modale, bloque sinon tout événement hors d'un élément
           // `data-lenis-prevent`.
           <div className="fixed inset-0 z-[100]">
-            <div aria-hidden className="absolute inset-0 bg-ink/60 backdrop-blur-sm" />
+            <div aria-hidden className="absolute inset-0 bg-deep/60 backdrop-blur-sm" />
             <div
               data-lenis-prevent
               className="absolute inset-0 overflow-y-auto overscroll-contain"
@@ -99,15 +99,15 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
                   role="dialog"
                   aria-modal="true"
                   aria-labelledby={titleId}
-                  className="w-full max-w-md rounded-[2rem] bg-white shadow-brand"
+                  className="w-full max-w-md rounded-none bg-surface shadow-brand"
                 >
                   {/* En-tête collant : la croix reste atteignable même en bas de liste. */}
-                  <div className="sticky top-0 z-10 flex items-start justify-between gap-4 rounded-t-[2rem] bg-white px-7 pb-4 pt-7">
+                  <div className="sticky top-0 z-10 flex items-start justify-between gap-4 rounded-none bg-surface px-7 pb-4 pt-7">
                     <div>
                       <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
                         Zone d&apos;intervention
                       </span>
-                      <h2 id={titleId} className="mt-2 text-2xl font-semibold text-ink">
+                      <h2 id={titleId} className="mt-2 text-3xl font-semibold text-ink">
                         {site.areaLong}
                       </h2>
                     </div>
@@ -130,7 +130,7 @@ export default function ZoneModal({ variant }: ZoneModalProps) {
                       {serviceAreas.map((city) => (
                         <li
                           key={city}
-                          className="flex items-center gap-1.5 rounded-full bg-brand-tint px-3.5 py-2 text-sm font-medium text-ink"
+                          className="flex items-center gap-1.5 rounded-none bg-brand-tint px-3.5 py-2 text-sm font-medium text-ink"
                         >
                           <MapPinIcon className="h-3.5 w-3.5 text-brand" />
                           {city}

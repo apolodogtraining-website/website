@@ -8,7 +8,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from "motion/react"
  * Photo en léger parallax : elle défile un peu plus lentement que le reste
  * de la section, pour une impression de profondeur. La photo est surdimensionnée
  * (inset -10%) pour ne jamais laisser de bord vide pendant le déplacement ;
- * le conteneur parent (rounded-[2rem] overflow-hidden dans Method.tsx) la
+ * le conteneur parent (rounded-none overflow-hidden dans Method.tsx) la
  * rogne à la forme visible.
  *
  * Coupé si prefers-reduced-motion : un décalage arrière-plan/premier-plan à

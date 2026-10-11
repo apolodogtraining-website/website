@@ -14,7 +14,7 @@ export default function ConfidentialitePage() {
   return (
     <>
       <Header />
-      <main className="pt-28">
+      <main className="pt-20">
         <Legal
           title="Politique de confidentialité"
           intro="Ce site collecte le strict minimum. Voici précisément quoi, pourquoi, combien de temps, et ce que vous pouvez exiger."

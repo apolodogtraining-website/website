@@ -19,13 +19,13 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main className="pt-28">
+      <main className="pt-20">
         <section className="bg-brand-tint py-16 md:py-24">
           <div className="mx-auto max-w-3xl px-5">
             <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Erreur 404
             </span>
-            <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
+            <h1 className="mt-3 text-balance text-5xl font-semibold leading-tight text-ink md:text-6xl">
               Cette page n&apos;existe pas (ou plus).
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
@@ -35,7 +35,7 @@ export default function NotFound() {
           </div>
         </section>
 
-        <section className="bg-white py-16 md:py-24">
+        <section className="bg-surface py-16 md:py-24">
           <div className="mx-auto grid max-w-3xl gap-4 px-5">
             {shortcuts.map((item) => (
               <Link

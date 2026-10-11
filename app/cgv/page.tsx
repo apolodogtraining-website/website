@@ -15,7 +15,7 @@ export default function CgvPage() {
   return (
     <>
       <Header />
-      <main className="pt-28">
+      <main className="pt-20">
         <Legal
           title="Conditions générales de vente"
           intro={`Prestations d'éducation canine pour les consommateurs. Version ${CGV_VERSION}.`}

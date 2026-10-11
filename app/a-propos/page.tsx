@@ -70,12 +70,12 @@ export default function AboutPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Une question avant de démarrer ?
             </p>
-            <h2 className="mt-3 text-3xl font-semibold text-ink">
+            <h2 className="mt-3 text-4xl font-semibold text-ink">
               Le meilleur point de départ reste votre chien.
             </h2>
             <Link
               href="/contact"
-              className="mt-7 inline-flex rounded-full bg-brand px-6 py-3.5 font-semibold text-white shadow-brand hover:bg-brand-dark"
+              className="mt-7 inline-flex rounded-none bg-brand px-6 py-3.5 font-semibold text-cta shadow-brand hover:bg-brand-dark"
             >
               Prendre contact
             </Link>

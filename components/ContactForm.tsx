@@ -9,7 +9,7 @@ import { LIMITS, onlyDigits, SITUATIONS, validateContact, type ContactErrors } f
 type Status = "idle" | "sending" | "sent" | "failed";
 
 const inputClass =
-  "w-full rounded-xl border border-brand-light bg-white px-4 py-3 text-base text-ink placeholder:text-ink-soft/60 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 aria-[invalid=true]:border-red-500";
+  "w-full rounded-xl border border-brand-light bg-surface px-4 py-3 text-base text-ink placeholder:text-ink-soft/60 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30 aria-[invalid=true]:border-red-500";
 
 function FieldShell({
   id,
@@ -160,7 +160,7 @@ export default function ContactForm() {
         <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-light text-brand">
           <CheckIcon className="h-6 w-6" />
         </span>
-        <h2 className="text-2xl font-semibold text-ink">Message envoyé</h2>
+        <h2 className="text-3xl font-semibold text-ink">Message envoyé</h2>
         <p className="leading-relaxed text-ink-soft">
           Merci {sentName}. Je lis votre message et je vous réponds rapidement.
         </p>
@@ -178,7 +178,7 @@ export default function ContactForm() {
   return (
     <form onSubmit={onSubmit} noValidate className="relative space-y-5">
       <div>
-        <h2 className="text-2xl font-semibold text-ink">Écrivez-moi</h2>
+        <h2 className="text-3xl font-semibold text-ink">Écrivez-moi</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
           Décrivez votre situation, je vous oriente vers l&apos;accompagnement le plus pertinent.
         </p>
@@ -222,7 +222,7 @@ export default function ContactForm() {
                 checked={situations.includes(s)}
                 onChange={() => toggleSituation(s)}
               />
-              <span className="inline-flex rounded-full border border-brand-light bg-brand-tint px-3.5 py-2 text-sm font-medium text-ink transition-colors hover:border-brand/50 peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40">
+              <span className="inline-flex rounded-none border border-brand-light bg-brand-tint px-3.5 py-2 text-sm font-medium text-ink transition-colors hover:border-brand/50 peer-checked:border-brand peer-checked:bg-brand peer-checked:text-cta peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40">
                 {s}
               </span>
             </label>
@@ -312,7 +312,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="inline-flex items-center justify-center rounded-full bg-brand px-7 py-3.5 text-base font-semibold text-white shadow-brand transition-transform hover:-translate-y-0.5 hover:bg-brand-dark disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
+        className="inline-flex items-center justify-center rounded-none bg-brand px-7 py-3.5 text-base font-semibold text-cta shadow-brand transition-transform hover:-translate-y-0.5 hover:bg-brand-dark disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
       >
         {status === "sending" ? "Envoi en cours…" : "Envoyer ma demande"}
       </button>

@@ -29,8 +29,8 @@ export default async function AvisPage() {
         <section className="bg-brand-tint py-16">
           <div className="mx-auto max-w-3xl px-5 text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">Envie de rejoindre les prochains avis ?</p>
-            <h2 className="mt-3 text-3xl font-semibold text-ink">Parlons de votre chien.</h2>
-            <Link href="/contact" className="mt-7 inline-flex rounded-full bg-brand px-6 py-3.5 font-semibold text-white shadow-brand hover:bg-brand-dark">Prendre contact</Link>
+            <h2 className="mt-3 text-4xl font-semibold text-ink">Parlons de votre chien.</h2>
+            <Link href="/contact" className="mt-7 inline-flex rounded-none bg-brand px-6 py-3.5 font-semibold text-cta shadow-brand hover:bg-brand-dark">Prendre contact</Link>
           </div>
         </section>
       </main>

@@ -11,11 +11,11 @@ const situations = [
 
 export default function Qualification() {
   return (
-    <section className="bg-white py-20 md:py-28">
+    <section className="bg-surface py-20 md:py-28">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
         <Reveal>
           <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">Pour qui ?</span>
-          <h2 className="mt-3 text-balance text-3xl font-semibold leading-tight text-ink md:text-4xl">Vous ne devriez pas avoir à choisir entre aimer votre chien et subir votre quotidien.</h2>
+          <h2 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">Vous ne devriez pas avoir à choisir entre aimer votre chien et subir votre quotidien.</h2>
           <p className="mt-5 max-w-md leading-relaxed text-ink-soft">Chaque chien communique à sa manière. Le point de départ est de comprendre ce qui se joue, sans étiquette ni solution toute faite.</p>
           <Link href="/contact" className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-brand-darker hover:text-brand">Parler de votre situation <ArrowIcon className="h-4 w-4" /></Link>
         </Reveal>

@@ -25,11 +25,11 @@ export default function MethodSteps({ steps }: { steps: readonly Step[] }) {
       <div className="divide-y divide-white/15">
         {steps.map(([number, title, text]) => (
           <div key={number} className="grid grid-cols-[3rem_1fr] gap-3 py-5">
-            <span className="relative flex h-9 w-9 items-center justify-center justify-self-center rounded-full border border-white/15 bg-ink text-xs font-semibold text-brand">
+            <span className="relative flex h-9 w-9 items-center justify-center justify-self-center rounded-full border border-white/15 bg-deep text-xs font-semibold text-brand">
               {number}
             </span>
             <div>
-              <h3 className="text-lg font-semibold">{title}</h3>
+              <h3 className="text-xl font-semibold">{title}</h3>
               <p className="mt-2 leading-relaxed text-white/70">{text}</p>
             </div>
           </div>

@@ -1,16 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins } from "next/font/google";
+import { Barlow, Barlow_Condensed, Saira_Extra_Condensed } from "next/font/google";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site } from "@/lib/site";
 import SmoothScroll from "@/components/SmoothScroll";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
+// Charte Apolo : Barlow pour le texte, Saira Extra Condensed Black pour les titres, Barlow Condensed pour les chiffres.
+const barlow = Barlow({ variable: "--font-barlow", subsets: ["latin"], weight: ["400", "500", "600", "700"], display: "swap" });
+const barlowCondensed = Barlow_Condensed({ variable: "--font-barlow-condensed", subsets: ["latin"], weight: ["700", "800"], display: "swap" });
+const saira = Saira_Extra_Condensed({ variable: "--font-saira", subsets: ["latin"], weight: "900", display: "swap" });
 
 // Google réécrivait le title déclaré (« Apolo Dog Training — Éducateur &
 // comportementaliste canin à Bordeaux ») au profit d'une formulation tournée
@@ -78,7 +76,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#5AA7DD",
+  themeColor: "#1f2222",
 };
 
 export default function RootLayout({
@@ -87,8 +85,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${poppins.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-white text-ink">
+    <html lang="fr" className={`${barlow.variable} ${barlowCondensed.variable} ${saira.variable} h-full`}>
+      <body className="min-h-full flex flex-col bg-surface text-ink">
         <SmoothScroll>{children}</SmoothScroll>
         {/* Core Web Vitals mesurés chez les vrais visiteurs (LCP / INP / CLS),
             remontés dans le tableau de bord Vercel. Sans cookie : ni bandeau de

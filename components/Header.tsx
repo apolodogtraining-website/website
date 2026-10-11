@@ -7,128 +7,99 @@ import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { headerNav, site } from "@/lib/site";
 import useScrollLock from "@/hooks/useScrollLock";
+import { ArrowIcon, MapPinIcon } from "./icons";
 
+/**
+ * Barre de navigation sombre, pleine largeur (charte Apolo).
+ * Sur l'accueil, le hero porte sa propre barre : celle-ci n'apparaît qu'une fois le hero dépassé.
+ */
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
-  // Verre visible dès qu'on quitte le haut du hero de l'accueil (comme le
-  // template Evasion, piloté par isScrolled), ou dès que le menu mobile est
-  // ouvert (il a besoin d'un fond lisible quel que soit le défilement).
-  const glass = !isHome || scrolled || open;
+  const visible = !isHome || pastHero || open;
 
   useScrollLock(open);
 
   useEffect(() => {
     if (!isHome) return;
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const hero = document.querySelector<HTMLElement>("[data-hero]");
+    if (!hero) return;
+    const update = () => setPastHero(hero.getBoundingClientRect().bottom < 140);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, [isHome]);
+
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`));
 
   return (
     <header
-      className="fixed left-1/2 top-4 z-50 w-[92%] max-w-4xl -translate-x-1/2 md:top-5 md:w-fit md:max-w-[94vw]"
+      className={`fixed inset-x-0 top-0 z-50 border-b border-brand-light/70 bg-surface/90 backdrop-blur-md transition-transform duration-300 ${
+        visible ? "translate-y-0" : "-translate-y-full"
+      }`}
+      {...(!visible ? { inert: true, "aria-hidden": true } : {})}
     >
-      {/* Le fond/flou/ombre "verre" vit sur CE bandeau (hauteur fixe, ~52px),
-          jamais sur <header> lui-même : si on l'y met, dès que le panneau
-          mobile s'ouvre en dessous, la boîte <header> devient très haute et
-          `rounded-full` (border-radius: 9999px, plafonné à la moitié de la
-          plus petite dimension) se transforme en capsule/ovale géant au lieu
-          d'une pilule normale — c'était le bug du menu mobile "en boule". */}
-      <div
-        className={`transition-all duration-300 ${
-          glass ? "rounded-full bg-white/60 backdrop-blur-md" : "bg-transparent"
-        }`}
-        style={{
-          boxShadow: glass
-            ? "rgba(14,95,130,.06) 0px 0px 0px 1px, rgba(22,35,44,.05) 0px 1px 1px -0.5px, rgba(22,35,44,.05) 0px 3px 3px -1.5px, rgba(22,35,44,.05) 0px 6px 6px -3px, rgba(14,95,130,.05) 0px 12px 12px -6px, rgba(14,95,130,.05) 0px 24px 24px -12px"
-            : "none",
-        }}
-      >
-        <div className="flex items-center justify-between gap-8 px-2 pl-5 py-2 md:justify-start">
-          <Link
-            href="/"
-            className="relative h-7 w-[82px] shrink-0"
-            aria-label={site.name}
-          >
-            {/* Recadrés au plus juste (public/logo/logo-header.png) pour ne
-                pas agrandir le bandeau : 28px de haut, comme demandé.
+      <div className="mx-auto flex h-20 max-w-[1672px] items-center justify-between gap-6 px-6 lg:px-[4.3vw]">
+        <Link href="/" className="relative block h-14 w-[142px] shrink-0" aria-label={`${site.name} — accueil`}>
+          <Image src="/hero/logo-apolo.webp" alt="" fill sizes="142px" priority={!isHome} className="object-contain object-left" />
+        </Link>
 
-                Les deux logos sont superposés et alternés en opacité. `priority`
-                doit suivre celui qui est RÉELLEMENT visible au chargement :
-                le blanc sur le hero transparent de l'accueil, le sombre partout
-                ailleurs (où `glass` est vrai dès le premier rendu). Sans ça, on
-                précharge un logo invisible pendant que celui qu'on voit part en
-                `loading="lazy"`. */}
-            <Image
-              src="/logo/logo-white.png"
-              alt=""
-              fill
-              aria-hidden
-              priority={isHome}
-              sizes="82px"
-              className={`object-contain transition-opacity duration-300 ${
-                glass ? "opacity-0" : "opacity-100"
-              }`}
-            />
-            <Image
-              src="/logo/logo-header.png"
-              alt={site.name}
-              fill
-              priority={!isHome}
-              sizes="82px"
-              className={`object-contain transition-opacity duration-300 ${
-                glass ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          </Link>
-
-          <nav className="hidden shrink-0 flex-nowrap items-center gap-8 md:flex">
-            {headerNav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`shrink-0 whitespace-nowrap text-sm transition-colors ${
-                  glass ? "text-ink-soft hover:text-ink" : "text-white/70 hover:text-white"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+        <nav aria-label="Navigation principale" className="hidden items-center gap-9 lg:flex xl:gap-14">
+          {headerNav.map((item) => (
             <Link
-              href="/contact"
-              className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-85 ${
-                glass ? "bg-brand text-white" : "bg-white text-brand"
+              key={item.href}
+              href={item.href}
+              aria-current={isActive(item.href) ? "page" : undefined}
+              className={`whitespace-nowrap border-b-2 py-1 text-[17px] transition-colors hover:text-brand-dark ${
+                isActive(item.href) ? "border-brand text-ink" : "border-transparent text-[#cccbc6]"
               }`}
             >
-              Réserver
+              {item.label}
             </Link>
-          </nav>
+          ))}
+        </nav>
 
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className={`transition-colors md:hidden ${glass ? "text-ink" : "text-white"}`}
-            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-            aria-expanded={open}
+        <div className="hidden items-center gap-8 lg:flex">
+          <span className="hidden items-center gap-3 whitespace-nowrap text-[17px] text-ink-soft min-[1350px]:flex">
+            <MapPinIcon className="h-5 w-5 text-brand" />
+            {site.areaLong}
+          </span>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-4 whitespace-nowrap bg-brand px-7 py-3.5 text-lg font-semibold text-cta transition-all hover:-translate-y-0.5 hover:bg-brand-dark"
           >
-            {open ? <X size={24} /> : <Menu size={24} />}
-          </button>
+            Réserver une évaluation
+            <ArrowIcon className="h-5 w-5" />
+          </Link>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="flex h-11 w-11 items-center justify-center text-ink lg:hidden"
+          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={open}
+        >
+          {open ? <X size={26} /> : <Menu size={26} />}
+        </button>
       </div>
 
       {open && (
-        <div className="mt-2 overflow-hidden rounded-[28px] border border-white/25 bg-gradient-to-b from-white/70 to-white/45 px-6 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,.4),inset_0_-1px_0_rgba(14,95,130,.05),0_25px_50px_-22px_rgba(14,95,130,.28)] backdrop-blur-[28px] backdrop-saturate-[1.6] md:hidden">
-          <nav className="flex flex-col gap-7">
+        <div className="border-t border-brand-light/70 bg-surface px-6 pb-8 pt-6 lg:hidden">
+          <nav aria-label="Navigation mobile" className="flex flex-col gap-5">
             {headerNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="text-lg text-ink"
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={`text-xl ${isActive(item.href) ? "text-brand-darker" : "text-ink"}`}
               >
                 {item.label}
               </Link>
@@ -136,9 +107,10 @@ export default function Header() {
             <Link
               href="/contact"
               onClick={() => setOpen(false)}
-              className="mt-2 rounded-full bg-brand px-5 py-3 text-center text-sm font-semibold text-white"
+              className="mt-2 inline-flex items-center justify-between bg-brand px-6 py-4 text-lg font-semibold text-cta"
             >
-              Réserver une séance
+              Réserver une évaluation
+              <ArrowIcon className="h-5 w-5" />
             </Link>
           </nav>
         </div>

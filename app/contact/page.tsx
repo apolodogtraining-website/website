@@ -49,7 +49,7 @@ function Tile({
     <a
       href={href}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="flex items-center gap-4 rounded-2xl bg-white p-4 transition-transform hover:-translate-y-0.5 sm:p-5"
+      className="flex items-center gap-4 rounded-2xl bg-surface p-4 transition-transform hover:-translate-y-0.5 sm:p-5"
     >
       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-light text-brand">
         {icon}
@@ -68,7 +68,7 @@ function Tile({
  */
 function PhoneTile() {
   return (
-    <div className="rounded-2xl bg-white p-4 sm:p-5">
+    <div className="rounded-2xl bg-surface p-4 sm:p-5">
       <div className="flex items-center gap-4">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-light text-brand">
           <PhoneIcon className="h-6 w-6" />
@@ -81,7 +81,7 @@ function PhoneTile() {
       <div className="mt-3 grid grid-cols-2 gap-2">
         <a
           href={`tel:${site.phoneIntl}`}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-3 py-2.5 text-sm font-semibold text-cta transition-colors hover:bg-brand-dark"
         >
           <PhoneIcon className="h-4 w-4" /> Appeler
         </a>
@@ -116,10 +116,10 @@ function Photo({ className = "" }: { className?: string }) {
         sizes="(min-width: 1024px) 40vw, 100vw"
         className="object-cover object-top"
       />
-      <ol className="absolute inset-x-3 bottom-3 grid gap-2 rounded-2xl bg-white/65 p-3 sm:gap-2.5 shadow-soft backdrop-blur-md sm:grid-cols-3">
+      <ol className="absolute inset-x-3 bottom-3 grid gap-2 rounded-2xl bg-deep/75 p-3 backdrop-blur-md sm:grid-cols-3 sm:gap-2.5">
         {STEPS.map(([n, t, d]) => (
           <li key={n} className="flex gap-2.5 text-ink sm:block">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">{n}</span>
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-cta">{n}</span>
             <span className="block sm:mt-1.5">
               <span className="block text-sm font-semibold leading-snug">{t}</span>
               <span className="hidden text-xs leading-snug text-ink/70 sm:block">{d}</span>
@@ -154,13 +154,13 @@ export default function ContactPage() {
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <Header />
-      <main className="pt-28">
+      <main className="pt-20">
         <section className="bg-brand-tint py-10 md:py-14">
           <div className="mx-auto max-w-4xl px-5">
             <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Prendre rendez-vous
             </span>
-            <h1 className="mt-2 max-w-3xl text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
+            <h1 className="mt-2 max-w-3xl text-balance text-5xl font-semibold leading-tight text-ink md:text-6xl">
               Parlons de votre chien et de ce que vous vivez au quotidien.
             </h1>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">
@@ -170,11 +170,11 @@ export default function ContactPage() {
           </div>
         </section>
 
-        <section className="bg-white py-16 md:py-24">
+        <section className="bg-surface py-16 md:py-24">
           <div className="mx-auto max-w-6xl px-5">
-            <Reveal className="contact-gradient overflow-hidden rounded-[2.5rem] shadow-brand">
+            <Reveal className="contact-gradient overflow-hidden rounded-none shadow-brand">
               <div className="grid gap-8 p-5 sm:p-8 lg:grid-cols-[1.25fr_1fr] lg:gap-10 lg:p-12">
-                <div className="min-w-0 rounded-3xl bg-white p-6 sm:p-8">
+                <div className="min-w-0 rounded-3xl bg-surface p-6 sm:p-8">
                   <ContactForm />
                 </div>
 

@@ -19,25 +19,25 @@ export default function Contact({
   total = site.google.count,
 }: ContactProps) {
   return (
-    <section id="contact" className="bg-white py-20 md:py-28">
+    <section id="contact" className="bg-surface py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5">
-        <Reveal className="contact-gradient overflow-hidden rounded-[2.5rem] shadow-brand">
+        <Reveal className="contact-gradient overflow-hidden rounded-none shadow-brand">
           <div className="grid gap-10 p-6 sm:p-8 lg:grid-cols-2 lg:p-14">
-            <div className="text-white">
-              <h2 className="text-balance text-3xl font-bold uppercase lg:text-4xl">
+            <div className="text-cta">
+              <h2 className="text-balance text-4xl font-bold uppercase lg:text-5xl">
                 Parlons de votre chien
               </h2>
-              <p className="mt-4 max-w-md leading-relaxed text-white/85">
+              <p className="mt-4 max-w-md leading-relaxed text-cta/85">
                 Décrivez-moi brièvement votre situation ou votre objectif. Je vous réponds rapidement pour vous orienter vers l&apos;accompagnement le plus pertinent.
               </p>
 
-              <div className="mt-8 flex items-center gap-3 text-white/90">
+              <div className="mt-8 flex items-center gap-3 text-cta/90">
                 <MapPinIcon className="h-5 w-5 shrink-0" />
                 <span className="text-sm">
                   {site.areaLong}
                 </span>
               </div>
-              <div className="mt-3 flex items-center gap-3 text-white/90">
+              <div className="mt-3 flex items-center gap-3 text-cta/90">
                 <div className="flex text-[#fbbc05]">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <StarIcon key={i} className="h-4 w-4" />
@@ -52,7 +52,7 @@ export default function Contact({
             <div className="flex flex-col justify-center gap-4">
               <a
                 href={`tel:${site.phoneIntl}`}
-                className="group flex items-center gap-3 rounded-2xl bg-white p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
+                className="group flex items-center gap-3 rounded-2xl bg-surface p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand sm:h-12 sm:w-12">
                   <PhoneIcon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -69,7 +69,7 @@ export default function Contact({
 
               <a
                 href={`mailto:${site.email}`}
-                className="group flex items-center gap-3 rounded-2xl bg-white p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
+                className="group flex items-center gap-3 rounded-2xl bg-surface p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand sm:h-12 sm:w-12">
                   <MailIcon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -88,7 +88,7 @@ export default function Contact({
                 href={site.instagram.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-3 rounded-2xl bg-white p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
+                className="group flex items-center gap-3 rounded-2xl bg-surface p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand sm:h-12 sm:w-12">
                   <InstagramIcon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -107,7 +107,7 @@ export default function Contact({
                 href={site.facebook.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-3 rounded-2xl bg-white p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
+                className="group flex items-center gap-3 rounded-2xl bg-surface p-4 transition-transform hover:-translate-y-0.5 sm:gap-4 sm:p-5"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand sm:h-12 sm:w-12">
                   <FacebookIcon className="h-5 w-5 sm:h-6 sm:w-6" />

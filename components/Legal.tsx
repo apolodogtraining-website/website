@@ -26,7 +26,7 @@ export default function Legal({ title, intro, updatedAt, sections }: LegalProps)
           <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
             Informations légales
           </span>
-          <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
+          <h1 className="mt-3 text-balance text-5xl font-semibold leading-tight text-ink md:text-6xl">
             {title}
           </h1>
           {intro ? (
@@ -36,11 +36,11 @@ export default function Legal({ title, intro, updatedAt, sections }: LegalProps)
         </div>
       </section>
 
-      <section className="bg-white py-14 md:py-20">
+      <section className="bg-surface py-14 md:py-20">
         <div className="mx-auto flex max-w-3xl flex-col gap-10 px-5">
           {sections.map((section) => (
             <div key={section.heading}>
-              <h2 className="text-xl font-semibold text-ink">{section.heading}</h2>
+              <h2 className="text-2xl font-semibold text-ink">{section.heading}</h2>
               <div className="mt-3 space-y-3 leading-relaxed text-ink-soft">
                 {section.body.map((paragraph) => (
                   <p key={paragraph.slice(0, 40)}>{paragraph}</p>

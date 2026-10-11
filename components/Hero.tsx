@@ -1,13 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Barlow, Barlow_Condensed, Saira_Extra_Condensed } from "next/font/google";
 import HeroScroll from "./HeroScroll";
-
-// Titre : Saira Extra Condensed Black, la plus proche de la lettre massive de la maquette (même rapport largeur / hauteur).
-const saira = Saira_Extra_Condensed({ subsets: ["latin"], weight: "900", variable: "--font-saira", display: "swap" });
-// Polices de la charte (kit Apolo) : Barlow pour le texte, Barlow Condensed pour les titres.
-const barlow = Barlow({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-barlow", display: "swap" });
-const barlowCondensed = Barlow_Condensed({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-barlow-condensed", display: "swap" });
 
 const NAV = [
   { label: "Approche", href: "#methode" },
@@ -30,7 +23,7 @@ function Arrow() {
  */
 export default function Hero() {
   return (
-    <section id="accueil" data-hero className={`apolo-hero ${barlow.variable} ${barlowCondensed.variable} ${saira.variable}`}>
+    <section id="accueil" data-hero className="apolo-hero">
       <div className="apolo-scene" data-hero-scene>
         <header className="apolo-header">
           <Link href="/" aria-label="Apolo Dog Training, accueil">

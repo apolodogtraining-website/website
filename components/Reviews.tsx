@@ -31,7 +31,7 @@ export default function Reviews({ data, as: Heading = "h2", heading }: ReviewsPr
   const columns = splitColumns(featured, 3);
 
   return (
-    <section id="avis" className="bg-white py-20 md:py-28">
+    <section id="avis" className="bg-surface py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5">
         <Reveal className="flex flex-col items-center gap-6 text-center">
           <span className="text-sm font-semibold uppercase tracking-wider text-brand">
@@ -74,7 +74,7 @@ export default function Reviews({ data, as: Heading = "h2", heading }: ReviewsPr
             href={site.google.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-white px-6 py-3 text-sm font-semibold text-brand-darker transition-colors hover:bg-brand-light"
+            className="inline-flex items-center gap-2 rounded-none border border-brand/30 bg-surface px-6 py-3 text-sm font-semibold text-brand-darker transition-colors hover:bg-brand-light"
           >
             Voir tous les avis sur Google
             <ArrowIcon className="h-4 w-4" />

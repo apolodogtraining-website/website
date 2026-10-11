@@ -6,17 +6,17 @@ import { FacebookIcon, InstagramIcon, MailIcon, PhoneIcon } from "./icons";
 export default function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="bg-ink text-white/70">
+    <footer className="border-t border-brand-light/70 bg-deep text-ink-soft">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-3">
         <div>
           <Link href="/" className="inline-flex" aria-label={`${site.name} — retour à l'accueil`}>
             <Image
-              src="/logo/logo-white.png"
+              src="/hero/logo-apolo.webp"
               alt={site.name}
-              width={160}
-              height={56}
-              sizes="160px"
-              className="h-12 w-auto"
+              width={1200}
+              height={474}
+              sizes="180px"
+              className="h-16 w-auto"
             />
           </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed">
@@ -28,12 +28,12 @@ export default function Footer() {
             <br />
             Interventions à {site.area}
             <br />
-            <span className="text-white/50">SIREN {site.siren}</span>
+            <span className="text-ink-soft/70">SIREN {site.siren}</span>
           </address>
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
+          <h3 className="text-xl text-ink">
             Navigation
           </h3>
           <ul className="mt-4 space-y-2 text-sm">
@@ -51,7 +51,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
+          <h3 className="text-xl text-ink">
             Contact
           </h3>
           <ul className="mt-4 space-y-3 text-sm">
@@ -99,7 +99,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10">
+      <div className="border-t border-brand-light/70">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-5 py-6 text-xs sm:flex-row">
           <p>
             © {year} {site.name}. Tous droits réservés.
@@ -115,7 +115,7 @@ export default function Footer() {
           </ul>
           <p>
             Site créé par{" "}
-            <span className="font-semibold text-white">STUDIO APOLO</span>
+            <span className="font-semibold text-ink">STUDIO APOLO</span>
           </p>
         </div>
       </div>

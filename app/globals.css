@@ -1,24 +1,38 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #2aa9e1;
-  --color-brand-dark: #1985b4;
-  --color-brand-darker: #0e5f82;
-  --color-brand-light: #d5e6ed;
-  --color-brand-tint: #f3f7f9;
-  --color-ink: #16232c;
-  --color-ink-soft: #5c6f7a;
+  /* Charte Apolo : charbon, ivoire, bleu électrique (kit « Apolo »). */
+  --color-brand: #1293fb;
+  --color-brand-dark: #45adff; /* survol */
+  --color-brand-darker: #6dbbff; /* texte et liens bleus sur fond sombre */
+  --color-brand-light: #3a3e3e; /* lignes, pastilles, fonds d'icônes */
+  --color-brand-tint: #252929; /* sections et tuiles en retrait */
+  --color-ink: #f4eee7; /* texte principal (ivoire) */
+  --color-ink-soft: #b3b2ad; /* texte secondaire */
+  --color-surface: #1f2222; /* fond principal (charbon) */
+  --color-deep: #191c1c; /* fond le plus sombre (pied de page, bandeaux) */
+  --color-cta: #101717; /* texte posé sur le bleu */
 
-  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-saira), var(--font-barlow-condensed), Impact, ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-anton), Impact, ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-soft: 0 18px 50px -24px rgba(22, 35, 44, 0.27);
-  --shadow-brand: 0 18px 42px -18px rgba(14, 95, 130, 0.48);
+  /* Angles droits partout (boutons, cartes, champs), comme la maquette. */
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-4xl: 0;
+
+  /* « Pas de grosse ombre » : séparation par filets et contrastes de fond. */
+  --shadow-soft: 0 0 #0000;
+  --shadow-brand: 0 0 #0000;
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #16232c;
+  --background: #1f2222;
+  --foreground: #f4eee7;
 }
 
 /* Le scroll fluide est géré par Lenis (components/SmoothScroll.tsx) ; on ne
@@ -37,8 +51,8 @@ body {
 }
 
 ::selection {
-  background: var(--color-brand-light);
-  color: var(--color-brand-darker);
+  background: var(--color-brand);
+  color: var(--color-cta);
 }
 
 /* Hauteur plein écran avec repli pour navigateurs sans unité svh */
@@ -173,23 +187,8 @@ details[open] > .faq-a-wrap {
 /* Dégradé animé du bloc contact : mouvement lent et ambiant (pas une
    interaction au survol), pour une section qui respire un peu. */
 .contact-gradient {
-  background-image: linear-gradient(
-    120deg,
-    var(--color-brand) 0%,
-    var(--color-brand-darker) 50%,
-    var(--color-brand) 100%
-  );
-  background-size: 200% 200%;
-  animation: contact-gradient-shift 14s ease-in-out infinite;
-}
-@keyframes contact-gradient-shift {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+  /* Aplat bleu de la charte, coupé d'une diagonale plus sombre (écho aux bandes du hero). */
+  background-image: linear-gradient(112deg, var(--color-brand) 0 66%, #0f80e6 66% 100%);
 }
 
 /* Colonnes d'avis défilantes (components/ReviewsColumn.tsx). Pause au
@@ -243,9 +242,9 @@ details[open] > .faq-a-wrap {
   color-scheme: dark;
   /* Redéfini ici : --font-anton n'existe que sous ce wrapper, pas à la racine où @theme résout --font-display. */
   --font-display: var(--font-anton), Impact, ui-sans-serif, system-ui, sans-serif;
-  --color-brand: #2aa9e1;
-  --color-brand-dark: #5cbfec;
-  --color-brand-darker: #8fd3f2;
+  --color-brand: #1293fb;
+  --color-brand-dark: #45adff;
+  --color-brand-darker: #6dbbff;
   --color-brand-light: #33383b;
   --color-brand-tint: #151718;
   --color-ink: #f4efe6;
@@ -278,9 +277,9 @@ details[open] > .faq-a-wrap {
 @media print {
   .portal-theme {
     color-scheme: light;
-    --color-brand: #2aa9e1;
-    --color-brand-dark: #1985b4;
-    --color-brand-darker: #0e5f82;
+    --color-brand: #1293fb;
+    --color-brand-dark: #0f7fe0;
+    --color-brand-darker: #0a5fb3;
     --color-brand-light: #d5e6ed;
     --color-brand-tint: #f3f7f9;
     --color-ink: #16232c;
@@ -695,4 +694,22 @@ details[open] > .faq-a-wrap {
 @media (prefers-reduced-motion: reduce) {
   .apolo-cta { transition: none; }
   .apolo-dog, .apolo-ground, .apolo-back, .apolo-front-band { transform: none; }
+}
+
+/* Titres : capitales en Saira Extra Condensed (charte). Dans @layer base, donc les classes utilitaires prennent le dessus. */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+  /* Le portail garde ses propres titres. */
+  .portal-theme :where(h1, h2, h3) {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    text-transform: none;
+  }
 }

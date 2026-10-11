@@ -12,7 +12,7 @@ export default function Services() {
           <span className="text-sm font-semibold uppercase tracking-wider text-brand">
             Mes services
           </span>
-          <h2 className="mx-auto mt-3 max-w-3xl text-balance text-3xl font-bold uppercase text-ink sm:text-4xl lg:whitespace-nowrap">
+          <h2 className="mx-auto mt-3 max-w-3xl text-balance text-4xl font-bold uppercase text-ink sm:text-5xl lg:whitespace-nowrap">
             Révélez le super pouvoir de votre chien
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-ink-soft">
@@ -25,12 +25,12 @@ export default function Services() {
             <Reveal key={s.title} delay={(i % 4) * 80} variant="scale" className="h-full">
               <TiltCard
                 as="article"
-                className="group flex h-full flex-col rounded-3xl border border-brand-light bg-white p-7 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)] transition-colors duration-300 hover:border-brand/40 hover:shadow-brand"
+                className="group flex h-full flex-col rounded-3xl border border-brand-light bg-surface p-7 transition-colors duration-300 hover:border-brand/40 hover:shadow-brand"
               >
-                <div className="tilt-card-pop flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-light text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
+                <div className="tilt-card-pop flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-light text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-cta">
                   <ServiceIcon name={s.icon} className="h-7 w-7" />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-ink">{s.title}</h3>
+                <h3 className="mt-5 text-xl font-semibold text-ink">{s.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                   {s.description}
                 </p>
@@ -45,20 +45,20 @@ export default function Services() {
           <Reveal delay={90} variant="scale" className="h-full">
             <TiltCard
               as="article"
-              className="flex h-full flex-col justify-center rounded-3xl bg-brand p-7 text-white shadow-brand"
+              className="flex h-full flex-col justify-center rounded-3xl bg-brand p-7 text-cta shadow-brand"
             >
-              <h3 className="tilt-card-pop text-xl font-bold">Un projet en tête&nbsp;?</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/90">
+              <h3 className="tilt-card-pop text-2xl font-bold">Un projet en tête&nbsp;?</h3>
+              <p className="mt-3 text-sm leading-relaxed text-cta/85">
                 Parlons de votre chien et construisons ensemble le programme qui
                 lui correspond.
               </p>
               <Link
                 href="/contact"
-                className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-brand-darker transition-transform hover:-translate-y-0.5"
+                className="mt-6 inline-flex w-fit items-center gap-2 rounded-none bg-deep px-5 py-2.5 text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5"
               >
                 Réserver une étude
               </Link>
-              <p className="mt-4 text-xs text-white/70">
+              <p className="mt-4 text-xs text-cta/70">
                 {site.role} · {site.area}
               </p>
             </TiltCard>

@@ -31,13 +31,13 @@ export default function Error({
   return (
     <>
       <Header />
-      <main className="pt-28">
+      <main className="pt-20">
         <section className="bg-brand-tint py-16 md:py-24">
           <div className="mx-auto max-w-3xl px-5">
             <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Erreur technique
             </span>
-            <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
+            <h1 className="mt-3 text-balance text-5xl font-semibold leading-tight text-ink md:text-6xl">
               Cette page n&apos;a pas pu s&apos;afficher.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
@@ -50,21 +50,21 @@ export default function Error({
               <button
                 type="button"
                 onClick={reset}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-base font-semibold text-white shadow-brand transition-transform hover:-translate-y-0.5 hover:bg-brand-dark"
+                className="inline-flex items-center justify-center gap-2 rounded-none bg-brand px-7 py-3.5 text-base font-semibold text-cta shadow-brand transition-transform hover:-translate-y-0.5 hover:bg-brand-dark"
               >
                 Réessayer
                 <ArrowIcon className="h-5 w-5" />
               </button>
               <a
                 href={`tel:${site.phoneIntl}`}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-brand/30 bg-white px-7 py-3.5 text-base font-semibold text-brand-darker transition-colors hover:bg-brand-light"
+                className="inline-flex items-center justify-center gap-2 rounded-none border border-brand/30 bg-surface px-7 py-3.5 text-base font-semibold text-brand-darker transition-colors hover:bg-brand-light"
               >
                 <PhoneIcon className="h-5 w-5" />
                 {site.phone}
               </a>
               <Link
                 href="/"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-brand/30 bg-white px-7 py-3.5 text-base font-semibold text-brand-darker transition-colors hover:bg-brand-light"
+                className="inline-flex items-center justify-center gap-2 rounded-none border border-brand/30 bg-surface px-7 py-3.5 text-base font-semibold text-brand-darker transition-colors hover:bg-brand-light"
               >
                 Retour à l&apos;accueil
               </Link>
