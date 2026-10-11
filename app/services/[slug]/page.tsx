@@ -85,7 +85,7 @@ export default async function ServicePage({ params }: Props) {
       <Header />
       <main className="pt-28">
         {/* ── En-tête ──────────────────────────────────────────────────────── */}
-        <section className="bg-brand-tint py-14 md:py-20">
+        <section className="bg-brand-tint py-10 md:py-14">
           <div className="mx-auto max-w-4xl px-5">
             <nav aria-label="Fil d'Ariane" className="mb-8 text-sm text-ink-soft">
               <ol className="flex flex-wrap items-center gap-2">

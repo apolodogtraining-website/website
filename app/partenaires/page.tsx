@@ -26,15 +26,15 @@ export default function PartenairesPage() {
       />
       <Header />
       <main className="pt-28">
-        <section className="bg-brand-tint py-16 md:py-24">
+        <section className="bg-brand-tint py-10 md:py-14">
           <div className="mx-auto max-w-3xl px-5 text-center">
             <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Réseau de confiance
             </span>
-            <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight text-ink md:text-6xl">
+            <h1 className="mt-2 text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
               Mes partenaires
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-ink-soft">
+            <p className="mt-4 text-lg leading-relaxed text-ink-soft">
               Pour chaque besoin hors de mes compétences, je fais confiance à
               ces professionnels que je recommande personnellement.
             </p>

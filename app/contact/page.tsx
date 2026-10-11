@@ -70,15 +70,15 @@ export default function ContactPage() {
       />
       <Header />
       <main className="pt-28">
-        <section className="bg-brand-tint py-16 md:py-24">
+        <section className="bg-brand-tint py-10 md:py-14">
           <div className="mx-auto max-w-4xl px-5">
             <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand">
               Prendre rendez-vous
             </span>
-            <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-tight text-ink md:text-6xl">
+            <h1 className="mt-2 max-w-3xl text-balance text-4xl font-semibold leading-tight text-ink md:text-5xl">
               Parlons de votre chien et de ce que vous vivez au quotidien.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">
               Décrivez-moi sa situation, son âge et ce que vous aimeriez améliorer. Je vous orienterai
               vers l&apos;accompagnement le plus pertinent.
             </p>
