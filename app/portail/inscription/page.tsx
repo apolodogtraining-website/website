@@ -60,7 +60,7 @@ export default function ClientSignup() {
         ) : step === "form" ? (
           <Card>
             <h1 className="font-display uppercase tracking-wide text-2xl font-normal text-ink">Créer mon dossier client</h1>
-            <p className="mt-1 text-sm text-ink-soft">Étape 1 sur 2 · Vos informations et votre demande.</p>
+            <p className="mt-1 text-sm text-ink-soft">Étape 1 sur 2 · Vos informations et votre demande. Les champs marqués d&apos;un <span className="text-brand">*</span> sont obligatoires.</p>
             <form
               className="mt-6 space-y-4"
               onSubmit={(e) => {
@@ -70,22 +70,22 @@ export default function ClientSignup() {
               }}
             >
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nom">
-                  {(id) => <input id={id} required autoComplete="family-name" maxLength={60} placeholder="Ex. Dupont" className={inputCls} value={f.lastName} onChange={(e) => set("lastName", e.target.value)} />}
+                <Field label="Nom" required>
+                  {(id) => <input id={id} required pattern=".*\S.*" title="Champ obligatoire" autoComplete="family-name" maxLength={60} placeholder="Ex. Dupont" className={inputCls} value={f.lastName} onChange={(e) => set("lastName", e.target.value)} />}
                 </Field>
-                <Field label="Prénom">
-                  {(id) => <input id={id} required autoComplete="given-name" maxLength={60} placeholder="Ex. Marie" className={inputCls} value={f.firstName} onChange={(e) => set("firstName", e.target.value)} />}
+                <Field label="Prénom" required>
+                  {(id) => <input id={id} required pattern=".*\S.*" title="Champ obligatoire" autoComplete="given-name" maxLength={60} placeholder="Ex. Marie" className={inputCls} value={f.firstName} onChange={(e) => set("firstName", e.target.value)} />}
                 </Field>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Téléphone">
-                  {(id) => <PhoneInput id={id} required value={f.phone} onValueChange={(v) => set("phone", v)} />}
+                <Field label="Téléphone" required>
+                  {(id) => <PhoneInput id={id} required minLength={8} title="8 à 15 chiffres" value={f.phone} onValueChange={(v) => set("phone", v)} />}
                 </Field>
-                <Field label="Adresse e-mail">
+                <Field label="Adresse e-mail" required>
                   {(id) => <input id={id} type="email" required autoComplete="email" placeholder="marie.dupont@exemple.fr" className={inputCls} value={f.email} onChange={(e) => set("email", e.target.value)} />}
                 </Field>
               </div>
-              <Field label="Adresse d'intervention">
+              <Field label="Adresse d'intervention" required>
                 {(id) => <input id={id} required autoComplete="street-address" placeholder="Ex. 12 rue des Lilas, 33000 Bordeaux" className={inputCls} value={f.address} onChange={(e) => set("address", e.target.value)} />}
               </Field>
               {f.dogs.map((dog, i) => (
@@ -99,7 +99,7 @@ export default function ClientSignup() {
                     )}
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <Field label="Nom du chien">
+                    <Field label="Nom du chien" required>
                       {(id) => (
                         <input id={id} required maxLength={60} placeholder="Ex. Max" className={inputCls} value={dog.name} onChange={(e) => set("dogs", f.dogs.map((d, k) => (k === i ? { ...d, name: e.target.value } : d)))} />
                       )}
