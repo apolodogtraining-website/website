@@ -43,22 +43,22 @@ export default function PartenairesPage() {
           </div>
         </section>
 
-        <section className="bg-white py-16 md:py-24">
-          <div className="mx-auto grid max-w-6xl gap-6 px-5 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="bg-white pb-16 pt-8 md:pb-24 md:pt-10">
+          <div className="mx-auto grid max-w-7xl gap-6 px-5 sm:grid-cols-2 xl:grid-cols-4">
             {partners.map((partner, i) => (
               <Reveal key={partner.name} delay={(i % 4) * 80} variant="scale" className="h-full">
                 <TiltCard
                   as="article"
-                  className="group flex h-full flex-col rounded-3xl border border-brand-light bg-white p-4 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)] transition-colors duration-300 hover:border-brand/40 hover:shadow-brand"
+                  className="group flex h-full flex-col rounded-3xl border border-brand-light bg-white p-5 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)] transition-colors duration-300 hover:border-brand/40 hover:shadow-brand"
                 >
-                  <div className="tilt-card-pop flex h-28 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-tint to-brand-light/60">
+                  <div className="tilt-card-pop flex h-36 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-tint to-brand-light/60">
                     {partner.logo ? (
                       <Image
                         src={partner.logo}
                         alt={`Logo ${partner.name}`}
                         width={240}
                         height={120}
-                        className="h-20 w-auto max-w-[70%] object-contain"
+                        className="h-24 w-auto max-w-[70%] object-contain"
                       />
                     ) : (
                       <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-light text-xl font-bold text-brand-darker">
@@ -67,8 +67,8 @@ export default function PartenairesPage() {
                     )}
                   </div>
 
-                  <div className="flex flex-1 flex-col px-1 pb-1 pt-4">
-                    <h2 className="text-base font-semibold leading-snug text-ink">{partner.name}</h2>
+                  <div className="flex flex-1 flex-col px-1 pb-1 pt-5">
+                    <h2 className="text-lg font-semibold leading-snug text-ink">{partner.name}</h2>
                     <div className="mt-1 flex flex-wrap items-center gap-2">
                       <span className="text-xs font-semibold text-brand-darker">{partner.tag}</span>
                       <span className="flex items-center gap-1 text-xs text-ink-soft">
@@ -76,7 +76,7 @@ export default function PartenairesPage() {
                         {partner.location}
                       </span>
                     </div>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{partner.description}</p>
+                    <p className="mt-3 flex-1 text-[0.95rem] leading-relaxed text-ink-soft">{partner.description}</p>
                     {/* Lien étiré : toute la carte est cliquable, le lien reste le seul élément focalisable. */}
                     <a
                       href={partner.url}
