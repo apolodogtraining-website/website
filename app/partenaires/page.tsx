@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import StickyCall from "@/components/StickyCall";
+import Image from "next/image";
+import Reveal from "@/components/Reveal";
+import TiltCard from "@/components/TiltCard";
 import { partners } from "@/lib/site";
 import { ArrowIcon, MapPinIcon } from "@/components/icons";
 import Link from "next/link";
@@ -42,55 +44,52 @@ export default function PartenairesPage() {
         </section>
 
         <section className="bg-white py-16 md:py-24">
-          <div className="mx-auto grid max-w-6xl gap-5 px-5 md:grid-cols-2">
-            {partners.map((partner) => (
-              <article
-                key={partner.name}
-                className="flex flex-col rounded-3xl border border-brand-light p-7 shadow-soft"
-              >
-                <div className="flex h-20 w-20 items-center justify-center">
-                  {partner.logo ? (
-                    <Image
-                      src={partner.logo}
-                      alt={partner.name}
-                      width={80}
-                      height={80}
-                      className="h-full w-full object-contain"
-                    />
-                  ) : (
-                    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-light text-lg font-bold text-brand-darker">
-                      {partner.name.charAt(0)}
-                    </span>
-                  )}
-                </div>
-
-                <div className="mt-5 flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-brand-light px-3 py-1 text-xs font-semibold text-brand-darker">
-                    {partner.tag}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-ink-soft">
-                    <MapPinIcon className="h-3.5 w-3.5" />
-                    {partner.location}
-                  </span>
-                </div>
-
-                <h2 className="mt-4 text-xl font-semibold text-ink">
-                  {partner.name}
-                </h2>
-                <p className="mt-3 flex-1 leading-relaxed text-ink-soft">
-                  {partner.description}
-                </p>
-
-                <a
-                  href={partner.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-darker hover:text-brand"
+          <div className="mx-auto grid max-w-6xl gap-6 px-5 sm:grid-cols-2 lg:grid-cols-4">
+            {partners.map((partner, i) => (
+              <Reveal key={partner.name} delay={(i % 4) * 80} variant="scale" className="h-full">
+                <TiltCard
+                  as="article"
+                  className="group flex h-full flex-col rounded-3xl border border-brand-light bg-white p-4 shadow-[0_6px_30px_-18px_rgba(20,36,46,0.35)] transition-colors duration-300 hover:border-brand/40 hover:shadow-brand"
                 >
-                  Visiter le site
-                  <ArrowIcon className="h-4 w-4" />
-                </a>
-              </article>
+                  <div className="tilt-card-pop flex h-28 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-tint to-brand-light/60">
+                    {partner.logo ? (
+                      <Image
+                        src={partner.logo}
+                        alt={`Logo ${partner.name}`}
+                        width={240}
+                        height={120}
+                        className="h-20 w-auto max-w-[70%] object-contain"
+                      />
+                    ) : (
+                      <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-light text-xl font-bold text-brand-darker">
+                        {partner.name.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-1 flex-col px-1 pb-1 pt-4">
+                    <h2 className="text-base font-semibold leading-snug text-ink">{partner.name}</h2>
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      <span className="text-xs font-semibold text-brand-darker">{partner.tag}</span>
+                      <span className="flex items-center gap-1 text-xs text-ink-soft">
+                        <MapPinIcon className="h-3.5 w-3.5" />
+                        {partner.location}
+                      </span>
+                    </div>
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{partner.description}</p>
+                    {/* Lien étiré : toute la carte est cliquable, le lien reste le seul élément focalisable. */}
+                    <a
+                      href={partner.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-darker transition-colors after:absolute after:inset-0 after:rounded-3xl hover:text-brand"
+                    >
+                      Visiter le site<span className="sr-only"> de {partner.name}</span>
+                      <ArrowIcon className="h-4 w-4" />
+                    </a>
+                  </div>
+                </TiltCard>
+              </Reveal>
             ))}
           </div>
         </section>
