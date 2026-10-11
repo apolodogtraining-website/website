@@ -11,16 +11,20 @@ export const SITUATIONS = [
 ] as const;
 
 export const LIMITS = {
-  firstName: 80,
-  contact: 120,
+  lastName: 60,
+  firstName: 60,
+  email: 200,
+  phone: 15,
   dogName: 60,
   dogInfo: 120,
   message: 2000,
 } as const;
 
 export type ContactInput = {
+  lastName: string;
   firstName: string;
-  contact: string;
+  phone: string;
+  email: string;
   dogName: string;
   dogInfo: string;
   situations: string[];
@@ -29,28 +33,41 @@ export type ContactInput = {
 };
 
 export type ContactErrors = Partial<
-  Record<"firstName" | "contact" | "message" | "consent", string>
+  Record<"lastName" | "firstName" | "phone" | "email" | "dogName" | "message" | "consent", string>
 >;
 
 export function isEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 }
 
-function isPhone(value: string): boolean {
-  const digits = value.replace(/[\s.\-()]/g, "").replace(/^\+/, "");
-  return /^\d{9,15}$/.test(digits);
-}
+/** Garde uniquement les chiffres (champ téléphone). */
+export const onlyDigits = (value: string) => value.replace(/\D/g, "");
+
+export const PHONE_MIN_DIGITS = 8;
+
+const REQUIRED = "Ce champ est obligatoire.";
+
+/** Texte vide ou fait uniquement d'espaces : traité comme non rempli. */
+const blank = (value: string) => value.trim() === "";
 
 export function validateContact(input: ContactInput): ContactErrors {
   const errors: ContactErrors = {};
-  if (!input.firstName.trim()) errors.firstName = "Indiquez votre prénom.";
+  if (blank(input.lastName)) errors.lastName = REQUIRED;
+  if (blank(input.firstName)) errors.firstName = REQUIRED;
 
-  const contact = input.contact.trim();
-  if (!contact) errors.contact = "Indiquez un email ou un numéro de téléphone.";
-  else if (!isEmail(contact) && !isPhone(contact))
-    errors.contact = "Ce n'est ni un email ni un numéro de téléphone valide.";
+  const digits = onlyDigits(input.phone);
+  if (blank(input.phone)) errors.phone = REQUIRED;
+  else if (digits.length < PHONE_MIN_DIGITS) errors.phone = `Indiquez au moins ${PHONE_MIN_DIGITS} chiffres.`;
+  else if (digits.length > LIMITS.phone) errors.phone = `Indiquez ${LIMITS.phone} chiffres au maximum.`;
 
-  if (input.message.trim().length < 10)
+  const email = input.email.trim();
+  if (!email) errors.email = REQUIRED;
+  else if (!isEmail(email)) errors.email = "Cette adresse e-mail n'est pas valide.";
+
+  if (blank(input.dogName)) errors.dogName = REQUIRED;
+
+  if (blank(input.message)) errors.message = REQUIRED;
+  else if (input.message.trim().length < 10)
     errors.message = "Décrivez votre situation en quelques mots (10 caractères minimum).";
 
   if (!input.consent) errors.consent = "Cochez la case pour envoyer votre demande.";
