@@ -104,12 +104,17 @@ export function Stat({ label, value, hint, tone }: { label: string; value: strin
   );
 }
 
-export function Field({ label, children, hint }: { label: string; children: (id: string) => React.ReactNode; hint?: string }) {
+export function Field({ label, children, hint, required }: { label: string; children: (id: string) => React.ReactNode; hint?: string; required?: boolean }) {
   const id = useId();
   return (
     <div>
       <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-ink">
         {label}
+        {required && (
+          <span aria-hidden className="ml-0.5 text-brand">
+            *
+          </span>
+        )}
       </label>
       {children(id)}
       {hint && <p className="mt-1 text-xs text-ink-soft">{hint}</p>}
