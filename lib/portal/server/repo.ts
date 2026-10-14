@@ -47,6 +47,7 @@ const toPayment = (r: Row): Payment => ({
   invoiceId: s(r.invoice_id),
   amount: Number(r.amount),
   paidAt: s(r.paid_at),
+  method: s(r.method),
   note: s(r.note),
 });
 

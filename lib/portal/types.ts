@@ -130,6 +130,8 @@ export type Payment = {
   amount: number;
   /** « YYYY-MM-DD ». */
   paidAt: string;
+  /** Mode de règlement (chèque, virement…) ; vide pour un règlement saisi avant ce champ. */
+  method: string;
   note: string;
 };
 

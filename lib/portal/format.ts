@@ -104,7 +104,7 @@ const cents = (n: number) => Math.round(n * 100);
  */
 export function invoicePayments(inv: Invoice): Payment[] {
   if (inv.payments?.length) return inv.payments;
-  return inv.clientPaidAt ? [{ id: `legacy-${inv.id}`, invoiceId: inv.id, amount: inv.gross, paidAt: inv.clientPaidAt, note: "" }] : [];
+  return inv.clientPaidAt ? [{ id: `legacy-${inv.id}`, invoiceId: inv.id, amount: inv.gross, paidAt: inv.clientPaidAt, method: "", note: "" }] : [];
 }
 
 /** Montant déjà reçu du client. Facture soldée = montant total, quoi qu'il arrive aux lignes de paiement. */
