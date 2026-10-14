@@ -1,4 +1,5 @@
 import { site } from "@/lib/site";
+import type { ContractArticle } from "./contract-text";
 
 export const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -8,13 +9,27 @@ const fmtSigned = (local: string) => dateFmt.format(new Date(local));
 
 type Doc = {
   title: string;
-  articles: { title: string; body: string }[];
+  articles: ContractArticle[];
   signedBy: string;
   signedAt: string;
   version: string;
   /** Mention complémentaire consignée dans l'exemplaire (ex. demande expresse de début anticipé). */
   notice?: string;
 };
+
+/** Un article en HTML ; tableau de tarifs et note d'astérisque en option. Styles en ligne (e-mail + PDF). */
+function articleHtml(a: ContractArticle) {
+  const items = a.items?.length
+    ? `<table role="presentation" style="width:100%;border-collapse:collapse;margin:8px 0 0;color:#34454f">${a.items
+        .map(
+          (i) =>
+            `<tr><td style="padding:6px 0;border-bottom:1px solid #d5e6ed">${esc(i.label)}</td><td style="padding:6px 0 6px 12px;border-bottom:1px solid #d5e6ed;text-align:right;white-space:nowrap;font-weight:bold">${esc(i.price)}</td></tr>`,
+        )
+        .join("")}</table>`
+    : "";
+  const note = a.note ? `<p style="margin:8px 0 0;color:#5c6f7a;font-size:12px">${esc(a.note)}</p>` : "";
+  return `<h2 style="margin:18px 0 4px;font-size:15px">${esc(a.title)}</h2><p style="margin:0;color:#34454f">${esc(a.body)}</p>${items}${note}`;
+}
 
 /**
  * Exemplaire signé d'un contrat, en HTML autonome (styles en ligne) : sert à la
@@ -29,11 +44,7 @@ export function contractDocumentHtml(d: Doc) {
     <p style="margin:0 0 4px;color:#1985b4;font-weight:bold;font-size:13px;letter-spacing:.04em;text-transform:uppercase">${esc(site.name)}</p>
     <h1 style="margin:0 0 6px;font-size:22px">${esc(d.title)}</h1>
     <p style="margin:0 0 22px;color:#5c6f7a">Version ${esc(d.version)} · exemplaire signé électroniquement</p>
-    ${d.articles
-      .map(
-        (a) => `<h2 style="margin:18px 0 4px;font-size:15px">${esc(a.title)}</h2><p style="margin:0;color:#34454f">${esc(a.body)}</p>`,
-      )
-      .join("\n    ")}
+    ${d.articles.map(articleHtml).join("\n    ")}
     <div style="margin-top:28px;padding:14px 16px;border:1px solid #d5e6ed;border-radius:10px;background:#f3f7f9">
       <strong>Signé par ${esc(d.signedBy)}</strong><br>le ${esc(fmtSigned(d.signedAt))}
     </div>

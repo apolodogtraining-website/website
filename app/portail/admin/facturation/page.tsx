@@ -5,7 +5,8 @@ import { Download, Receipt } from "lucide-react";
 import InvoiceTable from "@/components/portal/InvoiceTable";
 import PortalShell from "@/components/portal/PortalShell";
 import { btn, Card, Empty, PageHeader, Stat, Table } from "@/components/portal/ui";
-import { billingTodo, isPackage, money, splitAmount } from "@/lib/portal/format";
+import { balanceDue, billingTodo, invoiceLabel, isPackage, money, packsToBill, paidAmount, splitAmount } from "@/lib/portal/format";
+import { packLabel } from "@/lib/portal/packs";
 import { billingSummary } from "@/lib/portal/stats";
 import { usePortal } from "@/lib/portal/store";
 
@@ -23,9 +24,10 @@ function exportCsv(rows: string[][]) {
 
 export default function AdminBilling() {
   const router = useRouter();
-  const { contracts, invoices, partners, invoiceContract } = usePortal();
+  const { contracts, invoices, partners, invoiceContract, invoicePack } = usePortal();
   const t = billingSummary(contracts, invoices);
   const pending = contracts.filter((c) => billingTodo(c, invoices).units > 0);
+  const packsPending = contracts.flatMap((c) => packsToBill(c, invoices).map((pack) => ({ c, pack })));
 
   return (
     <PortalShell role="admin">
@@ -40,13 +42,13 @@ export default function AdminBilling() {
             onClick={() => {
               const n = (x: number) => x.toFixed(2).replace(".", ",");
               exportCsv([
-                ["Numéro", "Émise le", "Échéance", "Client", "Partenaire", "Prestation", "Total", "Commission", "Net partenaire", "Payée le", "Reversée le"],
+                ["Numéro", "Émise le", "Échéance", "Client", "Partenaire", "Prestation", "Total", "Réglé", "Reste à payer", "Commission", "Net partenaire", "Payée le", "Reversée le"],
                 ...[...invoices]
                   .sort((a, b) => a.issuedAt.localeCompare(b.issuedAt) || a.number.localeCompare(b.number))
                   .map((i) => {
                     const c = contracts.find((x) => x.id === i.contractId);
                     const p = partners.find((x) => x.id === i.partnerId);
-                    return [i.number, i.issuedAt, i.dueAt, c?.clientName ?? "", p?.isSelf ? "Moi-même" : (p?.company ?? ""), c?.service ?? "", n(i.gross), n(i.commission), n(i.net), i.clientPaidAt ?? "", i.payoutAt ?? ""];
+                    return [i.number, i.issuedAt, i.dueAt, c?.clientName ?? "", p?.isSelf ? "Moi-même" : (p?.company ?? ""), invoiceLabel(i, c), n(i.gross), n(paidAmount(i)), n(balanceDue(i)), n(i.commission), n(i.net), i.clientPaidAt ?? "", i.payoutAt ?? ""];
                   }),
               ]);
             }}
@@ -64,8 +66,8 @@ export default function AdminBilling() {
       </div>
 
       <Card className="mt-6">
-        <h2 className="mb-3 text-base font-bold text-ink">À facturer (séances réalisées et forfaits)</h2>
-        {pending.length === 0 ? (
+        <h2 className="mb-3 text-base font-bold text-ink">À facturer (séances réalisées, forfaits et packs)</h2>
+        {pending.length === 0 && packsPending.length === 0 ? (
           <Empty>Tout est facturé.</Empty>
         ) : (
           <Table head={["Client", "Partenaire", "Séances", "Montant", "Commission", ""]}>
@@ -85,6 +87,30 @@ export default function AdminBilling() {
                       className={btn.primary}
                       onClick={async () => {
                         const id = await invoiceContract(c.id);
+                        if (id) router.push(`/portail/facture/${id}`);
+                      }}
+                    >
+                      <Receipt className="h-4 w-4" /> Facturer
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+            {packsPending.map(({ c, pack }) => {
+              const amount = splitAmount(pack.price, c.commissionRate);
+              return (
+                <tr key={pack.id}>
+                  <td className="font-semibold">{c.clientName}</td>
+                  <td>{partners.find((p) => p.id === c.partnerId)?.company}</td>
+                  <td>{packLabel(pack.kind)}</td>
+                  <td className="whitespace-nowrap">{money(amount.gross)}</td>
+                  <td className="whitespace-nowrap text-ink-soft">{money(amount.commission)}</td>
+                  <td className="text-right">
+                    <button
+                      type="button"
+                      className={btn.primary}
+                      onClick={async () => {
+                        const id = await invoicePack(pack.id);
                         if (id) router.push(`/portail/facture/${id}`);
                       }}
                     >

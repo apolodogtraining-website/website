@@ -8,6 +8,7 @@ import ContractForm from "@/components/portal/ContractForm";
 import InvoiceTable from "@/components/portal/InvoiceTable";
 import PortalShell from "@/components/portal/PortalShell";
 import DogsPanel from "@/components/portal/DogsPanel";
+import PacksPanel from "@/components/portal/PacksPanel";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, btn, Card, ConfirmModal, Field, inputCls, PageHeader } from "@/components/portal/ui";
 import { billingTodo, fmtDateTime, isPackage, fmtPhone, frequencyLabel, money, splitAmount, toLocalInput } from "@/lib/portal/format";
@@ -113,6 +114,8 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
           </div>
         </Card>
       </div>
+
+      <PacksPanel contract={contract} invoices={invoices.filter((i) => i.contractId === contract.id)} />
 
       <DogsPanel contract={contract} area="admin" />
 

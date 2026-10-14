@@ -1,9 +1,34 @@
 import { site } from "@/lib/site";
 import { CGV_URL, CGV_VERSION } from "@/lib/cgv";
+import { fromPriceLabel, PACKS, STUDY } from "./packs";
 import type { Partner } from "./types";
 
 export const CONTRACT_VERSION = "2026-06";
-export const CLIENT_CONTRACT_VERSION = "2026-10";
+/**
+ * Version du contrat de prestation signé par le client. À changer à chaque modification du texte :
+ * l'exemplaire signé est régénéré à la demande à partir de cette version (voir `clientContractArticles`),
+ * donc un ancien contrat doit continuer à restituer EXACTEMENT ce que le client a signé.
+ * 2026-10    : prix « communiqué avant la première intervention », sans tarifs dans le contrat.
+ * 2026-10-14 : tarifs « à partir de » de l'étude de comportement (obligatoire) puis des formules (article 5).
+ */
+export const CLIENT_CONTRACT_VERSION = "2026-10-14";
+
+/** Un article de contrat. `items` + `note` : liste de tarifs puis explication de l'astérisque. */
+export type ContractArticle = {
+  title: string;
+  body: string;
+  items?: { label: string; price: string }[];
+  note?: string;
+};
+
+/**
+ * Tarifs « à partir de » affichés dans le contrat client. Source unique : pas de prix écrits en dur
+ * ailleurs dans le contrat. Espaces insécables ( ) pour qu'un prix ne se coupe pas en fin de ligne.
+ */
+export const CLIENT_PRICES = [
+  { label: `${STUDY.label} (obligatoire)`, price: fromPriceLabel(STUDY.from) },
+  ...PACKS.map((p) => ({ label: p.label, price: fromPriceLabel(p.from) })),
+];
 
 /**
  * Trame du contrat de partenariat signé à la première connexion.
@@ -61,7 +86,12 @@ export function contractArticles(p: Pick<Partner, "company" | "contact" | "siret
  * acceptées en même temps que le contrat.
  * ⚠️ Trame à faire relire par un juriste.
  */
-export function clientContractArticles(c: { name: string; service: string }) {
+export function clientContractArticles(
+  c: { name: string; service: string },
+  version: string = CLIENT_CONTRACT_VERSION,
+): ContractArticle[] {
+  // Un exemplaire signé avant l'ajout des tarifs garde l'article 5 qu'il a réellement signé.
+  const withPrices = version === CLIENT_CONTRACT_VERSION;
   return [
     {
       title: "Article 1 — Objet",
@@ -79,10 +109,17 @@ export function clientContractArticles(c: { name: string; service: string }) {
       title: "Article 4 — Rendez-vous et annulation",
       body: "Les dates et lieux d'intervention sont convenus avec le Client après son inscription. Les règles d'annulation, de report et d'absence (notamment le délai de 48 heures) sont celles de l'article 7 des CGV.",
     },
-    {
-      title: "Article 5 — Prix et paiement",
-      body: "Le prix de la formule est communiqué au Client avant la première intervention (fiche tarifs ou devis). Les séances sont facturées par le Prestataire, quel que soit le partenaire intervenant. Le paiement peut se faire en une ou plusieurs fois, avec acompte le cas échéant, selon l'article 6 des CGV.",
-    },
+    withPrices
+      ? {
+          title: "Article 5 — Prix et paiement",
+          body: "Les séances sont facturées par le Prestataire, quel que soit le partenaire intervenant. Le paiement peut se faire en une ou plusieurs fois, avec acompte le cas échéant, selon l'article 6 des CGV. L'étude de comportement est obligatoire et préalable : son tarif ne concerne qu'elle. À l'issue de l'étude, une formule d'accompagnement (Pack Initial, Complice ou Expert) est proposée au Client selon les résultats de l'étude et ses besoins ; son tarif est distinct de celui de l'étude. Les tarifs de référence sont les suivants :",
+          items: CLIENT_PRICES,
+          note: "* Tarifs « à partir de », en euros, TVA non applicable (article 293 B du CGI). Il ne s'agit pas de prix définitifs : le prix final peut varier selon le chien et l'environnement d'intervention et, pour un lieu situé hors de la zone d'intervention du Prestataire, selon la distance de déplacement. Le prix définitif est communiqué au Client avant la première intervention (fiche tarifs ou devis).",
+        }
+      : {
+          title: "Article 5 — Prix et paiement",
+          body: "Le prix de la formule est communiqué au Client avant la première intervention (fiche tarifs ou devis). Les séances sont facturées par le Prestataire, quel que soit le partenaire intervenant. Le paiement peut se faire en une ou plusieurs fois, avec acompte le cas échéant, selon l'article 6 des CGV.",
+        },
     {
       title: "Article 6 — Engagements du Client",
       body: "Le Client s'engage à fournir des informations exactes sur son chien (comportement, santé, antécédents de morsure), à le tenir en sécurité pendant les séances, à faire le travail personnel demandé entre les séances, et à justifier de la vaccination et de l'assurance responsabilité civile propriétaire de l'animal.",

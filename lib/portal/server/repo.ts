@@ -1,6 +1,7 @@
 import type { Client, Row } from "@libsql/client";
 import { getSettings } from "./settings";
-import type { ClientRequest, Contract, Dog, Invoice, Partner, PortalData, PortalSession, Session } from "../types";
+import type { ClientRequest, Contract, Dog, Invoice, Pack, Partner, Payment, PortalData, PortalSession, Session } from "../types";
+import type { PackKind } from "../packs";
 
 const s = (v: unknown) => (v == null ? "" : String(v));
 const sn = (v: unknown) => (v == null ? null : String(v));
@@ -31,7 +32,25 @@ const toSession = (r: Row): Session & { contractId: string } => ({
   invoiceId: sn(r.invoice_id),
 });
 
-const toInvoice = (r: Row, sessionIds: string[]): Invoice => ({
+const toPack = (r: Row): Pack => ({
+  id: s(r.id),
+  contractId: s(r.contract_id),
+  kind: s(r.kind) as PackKind,
+  price: Number(r.price),
+  orderedAt: s(r.ordered_at),
+  closedAt: sn(r.closed_at),
+  notes: s(r.notes),
+});
+
+const toPayment = (r: Row): Payment => ({
+  id: s(r.id),
+  invoiceId: s(r.invoice_id),
+  amount: Number(r.amount),
+  paidAt: s(r.paid_at),
+  note: s(r.note),
+});
+
+const toInvoice = (r: Row, sessionIds: string[], payments: Payment[]): Invoice => ({
   id: s(r.id),
   number: s(r.number),
   contractId: s(r.contract_id),
@@ -45,6 +64,8 @@ const toInvoice = (r: Row, sessionIds: string[]): Invoice => ({
   clientPaidAt: sn(r.client_paid_at),
   payoutAt: sn(r.payout_at),
   lastReminderAt: sn(r.last_reminder_at),
+  packId: sn(r.pack_id),
+  payments,
 });
 
 function parseDogs(json: unknown, name: unknown, breed: unknown): { name: string; breed: string }[] {
@@ -100,6 +121,22 @@ export async function snapshot(client: Client, session: PortalSession): Promise<
     scope ? Promise.resolve({ rows: [] as Row[] }) : client.execute("SELECT * FROM requests ORDER BY created_at DESC"),
   ]);
 
+  // Packs et règlements du périmètre de la session (jointure plutôt qu'une longue liste d'identifiants).
+  const [packRows, paymentRows] = await Promise.all([
+    client.execute(
+      scope
+        ? { sql: "SELECT p.* FROM packs p JOIN contracts c ON c.id = p.contract_id WHERE c.partner_id = ? ORDER BY p.ordered_at, p.id", args: [scope] }
+        : "SELECT * FROM packs ORDER BY ordered_at, id",
+    ),
+    client.execute(
+      scope
+        ? { sql: "SELECT y.* FROM payments y JOIN invoices i ON i.id = y.invoice_id WHERE i.partner_id = ? ORDER BY y.paid_at, y.id", args: [scope] }
+        : "SELECT * FROM payments ORDER BY paid_at, id",
+    ),
+  ]);
+  const packs = packRows.rows.map(toPack);
+  const payments = paymentRows.rows.map(toPayment);
+
   const contractIds = contracts.rows.map((r) => s(r.id));
   const sessions = contractIds.length
     ? await client.execute({
@@ -154,11 +191,12 @@ export async function snapshot(client: Client, session: PortalSession): Promise<
       clientSignedAt: sn(r.client_signed_at),
       clientSignedBy: sn(r.client_signed_by),
       dogs: dogs.filter((d) => d.contractId === s(r.id)),
+      packs: packs.filter((p) => p.contractId === s(r.id)),
       sessions: sess
         .filter((x) => x.contractId === s(r.id))
         .map((x): Session => ({ id: x.id, date: x.date, status: x.status, invoiceId: x.invoiceId })),
     })),
-    invoices: invoices.rows.map((r) => toInvoice(r, byInvoice.get(s(r.id)) ?? [])),
+    invoices: invoices.rows.map((r) => toInvoice(r, byInvoice.get(s(r.id)) ?? [], payments.filter((p) => p.invoiceId === s(r.id)))),
     requests: requests.rows.map(toRequest),
     settings: await getSettings(client),
   };

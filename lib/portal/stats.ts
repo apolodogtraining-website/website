@@ -1,4 +1,4 @@
-import { billingTodo, invoiceStatus, round2 } from "./format";
+import { balanceDue, billingTodo, invoiceLabel, invoicePayments, invoiceStatus, packsToBill, paidAmount, round2 } from "./format";
 import type { ClientRequest, Contract, Invoice, Partner } from "./types";
 
 const sum = (xs: number[]) => round2(xs.reduce((a, b) => a + b, 0));
@@ -7,13 +7,15 @@ const sum = (xs: number[]) => round2(xs.reduce((a, b) => a + b, 0));
 export function billingSummary(contracts: Contract[], invoices: Invoice[]) {
   return {
     billed: sum(invoices.map((i) => i.gross)),
-    collected: sum(invoices.filter((i) => i.clientPaidAt).map((i) => i.gross)),
+    /** Montants réellement reçus des clients (acomptes compris), pas seulement les factures soldées. */
+    collected: sum(invoices.map(paidAmount)),
     commission: sum(invoices.map((i) => i.commission)),
-    /** Encaissé auprès du client mais pas encore reversé au partenaire. */
+    /** Encaissé auprès du client (en totalité) mais pas encore reversé au partenaire. */
     toPayOut: sum(invoices.filter((i) => i.clientPaidAt && !i.payoutAt).map((i) => i.net)),
-    outstanding: sum(invoices.filter((i) => !i.clientPaidAt).map((i) => i.gross)),
+    /** Reste à encaisser : le solde des factures, pas leur montant entier. */
+    outstanding: sum(invoices.map(balanceDue)),
     lateCount: invoices.filter((i) => invoiceStatus(i) === "late").length,
-    toInvoiceCount: contracts.reduce((n, c) => n + billingTodo(c, invoices).units, 0),
+    toInvoiceCount: contracts.reduce((n, c) => n + billingTodo(c, invoices).units + packsToBill(c, invoices).length, 0),
   };
 }
 
@@ -80,7 +82,7 @@ export function dashboardStats(partners: Partner[], contracts: Contract[], invoi
     }
     return [...m.entries()].map(([label, v]) => ({ label, value: v.commission, gross: v.gross })).filter((x) => x.value > 0).sort((a, b) => b.value - a.value);
   })();
-  const serviceOf = (i: Invoice) => contracts.find((c) => c.id === i.contractId)?.service ?? "Autre";
+  const serviceOf = (i: Invoice) => (contracts.find((c) => c.id === i.contractId) ? invoiceLabel(i, contracts.find((c) => c.id === i.contractId)) : "Autre");
   const partnerOf = (i: Invoice) => {
     const p = partners.find((x) => x.id === i.partnerId);
     return p ? (p.isSelf ? "Moi-même" : p.company) : "—";
@@ -103,8 +105,9 @@ export function dashboardStats(partners: Partner[], contracts: Contract[], invoi
     prevRevenue,
     /** Évolution en % par rapport à la période précédente (null si rien à comparer). */
     delta: prevRevenue > 0 ? Math.round(((revenue - prevRevenue) / prevRevenue) * 100) : null,
-    collected: sum(invoices.filter((i) => within(i.clientPaidAt, cur)).map((i) => i.gross)),
-    outstanding: sum(invoices.filter((i) => !i.clientPaidAt).map((i) => i.gross)),
+    /** Règlements reçus pendant la période, à la date de chaque règlement (acomptes inclus). */
+    collected: sum(invoices.flatMap(invoicePayments).filter((p) => within(p.paidAt, cur)).map((p) => p.amount)),
+    outstanding: sum(invoices.map(balanceDue)),
     sessions: {
       done: sessions.filter((x) => x.status === "done").length,
       planned: sessions.filter((x) => x.status === "planned").length,

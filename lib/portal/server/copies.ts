@@ -41,12 +41,14 @@ export async function deliverRequestCopy(client: Client, requestId: string): Pro
   const row = (await client.execute({ sql: "SELECT * FROM requests WHERE id = ?", args: [requestId] })).rows[0];
   if (!row) return { ok: false, reason: "Inscription introuvable." };
 
+  // Le texte est restitué selon la version signée : un ancien contrat ne reçoit pas les nouveaux tarifs.
+  const version = String(row.contract_version ?? CLIENT_CONTRACT_VERSION);
   const html = contractDocumentHtml({
     title: "Contrat de prestation",
-    articles: clientContractArticles({ name: String(row.name), service: String(row.service) }),
+    articles: clientContractArticles({ name: String(row.name), service: String(row.service) }, version),
     signedBy: String(row.signed_by),
     signedAt: String(row.signed_at),
-    version: String(row.contract_version ?? CLIENT_CONTRACT_VERSION),
+    version,
     notice: row.early_start_at
       ? `Le Client a expressément demandé, le ${fmtDateTime(String(row.early_start_at))}, que la prestation commence avant la fin du délai de rétractation de 14 jours ; s'il se rétracte, il règle les séances déjà réalisées.`
       : "Le Client n'a pas demandé de début de prestation avant la fin du délai de rétractation de 14 jours.",

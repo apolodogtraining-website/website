@@ -1,20 +1,23 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Printer } from "lucide-react";
-import { Badge, btn } from "@/components/portal/ui";
+import { Badge, btn, ConfirmModal } from "@/components/portal/ui";
+import PaymentModal from "@/components/portal/PaymentModal";
 import { statusTone } from "@/components/portal/InvoiceTable";
-import { fmtDate, fmtDateTime, invoiceStatus, invoiceStatusLabel, money } from "@/lib/portal/format";
+import { balanceDue, fmtDate, fmtDateTime, invoiceLabel, invoicePayments, invoiceStatus, invoiceStatusLabel, money } from "@/lib/portal/format";
 import { usePortal } from "@/lib/portal/store";
 import { site } from "@/lib/site";
 
 export default function InvoicePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { ready, session, invoices, contracts, partners } = usePortal();
+  const { ready, session, invoices, contracts, partners, deletePayment } = usePortal();
+  const [paying, setPaying] = useState(false);
+  const [removing, setRemoving] = useState<string | null>(null);
 
   useEffect(() => {
     if (ready && !session) router.replace("/portail");
@@ -41,6 +44,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
   const sessions = contract?.sessions.filter((s) => inv.sessionIds.includes(s.id)) ?? [];
   const st = invoiceStatus(inv);
   const isPartner = session.role === "partner";
+  const payments = invoicePayments(inv);
+  const due = balanceDue(inv);
 
   return (
     <div className="min-h-screen-mobile bg-brand-tint px-4 py-6 print:bg-white print:p-0">
@@ -98,7 +103,13 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
             </tr>
           </thead>
           <tbody className="divide-y divide-brand-light/60">
-            {contract?.pricing === "package" ? (
+            {inv.packId ? (
+              <tr>
+                <td className="py-2.5">{invoiceLabel(inv, contract)}</td>
+                <td className="py-2.5 text-ink-soft">Pack d&apos;accompagnement</td>
+                <td className="py-2.5 text-right">{money(inv.gross)}</td>
+              </tr>
+            ) : contract?.pricing === "package" ? (
               <tr>
                 <td className="py-2.5">{contract.service}</td>
                 <td className="py-2.5 text-ink-soft">Forfait global</td>
@@ -117,13 +128,67 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
           <tfoot>
             <tr className="border-t border-brand-light">
               <td colSpan={2} className="pt-3 text-right font-semibold">
-                Total à payer
+                {payments.length > 0 ? "Total de la facture" : "Total à payer"}
               </td>
-              <td className="pt-3 text-right text-lg font-bold">{money(inv.gross)}</td>
+              <td className={`pt-3 text-right ${payments.length > 0 ? "font-semibold" : "text-lg font-bold"}`}>{money(inv.gross)}</td>
             </tr>
+            {payments.map((p) => (
+              <tr key={p.id}>
+                <td colSpan={2} className="pt-1 text-right text-ink-soft">
+                  Règlement reçu le {fmtDate(p.paidAt)}
+                  {p.note ? ` · ${p.note}` : ""}
+                </td>
+                <td className="pt-1 text-right">− {money(p.amount)}</td>
+              </tr>
+            ))}
+            {payments.length > 0 && (
+              <tr className="border-t border-brand-light">
+                <td colSpan={2} className="pt-2 text-right font-semibold">
+                  {due > 0 ? "Reste à payer" : "Solde"}
+                </td>
+                <td className="pt-2 text-right text-lg font-bold">{money(due)}</td>
+              </tr>
+            )}
           </tfoot>
         </table>
         <p className="mt-3 text-xs text-ink-soft">TVA non applicable. Pénalités de retard et indemnité forfaitaire de recouvrement de 40 € applicables en cas de retard de paiement.</p>
+
+        {/* Gestion des règlements : administrateur uniquement, jamais imprimée. */}
+        {!isPartner && (
+          <section className="mt-6 rounded-sm border border-brand-light p-4 text-sm print:hidden">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-semibold text-ink">Règlements du client</h2>
+              {due > 0 && (
+                <button type="button" className={btn.primary} onClick={() => setPaying(true)}>
+                  {payments.length > 0 ? "Ajouter un paiement" : "Enregistrer un paiement"}
+                </button>
+              )}
+            </div>
+            {payments.length === 0 ? (
+              <p className="mt-2 text-ink-soft">Aucun règlement reçu pour l&apos;instant : {money(inv.gross)} à encaisser.</p>
+            ) : (
+              <ul className="mt-2 divide-y divide-brand-light/60">
+                {payments.map((p) => (
+                  <li key={p.id} className="flex items-center justify-between gap-3 py-2">
+                    <span className="text-ink-soft">
+                      {fmtDate(p.paidAt)}
+                      {p.note ? ` · ${p.note}` : p.id.startsWith("legacy-") ? " · facture marquée payée" : ""}
+                    </span>
+                    <span className="flex items-center gap-3">
+                      <strong className="text-ink">{money(p.amount)}</strong>
+                      {!p.id.startsWith("legacy-") && (
+                        <button type="button" className="text-xs font-semibold text-red-700 hover:underline" onClick={() => setRemoving(p.id)}>
+                          Supprimer
+                        </button>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {payments.length > 0 && <p className="mt-2 text-ink-soft">{due > 0 ? `Reste à payer : ${money(due)}.` : "Facture réglée en totalité."}</p>}
+          </section>
+        )}
 
         {/* Ventilation commission : visible dans le portail, retirée à l'impression (document client). */}
         <aside className="mt-6 rounded-sm bg-brand-tint p-4 text-sm print:hidden">
@@ -144,6 +209,16 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
           </dl>
         </aside>
       </article>
+      {paying && <PaymentModal invoice={inv} onClose={() => setPaying(false)} />}
+      {removing && (
+        <ConfirmModal
+          title="Supprimer ce règlement ?"
+          message="Le règlement sera retiré de la facture, qui repassera en attente de paiement pour ce montant."
+          confirmLabel="Supprimer"
+          onConfirm={() => void deletePayment(removing)}
+          onClose={() => setRemoving(null)}
+        />
+      )}
     </div>
   );
 }
