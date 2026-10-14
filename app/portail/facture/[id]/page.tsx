@@ -9,6 +9,7 @@ import { Badge, btn, ConfirmModal } from "@/components/portal/ui";
 import PaymentModal from "@/components/portal/PaymentModal";
 import { statusTone } from "@/components/portal/InvoiceTable";
 import { balanceDue, fmtDate, fmtDateTime, invoiceLabel, invoicePayments, invoiceStatus, invoiceStatusLabel, money } from "@/lib/portal/format";
+import { methodLabel } from "@/lib/portal/payments";
 import { usePortal } from "@/lib/portal/store";
 import { site } from "@/lib/site";
 
@@ -136,6 +137,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
               <tr key={p.id}>
                 <td colSpan={2} className="pt-1 text-right text-ink-soft">
                   Règlement reçu le {fmtDate(p.paidAt)}
+                  {methodLabel(p.method) ? ` · ${methodLabel(p.method)}` : ""}
                   {p.note ? ` · ${p.note}` : ""}
                 </td>
                 <td className="pt-1 text-right">− {money(p.amount)}</td>
@@ -172,6 +174,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                   <li key={p.id} className="flex items-center justify-between gap-3 py-2">
                     <span className="text-ink-soft">
                       {fmtDate(p.paidAt)}
+                      {methodLabel(p.method) ? ` · ${methodLabel(p.method)}` : ""}
                       {p.note ? ` · ${p.note}` : p.id.startsWith("legacy-") ? " · facture marquée payée" : ""}
                     </span>
                     <span className="flex items-center gap-3">

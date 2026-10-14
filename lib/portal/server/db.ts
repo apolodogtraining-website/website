@@ -120,7 +120,8 @@ const SCHEMA = [
     invoice_id TEXT NOT NULL REFERENCES invoices(id),
     amount REAL NOT NULL,
     paid_at TEXT NOT NULL,
-    note TEXT NOT NULL DEFAULT ''
+    note TEXT NOT NULL DEFAULT '',
+    method TEXT NOT NULL DEFAULT ''
   )`,
   `CREATE INDEX IF NOT EXISTS idx_packs_contract ON packs(contract_id)`,
   `CREATE INDEX IF NOT EXISTS idx_payments_invoice ON payments(invoice_id)`,
@@ -175,6 +176,7 @@ export function db(): Promise<Client> {
         "ALTER TABLE contracts ADD COLUMN client_last_name TEXT",
         "ALTER TABLE requests ADD COLUMN last_name TEXT",
         "ALTER TABLE invoices ADD COLUMN pack_id TEXT", // facture d'un pack (NULL = facture du contrat)
+        "ALTER TABLE payments ADD COLUMN method TEXT NOT NULL DEFAULT ''", // mode de règlement (chèque, virement…)
       ]) {
         await client.execute(ddl).catch((e: Error) => {
           if (!/duplicate column/i.test(e.message)) throw e;

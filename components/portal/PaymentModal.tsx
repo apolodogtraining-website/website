@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { balanceDue, money, paidAmount, parseDecimal, todayISO } from "@/lib/portal/format";
+import { PAYMENT_METHODS, type PaymentMethod } from "@/lib/portal/payments";
 import { usePortal } from "@/lib/portal/store";
 import type { Invoice } from "@/lib/portal/types";
 import { btn, Field, inputCls, Modal, NumberInput } from "./ui";
@@ -18,6 +19,7 @@ export default function PaymentModal({ invoice, onClose }: { invoice: Invoice; o
   const paid = paidAmount(invoice);
   const [amount, setAmount] = useState(asInput(due));
   const [date, setDate] = useState(todayISO());
+  const [method, setMethod] = useState<PaymentMethod | "">("");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -49,10 +51,11 @@ export default function PaymentModal({ invoice, onClose }: { invoice: Invoice; o
           const value = parseDecimal(amount);
           if (Number.isNaN(value) || value <= 0) return setError("Indiquez le montant reçu (un nombre, par exemple 300).");
           if (Math.round(value * 100) > Math.round(due * 100)) return setError(`Le montant dépasse le reste à payer (${money(due)}).`);
+          if (!method) return setError("Choisissez le mode de règlement (chèque, virement…).");
           if (date > todayISO()) return setError("La date du règlement ne peut pas être dans le futur.");
           setError("");
           setBusy(true);
-          const ok = await recordPayment(invoice.id, { amount: value, date, note });
+          const ok = await recordPayment(invoice.id, { amount: value, date, method, note });
           setBusy(false);
           if (ok) onClose(); // sinon, l'erreur est affichée par le bandeau du portail
         }}
@@ -68,8 +71,20 @@ export default function PaymentModal({ invoice, onClose }: { invoice: Invoice; o
         <button type="button" className={btn.ghost} onClick={() => setAmount(asInput(due))}>
           Régler tout le solde ({money(due)})
         </button>
-        <Field label="Note" hint="Facultatif : chèque d'acompte, virement, espèces…">
-          {(id) => <input id={id} maxLength={120} className={inputCls} placeholder="Ex. Acompte par chèque" value={note} onChange={(e) => setNote(e.target.value)} />}
+        <Field label="Mode de règlement" required>
+          {(id) => (
+            <select id={id} required className={inputCls} value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod | "")}>
+              <option value="">Choisir…</option>
+              {PAYMENT_METHODS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </Field>
+        <Field label="Note" hint="Facultatif : n° de chèque, précision sur l'acompte…">
+          {(id) => <input id={id} maxLength={120} className={inputCls} placeholder="Ex. Acompte, chèque n° 1234567" value={note} onChange={(e) => setNote(e.target.value)} />}
         </Field>
         {error && (
           <p role="alert" className="rounded-sm bg-red-50 px-3.5 py-2.5 text-sm text-red-700">

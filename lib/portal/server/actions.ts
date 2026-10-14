@@ -2,6 +2,7 @@ import type { Client, InStatement } from "@libsql/client";
 import { CONTRACT_VERSION } from "../contract-text";
 import { addDaysISO, billingTodo, composeName, generateSessions, round2, splitAmount, todayISO, toLocalInput, uid } from "../format";
 import { PACK_KINDS } from "../packs";
+import { PAYMENT_METHOD_VALUES } from "../payments";
 import type { Contract, Frequency, PortalSession } from "../types";
 import { after } from "next/server";
 import { hashPassword, tempPassword } from "./auth";
@@ -473,14 +474,15 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const received = await one(client, "SELECT COALESCE(SUM(amount), 0) AS total FROM payments WHERE invoice_id = ?", [id]);
       // Calculs en centimes : jamais de comparaison de décimaux (0,1 + 0,2 ≠ 0,3).
       const dueCents = Math.round(Number(inv.gross) * 100) - Math.round(Number(received?.total ?? 0) * 100);
+      const method = oneOf(b.method, "Le mode de règlement", PAYMENT_METHOD_VALUES);
       const amountCents = Math.round(num(b.amount, "Le montant", 0.01, 100000) * 100);
       if (amountCents > dueCents) throw new ActionError(`Le montant dépasse le reste à payer (${(dueCents / 100).toFixed(2).replace(".", ",")} €).`);
       const paidAt = b.date ? dateOnly(b.date, "La date") : todayISO();
       if (paidAt > todayISO()) throw new ActionError("La date du règlement ne peut pas être dans le futur.");
       const stmts: InStatement[] = [
         {
-          sql: "INSERT INTO payments (id, invoice_id, amount, paid_at, note) VALUES (?,?,?,?,?)",
-          args: [uid("y"), id, amountCents / 100, paidAt, text(b.note, "La note", { max: 120, required: false })],
+          sql: "INSERT INTO payments (id, invoice_id, amount, paid_at, note, method) VALUES (?,?,?,?,?,?)",
+          args: [uid("y"), id, amountCents / 100, paidAt, text(b.note, "La note", { max: 120, required: false }), method],
         },
       ];
       if (amountCents === dueCents) {
