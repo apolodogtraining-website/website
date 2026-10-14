@@ -9,6 +9,7 @@ import { Badge, btn, ConfirmModal } from "@/components/portal/ui";
 import PaymentModal from "@/components/portal/PaymentModal";
 import { statusTone } from "@/components/portal/InvoiceTable";
 import { balanceDue, fmtDate, fmtDateTime, invoiceLabel, invoicePayments, invoiceStatus, invoiceStatusLabel, money } from "@/lib/portal/format";
+import { methodLabel } from "@/lib/portal/payments";
 import { usePortal } from "@/lib/portal/store";
 import { site } from "@/lib/site";
 
@@ -46,6 +47,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
   const isPartner = session.role === "partner";
   const payments = invoicePayments(inv);
   const due = balanceDue(inv);
+  // Étude facturée par chien : nombre de chiens déduit du montant (le contrat peut avoir changé depuis).
+  const studyCount = contract && contract.price > 0 && Math.abs(Math.round(inv.gross / contract.price) * contract.price - inv.gross) < 0.005 ? Math.round(inv.gross / contract.price) : 1;
 
   return (
     <div className="min-h-screen-mobile bg-brand-tint px-4 py-6 print:bg-white print:p-0">
@@ -112,7 +115,10 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
             ) : contract?.pricing === "package" ? (
               <tr>
                 <td className="py-2.5">{contract.service}</td>
-                <td className="py-2.5 text-ink-soft">Forfait global</td>
+                <td className="py-2.5 text-ink-soft">
+                  Étude de comportement
+                  {studyCount > 1 ? ` · ${studyCount} chiens × ${money(contract.price)}` : ""}
+                </td>
                 <td className="py-2.5 text-right">{money(inv.gross)}</td>
               </tr>
             ) : (
@@ -136,6 +142,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
               <tr key={p.id}>
                 <td colSpan={2} className="pt-1 text-right text-ink-soft">
                   Règlement reçu le {fmtDate(p.paidAt)}
+                  {methodLabel(p.method) ? ` · ${methodLabel(p.method)}` : ""}
                   {p.note ? ` · ${p.note}` : ""}
                 </td>
                 <td className="pt-1 text-right">− {money(p.amount)}</td>
@@ -172,6 +179,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
                   <li key={p.id} className="flex items-center justify-between gap-3 py-2">
                     <span className="text-ink-soft">
                       {fmtDate(p.paidAt)}
+                      {methodLabel(p.method) ? ` · ${methodLabel(p.method)}` : ""}
                       {p.note ? ` · ${p.note}` : p.id.startsWith("legacy-") ? " · facture marquée payée" : ""}
                     </span>
                     <span className="flex items-center gap-3">
@@ -190,16 +198,20 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
           </section>
         )}
 
-        {/* Ventilation commission : visible dans le portail, retirée à l'impression (document client). */}
-        <aside className="mt-6 rounded-sm bg-brand-tint p-4 text-sm print:hidden">
+      </article>
+      {/* Ventilation commission : hors du document client (jamais imprimée ni exportée en PDF), et sans objet
+          pour une prestation « Moi-même » (aucune commission). */}
+      {!partner?.isSelf && (
+        <aside className="mx-auto mt-4 max-w-3xl rounded-sm bg-white p-4 text-sm shadow-soft print:hidden">
           <h2 className="mb-2 font-semibold text-ink">{isPartner ? "Votre règlement" : "Ventilation interne"}</h2>
+          <p className="mb-2 text-xs text-ink-soft">Cette ventilation n&apos;apparaît pas sur la facture envoyée au client.</p>
           <dl className="space-y-1">
             <div className="flex justify-between">
               <dt className="text-ink-soft">Montant facturé</dt>
               <dd>{money(inv.gross)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-ink-soft">Commission ({contract?.commissionRate} %)</dt>
+              <dt className="text-ink-soft">Commission ({inv.gross > 0 ? Math.round((inv.commission / inv.gross) * 10000) / 100 : 0} %)</dt>
               <dd>− {money(inv.commission)}</dd>
             </div>
             <div className="flex justify-between border-t border-brand-light pt-1 font-semibold">
@@ -208,7 +220,7 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
             </div>
           </dl>
         </aside>
-      </article>
+      )}
       {paying && <PaymentModal invoice={inv} onClose={() => setPaying(false)} />}
       {removing && (
         <ConfirmModal

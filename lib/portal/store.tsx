@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { PackKind } from "./packs";
+import type { PaymentMethod } from "./payments";
 import type {
   ContractType,
   Frequency,
@@ -43,10 +44,10 @@ export type ContractInput = {
 };
 
 /** Pack d'un client : prix convenu (modifiable) et date de l'accord. */
-export type PackInput = { kind: PackKind; price: number; orderedAt: string; notes: string };
+export type PackInput = { kind: PackKind; price: number; orderedAt: string; notes: string; commissionRate: number };
 
 /** Règlement reçu du client sur une facture. */
-export type PaymentInput = { amount: number; date: string; note: string };
+export type PaymentInput = { amount: number; date: string; method: PaymentMethod; note: string };
 
 export type DogInput = { name: string; breed: string; sex: "M" | "F" | ""; age: string; chip: string };
 

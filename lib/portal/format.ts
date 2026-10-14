@@ -1,5 +1,5 @@
 import { packLabel } from "./packs";
-import type { Contract, Frequency, Invoice, InvoiceStatus, Payment, Session } from "./types";
+import type { Contract, Frequency, Invoice, InvoiceStatus, Pack, Payment, Session } from "./types";
 
 const eur = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
 export const money = (n: number) => eur.format(n);
@@ -63,16 +63,19 @@ export const billableSessions = (c: Contract) =>
 
 export const isPackage = (c: Contract) => c.pricing === "package";
 
+/** L'étude de comportement est facturée par chien : au moins un, même si la fiche n'en liste pas encore. */
+export const studyDogs = (c: Pick<Contract, "dogs">) => Math.max(1, c.dogs?.length ?? 0);
+
 /**
- * Ce qui reste à facturer sur un contrat. Par séance : les séances réalisées sans facture. Forfait : le
- * forfait entier, une seule fois (dès qu'il a une séance non annulée), sans lier les séances à la facture.
+ * Ce qui reste à facturer sur un contrat. Par séance : les séances réalisées sans facture. Étude : le
+ * prix par chien × nombre de chiens, une seule fois (dès qu'il a une séance non annulée), sans lier les séances à la facture.
  * Les factures de PACK sont à part : elles ne comptent ni comme « forfait déjà facturé » ni comme séances.
  */
 export function billingTodo(c: Contract, invoices: Pick<Invoice, "contractId" | "packId">[]) {
   if (isPackage(c)) {
     const billed = invoices.some((i) => i.contractId === c.id && !i.packId);
     const ready = !billed && c.sessions.some((s) => s.status !== "cancelled");
-    return { units: ready ? 1 : 0, amount: ready ? round2(c.price) : 0, sessionIds: [] as string[] };
+    return { units: ready ? 1 : 0, amount: ready ? round2(c.price * studyDogs(c)) : 0, sessionIds: [] as string[] };
   }
   const ids = billableSessions(c).map((s) => s.id);
   return { units: ids.length, amount: round2(ids.length * c.price), sessionIds: ids };
@@ -88,8 +91,11 @@ export function invoiceLabel(inv: Pick<Invoice, "packId">, c: Contract | undefin
   return pack ? packLabel(pack.kind) : (c?.service ?? "—");
 }
 
-/** « 60,00 € / séance » ou « 300,00 € (forfait) ». */
-export const priceLabel = (c: Contract) => (isPackage(c) ? `${money(c.price)} (forfait)` : `${money(c.price)} / séance`);
+/** « 60,00 € / séance » ou « 100,00 € / chien (étude) ». */
+export const priceLabel = (c: Contract) => (isPackage(c) ? `${money(c.price)} / chien (étude)` : `${money(c.price)} / séance`);
+
+/** Commission du partenaire sur un pack : son taux propre, à défaut celui du contrat. */
+export const packCommissionRate = (p: Pick<Pack, "commissionRate">, c: Pick<Contract, "commissionRate">) => p.commissionRate ?? c.commissionRate;
 
 export function splitAmount(gross: number, rate: number) {
   const commission = round2((gross * rate) / 100);
@@ -104,7 +110,7 @@ const cents = (n: number) => Math.round(n * 100);
  */
 export function invoicePayments(inv: Invoice): Payment[] {
   if (inv.payments?.length) return inv.payments;
-  return inv.clientPaidAt ? [{ id: `legacy-${inv.id}`, invoiceId: inv.id, amount: inv.gross, paidAt: inv.clientPaidAt, note: "" }] : [];
+  return inv.clientPaidAt ? [{ id: `legacy-${inv.id}`, invoiceId: inv.id, amount: inv.gross, paidAt: inv.clientPaidAt, method: "", note: "" }] : [];
 }
 
 /** Montant déjà reçu du client. Facture soldée = montant total, quoi qu'il arrive aux lignes de paiement. */
@@ -140,7 +146,7 @@ export function contractBilling(c: Contract, invoices: Invoice[]) {
   if (late) return { tone: "red" as const, label: "Facture en retard" };
   if (toBill > 0 || packsDue > 0) {
     const parts = [
-      ...(toBill > 0 ? [isPackage(c) ? "Forfait" : `${toBill} séance${toBill > 1 ? "s" : ""}`] : []),
+      ...(toBill > 0 ? [isPackage(c) ? "Étude" : `${toBill} séance${toBill > 1 ? "s" : ""}`] : []),
       ...(packsDue > 0 ? [packsDue > 1 ? `${packsDue} packs` : "Pack"] : []),
     ];
     return { tone: "amber" as const, label: `${parts.join(" + ")} à facturer` };
