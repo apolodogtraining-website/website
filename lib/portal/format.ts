@@ -1,4 +1,5 @@
-import type { Contract, Frequency, Invoice, InvoiceStatus, Session } from "./types";
+import { packLabel } from "./packs";
+import type { Contract, Frequency, Invoice, InvoiceStatus, Payment, Session } from "./types";
 
 const eur = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
 export const money = (n: number) => eur.format(n);
@@ -65,15 +66,26 @@ export const isPackage = (c: Contract) => c.pricing === "package";
 /**
  * Ce qui reste à facturer sur un contrat. Par séance : les séances réalisées sans facture. Forfait : le
  * forfait entier, une seule fois (dès qu'il a une séance non annulée), sans lier les séances à la facture.
+ * Les factures de PACK sont à part : elles ne comptent ni comme « forfait déjà facturé » ni comme séances.
  */
-export function billingTodo(c: Contract, invoices: Pick<Invoice, "contractId">[]) {
+export function billingTodo(c: Contract, invoices: Pick<Invoice, "contractId" | "packId">[]) {
   if (isPackage(c)) {
-    const billed = invoices.some((i) => i.contractId === c.id);
+    const billed = invoices.some((i) => i.contractId === c.id && !i.packId);
     const ready = !billed && c.sessions.some((s) => s.status !== "cancelled");
     return { units: ready ? 1 : 0, amount: ready ? round2(c.price) : 0, sessionIds: [] as string[] };
   }
   const ids = billableSessions(c).map((s) => s.id);
   return { units: ids.length, amount: round2(ids.length * c.price), sessionIds: ids };
+}
+
+/** Packs du contrat pas encore facturés. */
+export const packsToBill = (c: Contract, invoices: Pick<Invoice, "packId">[]) =>
+  (c.packs ?? []).filter((p) => !invoices.some((i) => i.packId === p.id));
+
+/** Libellé de ce que couvre une facture : le pack facturé, sinon la prestation du contrat. */
+export function invoiceLabel(inv: Pick<Invoice, "packId">, c: Contract | undefined) {
+  const pack = inv.packId ? c?.packs?.find((p) => p.id === inv.packId) : undefined;
+  return pack ? packLabel(pack.kind) : (c?.service ?? "—");
 }
 
 /** « 60,00 € / séance » ou « 300,00 € (forfait) ». */
@@ -84,14 +96,33 @@ export function splitAmount(gross: number, rate: number) {
   return { gross: round2(gross), commission, net: round2(gross - commission) };
 }
 
+const cents = (n: number) => Math.round(n * 100);
+
+/**
+ * Règlements d'une facture. Une facture soldée avant le suivi des règlements n'a pas de ligne de paiement :
+ * on en déduit un règlement unique du montant total, à la date où elle a été marquée payée.
+ */
+export function invoicePayments(inv: Invoice): Payment[] {
+  if (inv.payments?.length) return inv.payments;
+  return inv.clientPaidAt ? [{ id: `legacy-${inv.id}`, invoiceId: inv.id, amount: inv.gross, paidAt: inv.clientPaidAt, note: "" }] : [];
+}
+
+/** Montant déjà reçu du client. Facture soldée = montant total, quoi qu'il arrive aux lignes de paiement. */
+export const paidAmount = (inv: Invoice) => (inv.clientPaidAt ? round2(inv.gross) : round2(cents((inv.payments ?? []).reduce((n, p) => n + p.amount, 0)) / 100));
+
+/** Reste à payer par le client. */
+export const balanceDue = (inv: Invoice) => round2(Math.max(0, cents(inv.gross) - cents(paidAmount(inv))) / 100);
+
 export function invoiceStatus(inv: Invoice): InvoiceStatus {
   if (inv.payoutAt) return "settled";
   if (inv.clientPaidAt) return "paid";
-  return inv.dueAt < todayISO() ? "late" : "sent";
+  if (inv.dueAt < todayISO()) return "late";
+  return paidAmount(inv) > 0 ? "partial" : "sent";
 }
 
 export const invoiceStatusLabel: Record<InvoiceStatus, string> = {
   sent: "Envoyée",
+  partial: "Partiellement payée",
   late: "En retard",
   paid: "Payée par le client",
   settled: "Partenaire réglé",
@@ -102,10 +133,19 @@ export function contractBilling(c: Contract, invoices: Invoice[]) {
   const own = invoices.filter((i) => i.contractId === c.id);
   const todo = billingTodo(c, invoices);
   const toBill = todo.units;
+  const packsDue = packsToBill(c, invoices).length;
   const late = own.some((i) => invoiceStatus(i) === "late");
   const open = own.some((i) => !i.clientPaidAt);
+  const partial = own.some((i) => !i.clientPaidAt && paidAmount(i) > 0);
   if (late) return { tone: "red" as const, label: "Facture en retard" };
-  if (toBill > 0) return { tone: "amber" as const, label: isPackage(c) ? "Forfait à facturer" : `${toBill} séance${toBill > 1 ? "s" : ""} à facturer` };
+  if (toBill > 0 || packsDue > 0) {
+    const parts = [
+      ...(toBill > 0 ? [isPackage(c) ? "Forfait" : `${toBill} séance${toBill > 1 ? "s" : ""}`] : []),
+      ...(packsDue > 0 ? [packsDue > 1 ? `${packsDue} packs` : "Pack"] : []),
+    ];
+    return { tone: "amber" as const, label: `${parts.join(" + ")} à facturer` };
+  }
+  if (partial) return { tone: "blue" as const, label: "Paiement partiel" };
   if (open) return { tone: "blue" as const, label: "En attente de paiement" };
   if (own.length > 0) return { tone: "green" as const, label: "À jour" };
   return { tone: "gray" as const, label: "Rien à facturer" };

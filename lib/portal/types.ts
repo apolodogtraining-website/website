@@ -1,3 +1,4 @@
+import type { PackKind } from "./packs";
 import type { PortalSettings } from "./settings";
 
 export type Role = "admin" | "partner";
@@ -64,6 +65,24 @@ export type Contract = {
   clientSignedAt?: string | null;
   clientSignedBy?: string | null;
   dogs?: Dog[];
+  /** Packs commandés par ce client, du plus ancien au plus récent (un client peut en enchaîner plusieurs). */
+  packs?: Pack[];
+};
+
+/**
+ * Un pack d'accompagnement commandé par un client, après l'étude de comportement. Le prix est celui
+ * convenu avec le client (modifiable tant que le pack n'est pas facturé), pas le tarif « à partir de ».
+ */
+export type Pack = {
+  id: string;
+  contractId: string;
+  kind: PackKind;
+  price: number;
+  /** Date de l'accord avec le client, « YYYY-MM-DD ». */
+  orderedAt: string;
+  /** Date de fin du pack (null = en cours). */
+  closedAt: string | null;
+  notes: string;
 };
 
 export type Sex = "M" | "F" | "";
@@ -93,13 +112,28 @@ export type Invoice = {
   gross: number;
   commission: number;
   net: number;
+  /** Date à laquelle la facture a été réglée EN TOTALITÉ (null tant qu'il reste un solde). */
   clientPaidAt: string | null;
   payoutAt: string | null;
   /** Date de la dernière relance de paiement envoyée au client par e-mail. */
   lastReminderAt?: string | null;
+  /** Pack facturé (null = facture du contrat : séances ou forfait). */
+  packId?: string | null;
+  /** Règlements reçus du client (acomptes, solde). Absent sur une facture soldée avant leur suivi. */
+  payments?: Payment[];
 };
 
-export type InvoiceStatus = "sent" | "late" | "paid" | "settled";
+/** Un règlement reçu du client sur une facture. */
+export type Payment = {
+  id: string;
+  invoiceId: string;
+  amount: number;
+  /** « YYYY-MM-DD ». */
+  paidAt: string;
+  note: string;
+};
+
+export type InvoiceStatus = "sent" | "partial" | "late" | "paid" | "settled";
 
 export type RequestStatus = "pending" | "converted" | "declined";
 

@@ -1,6 +1,7 @@
 import type { Client, InStatement } from "@libsql/client";
 import { CONTRACT_VERSION } from "../contract-text";
-import { addDaysISO, billingTodo, composeName, generateSessions, splitAmount, todayISO, toLocalInput, uid } from "../format";
+import { addDaysISO, billingTodo, composeName, generateSessions, round2, splitAmount, todayISO, toLocalInput, uid } from "../format";
+import { PACK_KINDS } from "../packs";
 import type { Contract, Frequency, PortalSession } from "../types";
 import { after } from "next/server";
 import { hashPassword, tempPassword } from "./auth";
@@ -55,6 +56,11 @@ const oneOf = <T extends string>(v: unknown, label: string, allowed: readonly T[
 const datetime = (v: unknown, label: string, required = true) => {
   const x = text(v, label, { max: 16, required });
   if (x && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(x)) throw new ActionError(`${label} est invalide.`);
+  return x;
+};
+const dateOnly = (v: unknown, label: string) => {
+  const x = text(v, label, { max: 10 });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(x) || Number.isNaN(new Date(`${x}T12:00`).getTime())) throw new ActionError(`${label} est invalide.`);
   return x;
 };
 const email = (v: unknown, label: string, required = true) => {
@@ -137,7 +143,12 @@ const ADMIN_ONLY = new Set([
   "addSession",
   "removeSession",
   "invoiceContract",
-  "markClientPaid",
+  "savePack",
+  "setPackClosed",
+  "deletePack",
+  "invoicePack",
+  "recordPayment",
+  "deletePayment",
   "markPayout",
   "declineRequest",
   "deleteRequest",
@@ -148,6 +159,27 @@ const ADMIN_ONLY = new Set([
   "saveSettings",
   "remindInvoice",
 ]);
+
+/**
+ * Crée une facture (numéro = plus grand numéro de l'année + 1 : jamais le nombre de factures, une suppression
+ * créerait un doublon) et y rattache les séances données. `packId` : facture d'un pack plutôt que du contrat.
+ */
+async function createInvoice(client: Client, c: { id: string; partnerId: string; commissionRate: number }, amount: number, sessionIds: string[], packId: string | null) {
+  const { gross, commission, net } = splitAmount(amount, c.commissionRate);
+  const issuedAt = todayISO();
+  const id = uid("i");
+  const last = await one(client, "SELECT MAX(CAST(SUBSTR(number, 8) AS INTEGER)) AS n FROM invoices WHERE number LIKE ?", [`F-${issuedAt.slice(0, 4)}-%`]);
+  const number = `F-${issuedAt.slice(0, 4)}-${String(Number(last?.n ?? 0) + 1).padStart(4, "0")}`;
+  const stmts: InStatement[] = [
+    {
+      sql: "INSERT INTO invoices (id, number, contract_id, partner_id, issued_at, due_at, gross, commission, net, client_paid_at, payout_at, pack_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+      args: [id, number, c.id, c.partnerId, issuedAt, addDaysISO(issuedAt, 14), gross, commission, net, null, null, packId],
+    },
+    ...sessionIds.map((sid): InStatement => ({ sql: "UPDATE sessions SET invoice_id = ? WHERE id = ? AND invoice_id IS NULL", args: [id, sid] })),
+  ];
+  await client.batch(stmts, "write");
+  return id;
+}
 
 /** Exécute une action métier avec les droits de la session et renvoie un éventuel résultat. */
 export async function runAction(client: Client, session: PortalSession, type: string, b: Body): Promise<unknown> {
@@ -187,7 +219,9 @@ export async function runAction(client: Client, session: PortalSession, type: st
           { sql: "DELETE FROM fiches WHERE dog_id IN (SELECT d.id FROM dogs d JOIN contracts c ON c.id = d.contract_id WHERE c.partner_id = ?)", args: [id] },
           { sql: "DELETE FROM dogs WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
           { sql: "DELETE FROM sessions WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
+          { sql: "DELETE FROM payments WHERE invoice_id IN (SELECT id FROM invoices WHERE partner_id = ?)", args: [id] },
           { sql: "DELETE FROM invoices WHERE partner_id = ?", args: [id] },
+          { sql: "DELETE FROM packs WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
           { sql: "UPDATE requests SET contract_id = NULL WHERE contract_id IN (SELECT id FROM contracts WHERE partner_id = ?)", args: [id] },
           { sql: "DELETE FROM contracts WHERE partner_id = ?", args: [id] },
           { sql: "DELETE FROM partners WHERE id = ?", args: [id] },
@@ -233,7 +267,7 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const id = typeof b.id === "string" ? b.id : null;
       if (id) {
         const current = await loadContract(client, id);
-        const hasInvoice = Boolean(await one(client, "SELECT id FROM invoices WHERE contract_id = ? LIMIT 1", [id]));
+        const hasInvoice = Boolean(await one(client, "SELECT id FROM invoices WHERE contract_id = ? AND pack_id IS NULL LIMIT 1", [id]));
         if (hasInvoice && (current.pricing ?? "session") !== f.pricing) throw new ActionError("Ce contrat a déjà une facture : son mode de tarification ne peut plus changer.");
         await client.execute({
           sql: "UPDATE contracts SET partner_id=?, type=?, client_name=?, client_first_name=?, client_last_name=?, client_email=?, client_phone=?, address=?, service=?, pricing=?, price=?, commission_rate=?, frequency=?, notes=? WHERE id=?",
@@ -286,7 +320,9 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const eventIds = await collectEventIds(client, { sessions: "c.id = ?" }, [id]);
       await client.batch(
         [
+          { sql: "DELETE FROM payments WHERE invoice_id IN (SELECT id FROM invoices WHERE contract_id = ?)", args: [id] },
           { sql: "DELETE FROM invoices WHERE contract_id = ?", args: [id] },
+          { sql: "DELETE FROM packs WHERE contract_id = ?", args: [id] },
           { sql: "DELETE FROM fiches WHERE dog_id IN (SELECT id FROM dogs WHERE contract_id = ?)", args: [id] },
           { sql: "DELETE FROM dogs WHERE contract_id = ?", args: [id] },
           { sql: "DELETE FROM sessions WHERE contract_id = ?", args: [id] },
@@ -370,30 +406,105 @@ export async function runAction(client: Client, session: PortalSession, type: st
       return null;
     }
 
+    /* ---------- packs ---------- */
+    case "savePack": {
+      const contractId = text(b.contractId, "Le contrat", { max: 80 });
+      if (!(await one(client, "SELECT id FROM contracts WHERE id = ?", [contractId]))) throw new ActionError("Contrat introuvable.", 404);
+      const kind = oneOf(b.kind, "Le pack", PACK_KINDS);
+      const price = round2(num(b.price, "Le prix", 0.01, 100000));
+      const orderedAt = dateOnly(b.orderedAt, "La date de l'accord");
+      const notes = text(b.notes, "Les notes", { max: 500, required: false });
+      const id = typeof b.id === "string" ? b.id : null;
+      if (id) {
+        const cur = await one(client, "SELECT kind, price FROM packs WHERE id = ? AND contract_id = ?", [id, contractId]);
+        if (!cur) throw new ActionError("Pack introuvable.", 404);
+        const invoiced = Boolean(await one(client, "SELECT id FROM invoices WHERE pack_id = ? LIMIT 1", [id]));
+        if (invoiced && (String(cur.kind) !== kind || Math.round(Number(cur.price) * 100) !== Math.round(price * 100))) {
+          throw new ActionError("Ce pack est déjà facturé : son type et son prix ne peuvent plus changer.");
+        }
+        await client.execute({ sql: "UPDATE packs SET kind=?, price=?, ordered_at=?, notes=? WHERE id=?", args: [kind, price, orderedAt, notes, id] });
+        return { id };
+      }
+      const newId = uid("k");
+      await client.execute({
+        sql: "INSERT INTO packs (id, contract_id, kind, price, ordered_at, closed_at, notes) VALUES (?,?,?,?,?,?,?)",
+        args: [newId, contractId, kind, price, orderedAt, null, notes],
+      });
+      return { id: newId };
+    }
+    case "setPackClosed": {
+      const id = text(b.id, "Le pack", { max: 80 });
+      const res =
+        b.closed === true
+          ? await client.execute({ sql: "UPDATE packs SET closed_at = COALESCE(closed_at, ?) WHERE id = ?", args: [todayISO(), id] })
+          : await client.execute({ sql: "UPDATE packs SET closed_at = NULL WHERE id = ?", args: [id] });
+      if (!res.rowsAffected) throw new ActionError("Pack introuvable.", 404);
+      return null;
+    }
+    case "deletePack": {
+      const id = text(b.id, "Le pack", { max: 80 });
+      if (await one(client, "SELECT id FROM invoices WHERE pack_id = ? LIMIT 1", [id])) throw new ActionError("Ce pack est déjà facturé : il ne peut plus être supprimé.");
+      await client.execute({ sql: "DELETE FROM packs WHERE id = ?", args: [id] });
+      return null;
+    }
+
     /* ---------- facturation ---------- */
     case "invoiceContract": {
       const contract = await loadContract(client, text(b.contractId, "Le contrat", { max: 80 }));
-      const existing = (await client.execute({ sql: "SELECT id, contract_id FROM invoices WHERE contract_id = ?", args: [contract.id] })).rows;
-      const todo = billingTodo(contract, existing.map((r) => ({ contractId: String(r.contract_id) })));
+      const existing = (await client.execute({ sql: "SELECT id, contract_id, pack_id FROM invoices WHERE contract_id = ?", args: [contract.id] })).rows;
+      const todo = billingTodo(contract, existing.map((r) => ({ contractId: String(r.contract_id), packId: r.pack_id == null ? null : String(r.pack_id) })));
       if (todo.units === 0) throw new ActionError(contract.pricing === "package" ? "Le forfait est déjà facturé (ou n'a aucune séance)." : "Aucune séance réalisée à facturer.");
-      const { gross, commission, net } = splitAmount(todo.amount, contract.commissionRate);
-      const issuedAt = todayISO();
-      const id = uid("i");
-      // Numéro = plus grand numéro de l'année + 1 (jamais le nombre de factures : une suppression créerait un doublon).
-      const last = await one(client, "SELECT MAX(CAST(SUBSTR(number, 8) AS INTEGER)) AS n FROM invoices WHERE number LIKE ?", [`F-${issuedAt.slice(0, 4)}-%`]);
-      const number = `F-${issuedAt.slice(0, 4)}-${String(Number(last?.n ?? 0) + 1).padStart(4, "0")}`;
-      const stmts: InStatement[] = [
-        { sql: "INSERT INTO invoices (id, number, contract_id, partner_id, issued_at, due_at, gross, commission, net, client_paid_at, payout_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)", args: [id, number, contract.id, contract.partnerId, issuedAt, addDaysISO(issuedAt, 14), gross, commission, net, null, null] },
-        ...todo.sessionIds.map((sid): InStatement => ({ sql: "UPDATE sessions SET invoice_id = ? WHERE id = ? AND invoice_id IS NULL", args: [id, sid] })),
-      ];
-      await client.batch(stmts, "write");
-      return { id };
+      return { id: await createInvoice(client, { id: contract.id, partnerId: contract.partnerId, commissionRate: contract.commissionRate }, todo.amount, todo.sessionIds, null) };
     }
-    case "markClientPaid": {
+    case "invoicePack": {
+      const pack = await one(client, "SELECT id, contract_id, price FROM packs WHERE id = ?", [text(b.id, "Le pack", { max: 80 })]);
+      if (!pack) throw new ActionError("Pack introuvable.", 404);
+      if (await one(client, "SELECT id FROM invoices WHERE pack_id = ? LIMIT 1", [String(pack.id)])) throw new ActionError("Ce pack est déjà facturé.");
+      const contract = await one(client, "SELECT id, partner_id, commission_rate FROM contracts WHERE id = ?", [String(pack.contract_id)]);
+      if (!contract) throw new ActionError("Contrat introuvable.", 404);
+      const c = { id: String(contract.id), partnerId: String(contract.partner_id), commissionRate: Number(contract.commission_rate) };
+      return { id: await createInvoice(client, c, Number(pack.price), [], String(pack.id)) };
+    }
+    case "recordPayment": {
       const id = text(b.id, "La facture", { max: 80 });
-      await client.execute({ sql: "UPDATE invoices SET client_paid_at = COALESCE(client_paid_at, ?) WHERE id = ?", args: [todayISO(), id] });
-      // Facture « Moi-même » : il n'y a personne à reverser, elle est soldée à l'encaissement.
-      await client.execute({ sql: "UPDATE invoices SET payout_at = COALESCE(payout_at, ?) WHERE id = ? AND partner_id = ?", args: [todayISO(), id, SELF_ID] });
+      const inv = await one(client, "SELECT gross, partner_id, client_paid_at FROM invoices WHERE id = ?", [id]);
+      if (!inv) throw new ActionError("Facture introuvable.", 404);
+      if (inv.client_paid_at) throw new ActionError("Cette facture est déjà payée en totalité.");
+      const received = await one(client, "SELECT COALESCE(SUM(amount), 0) AS total FROM payments WHERE invoice_id = ?", [id]);
+      // Calculs en centimes : jamais de comparaison de décimaux (0,1 + 0,2 ≠ 0,3).
+      const dueCents = Math.round(Number(inv.gross) * 100) - Math.round(Number(received?.total ?? 0) * 100);
+      const amountCents = Math.round(num(b.amount, "Le montant", 0.01, 100000) * 100);
+      if (amountCents > dueCents) throw new ActionError(`Le montant dépasse le reste à payer (${(dueCents / 100).toFixed(2).replace(".", ",")} €).`);
+      const paidAt = b.date ? dateOnly(b.date, "La date") : todayISO();
+      if (paidAt > todayISO()) throw new ActionError("La date du règlement ne peut pas être dans le futur.");
+      const stmts: InStatement[] = [
+        {
+          sql: "INSERT INTO payments (id, invoice_id, amount, paid_at, note) VALUES (?,?,?,?,?)",
+          args: [uid("y"), id, amountCents / 100, paidAt, text(b.note, "La note", { max: 120, required: false })],
+        },
+      ];
+      if (amountCents === dueCents) {
+        stmts.push({ sql: "UPDATE invoices SET client_paid_at = ? WHERE id = ?", args: [paidAt, id] });
+        // Facture « Moi-même » : il n'y a personne à reverser, elle est soldée à l'encaissement.
+        if (String(inv.partner_id) === SELF_ID) stmts.push({ sql: "UPDATE invoices SET payout_at = COALESCE(payout_at, ?) WHERE id = ?", args: [paidAt, id] });
+      }
+      await client.batch(stmts, "write");
+      return null;
+    }
+    case "deletePayment": {
+      const id = text(b.id, "Le règlement", { max: 80 });
+      const row = await one(client, "SELECT y.invoice_id, i.partner_id, i.payout_at FROM payments y JOIN invoices i ON i.id = y.invoice_id WHERE y.id = ?", [id]);
+      if (!row) throw new ActionError("Règlement introuvable.", 404);
+      const self = String(row.partner_id) === SELF_ID;
+      if (row.payout_at && !self) throw new ActionError("Le partenaire a déjà été réglé pour cette facture : ce règlement ne peut plus être supprimé.");
+      await client.batch(
+        [
+          { sql: "DELETE FROM payments WHERE id = ?", args: [id] },
+          // Le total reçu passe sous le montant : la facture n'est plus soldée (« Moi-même » est aussi « re-soldée » à l'encaissement).
+          { sql: `UPDATE invoices SET client_paid_at = NULL${self ? ", payout_at = NULL" : ""} WHERE id = ?`, args: [String(row.invoice_id)] },
+        ],
+        "write",
+      );
       return null;
     }
     case "markPayout": {
@@ -446,10 +557,13 @@ export async function runAction(client: Client, session: PortalSession, type: st
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ActionError("Le client n'a pas d'adresse e-mail valide.");
       const today = todayISO();
       if (String(inv.last_reminder_at ?? "").slice(0, 10) === today) throw new ActionError("Une relance a déjà été envoyée aujourd'hui.");
+      // La relance réclame le SOLDE, pas le montant initial : un client qui a versé un acompte ne doit pas se voir réclamer le total.
+      const received = await one(client, "SELECT COALESCE(SUM(amount), 0) AS total FROM payments WHERE invoice_id = ?", [id]);
       const mail = invoiceReminderEmail({
         firstName: String(inv.client_first_name || inv.client_name),
         number: String(inv.number),
-        amount: Number(inv.gross),
+        amount: round2(Number(inv.gross) - Number(received?.total ?? 0)),
+        total: Number(inv.gross),
         issuedAt: String(inv.issued_at),
         dueAt: String(inv.due_at),
       });

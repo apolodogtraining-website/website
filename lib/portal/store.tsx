@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import type { PackKind } from "./packs";
 import type {
   ContractType,
   Frequency,
@@ -41,6 +42,12 @@ export type ContractInput = {
   requestId?: string;
 };
 
+/** Pack d'un client : prix convenu (modifiable) et date de l'accord. */
+export type PackInput = { kind: PackKind; price: number; orderedAt: string; notes: string };
+
+/** Règlement reçu du client sur une facture. */
+export type PaymentInput = { amount: number; date: string; note: string };
+
 export type DogInput = { name: string; breed: string; sex: "M" | "F" | ""; age: string; chip: string };
 
 export type RequestInput = {
@@ -76,7 +83,13 @@ type Store = PortalData & {
   setSessionStatus: (contractId: string, sessionId: string, status: SessionStatus) => Promise<void>;
   removeSession: (contractId: string, sessionId: string) => Promise<void>;
   invoiceContract: (contractId: string) => Promise<string | null>;
-  markClientPaid: (invoiceId: string) => Promise<void>;
+  savePack: (contractId: string, input: PackInput, id?: string) => Promise<string | undefined>;
+  setPackClosed: (id: string, closed: boolean) => Promise<void>;
+  deletePack: (id: string) => Promise<void>;
+  invoicePack: (id: string) => Promise<string | null>;
+  /** Enregistre un règlement (acompte ou solde) ; renvoie true s'il a été pris en compte. */
+  recordPayment: (invoiceId: string, input: PaymentInput) => Promise<boolean>;
+  deletePayment: (id: string) => Promise<void>;
   markPayout: (invoiceId: string) => Promise<void>;
   declineRequest: (id: string) => Promise<void>;
   deleteRequest: (id: string) => Promise<void>;
@@ -204,7 +217,12 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       removeSession: async (_contractId, sessionId) => void (await call("removeSession", { sessionId })),
 
       invoiceContract: async (contractId) => (await call<{ id: string }>("invoiceContract", { contractId }))?.id ?? null,
-      markClientPaid: async (id) => void (await call("markClientPaid", { id })),
+      savePack: async (contractId, input, id) => (await call<{ id: string }>("savePack", { ...input, contractId, id }))?.id,
+      setPackClosed: async (id, closed) => void (await call("setPackClosed", { id, closed })),
+      deletePack: async (id) => void (await call("deletePack", { id })),
+      invoicePack: async (id) => (await call<{ id: string }>("invoicePack", { id }))?.id ?? null,
+      recordPayment: async (id, input) => (await call("recordPayment", { id, ...input })) !== undefined,
+      deletePayment: async (id) => void (await call("deletePayment", { id })),
       markPayout: async (id) => void (await call("markPayout", { id })),
 
       declineRequest: async (id) => void (await call("declineRequest", { id })),

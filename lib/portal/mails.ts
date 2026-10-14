@@ -50,7 +50,8 @@ export function sessionReminderEmail(r: Reminder) {
   return { subject: "Rappel : votre séance demain — Apolo Dog Training", html, text };
 }
 
-type Overdue = { firstName: string; number: string; amount: number; issuedAt: string; dueAt: string };
+/** `amount` : reste à payer ; `total` : montant de la facture (affiché seulement s'il y a déjà eu un règlement partiel). */
+type Overdue = { firstName: string; number: string; amount: number; total?: number; issuedAt: string; dueAt: string };
 
 const day = (iso: string) => longDate.format(new Date(`${iso.slice(0, 10)}T12:00`));
 
@@ -63,7 +64,13 @@ export function invoiceReminderEmail(o: Overdue) {
       "Sauf erreur de notre part, la facture ci-dessous n'a pas encore été réglée. Si vous l'avez payée depuis, merci de ne pas tenir compte de ce message.",
       "Vous pouvez régler par virement, chèque ou espèces. N'hésitez pas à nous contacter pour toute question.",
     ],
-    [`Facture : ${o.number}`, `Montant : ${eur.format(o.amount)}`, `Émise le ${day(o.issuedAt)} · échéance le ${day(o.dueAt)}`],
+    [
+      `Facture : ${o.number}`,
+      ...(o.total !== undefined && o.total - o.amount > 0.004
+        ? [`Montant de la facture : ${eur.format(o.total)}`, `Déjà réglé : ${eur.format(o.total - o.amount)}`, `Reste à payer : ${eur.format(o.amount)}`]
+        : [`Montant : ${eur.format(o.amount)}`]),
+      `Émise le ${day(o.issuedAt)} · échéance le ${day(o.dueAt)}`,
+    ],
   );
   return { subject: `Facture ${o.number} en attente de règlement — Apolo Dog Training`, html, text };
 }
