@@ -47,6 +47,8 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
   const isPartner = session.role === "partner";
   const payments = invoicePayments(inv);
   const due = balanceDue(inv);
+  // Étude facturée par chien : nombre de chiens déduit du montant (le contrat peut avoir changé depuis).
+  const studyCount = contract && contract.price > 0 && Math.abs(Math.round(inv.gross / contract.price) * contract.price - inv.gross) < 0.005 ? Math.round(inv.gross / contract.price) : 1;
 
   return (
     <div className="min-h-screen-mobile bg-brand-tint px-4 py-6 print:bg-white print:p-0">
@@ -113,7 +115,10 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
             ) : contract?.pricing === "package" ? (
               <tr>
                 <td className="py-2.5">{contract.service}</td>
-                <td className="py-2.5 text-ink-soft">Étude de comportement</td>
+                <td className="py-2.5 text-ink-soft">
+                  Étude de comportement
+                  {studyCount > 1 ? ` · ${studyCount} chiens × ${money(contract.price)}` : ""}
+                </td>
                 <td className="py-2.5 text-right">{money(inv.gross)}</td>
               </tr>
             ) : (

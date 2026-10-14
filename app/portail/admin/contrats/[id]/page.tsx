@@ -11,7 +11,7 @@ import DogsPanel from "@/components/portal/DogsPanel";
 import PacksPanel from "@/components/portal/PacksPanel";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, btn, Card, ConfirmModal, Field, inputCls, PageHeader } from "@/components/portal/ui";
-import { billingTodo, fmtDateTime, isPackage, fmtPhone, frequencyLabel, money, packCommissionRate, splitAmount, toLocalInput } from "@/lib/portal/format";
+import { billingTodo, fmtDateTime, isPackage, fmtPhone, frequencyLabel, money, packCommissionRate, splitAmount, studyDogs, toLocalInput } from "@/lib/portal/format";
 import { packLabel } from "@/lib/portal/packs";
 import { usePortal } from "@/lib/portal/store";
 
@@ -89,9 +89,14 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
               )}
             </Row>
             <Row k="Tarification">{pack ? "Étude de comportement" : "Prix par séance"}</Row>
-            <Row k={pack ? "Prix de l'étude" : "Prix / séance"}>{money(contract.price)}</Row>
+            <Row k={pack ? "Prix de l'étude / chien" : "Prix / séance"}>{money(contract.price)}</Row>
+            {pack && studyDogs(contract) > 1 && (
+              <Row k="Étude, tous chiens">
+                {studyDogs(contract)} chiens · {money(contract.price * studyDogs(contract))}
+              </Row>
+            )}
             {!self && <Row k="Commission">{contract.commissionRate} %</Row>}
-            {!self && <Row k={pack ? "Net partenaire (étude)" : "Net partenaire / séance"}>{money(splitAmount(contract.price, contract.commissionRate).net)}</Row>}
+            {!self && <Row k={pack ? "Net partenaire / chien" : "Net partenaire / séance"}>{money(splitAmount(contract.price, contract.commissionRate).net)}</Row>}
             {currentPacks.length === 0 ? (
               <Row k="Pack en cours">
                 <span className="text-ink-soft">Aucun</span>
@@ -115,7 +120,7 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
             {todo.units > 0 ? (
               <>
                 <p className="text-sm text-ink-soft">
-                  {pack ? "Étude à facturer" : `${todo.units} séance${todo.units > 1 ? "s" : ""} réalisée${todo.units > 1 ? "s" : ""} à facturer`} :{" "}
+                  {pack ? `Étude à facturer${studyDogs(contract) > 1 ? ` (${studyDogs(contract)} chiens)` : ""}` : `${todo.units} séance${todo.units > 1 ? "s" : ""} réalisée${todo.units > 1 ? "s" : ""} à facturer`} :{" "}
                   <strong className="text-ink">{money(preview.gross)}</strong>
                   {!self && <> dont {money(preview.commission)} de commission</>}.
                 </p>

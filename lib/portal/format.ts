@@ -63,16 +63,19 @@ export const billableSessions = (c: Contract) =>
 
 export const isPackage = (c: Contract) => c.pricing === "package";
 
+/** L'étude de comportement est facturée par chien : au moins un, même si la fiche n'en liste pas encore. */
+export const studyDogs = (c: Pick<Contract, "dogs">) => Math.max(1, c.dogs?.length ?? 0);
+
 /**
- * Ce qui reste à facturer sur un contrat. Par séance : les séances réalisées sans facture. Forfait : le
- * forfait entier, une seule fois (dès qu'il a une séance non annulée), sans lier les séances à la facture.
+ * Ce qui reste à facturer sur un contrat. Par séance : les séances réalisées sans facture. Étude : le
+ * prix par chien × nombre de chiens, une seule fois (dès qu'il a une séance non annulée), sans lier les séances à la facture.
  * Les factures de PACK sont à part : elles ne comptent ni comme « forfait déjà facturé » ni comme séances.
  */
 export function billingTodo(c: Contract, invoices: Pick<Invoice, "contractId" | "packId">[]) {
   if (isPackage(c)) {
     const billed = invoices.some((i) => i.contractId === c.id && !i.packId);
     const ready = !billed && c.sessions.some((s) => s.status !== "cancelled");
-    return { units: ready ? 1 : 0, amount: ready ? round2(c.price) : 0, sessionIds: [] as string[] };
+    return { units: ready ? 1 : 0, amount: ready ? round2(c.price * studyDogs(c)) : 0, sessionIds: [] as string[] };
   }
   const ids = billableSessions(c).map((s) => s.id);
   return { units: ids.length, amount: round2(ids.length * c.price), sessionIds: ids };
@@ -88,8 +91,8 @@ export function invoiceLabel(inv: Pick<Invoice, "packId">, c: Contract | undefin
   return pack ? packLabel(pack.kind) : (c?.service ?? "—");
 }
 
-/** « 60,00 € / séance » ou « 100,00 € (étude) ». */
-export const priceLabel = (c: Contract) => (isPackage(c) ? `${money(c.price)} (étude)` : `${money(c.price)} / séance`);
+/** « 60,00 € / séance » ou « 100,00 € / chien (étude) ». */
+export const priceLabel = (c: Contract) => (isPackage(c) ? `${money(c.price)} / chien (étude)` : `${money(c.price)} / séance`);
 
 /** Commission du partenaire sur un pack : son taux propre, à défaut celui du contrat. */
 export const packCommissionRate = (p: Pick<Pack, "commissionRate">, c: Pick<Contract, "commissionRate">) => p.commissionRate ?? c.commissionRate;

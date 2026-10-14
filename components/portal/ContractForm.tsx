@@ -80,7 +80,7 @@ export default function ContractForm({
           const price = parseDecimal(f.price);
           const commission = self ? 0 : parseDecimal(f.commissionRate);
           const count = parseDecimal(f.count);
-          if (Number.isNaN(price) || price < 0) return setError(f.pricing === "package" ? "Indiquez le prix de l'étude (un nombre, par exemple 100)." : "Indiquez le prix d'une séance (un nombre, par exemple 60).");
+          if (Number.isNaN(price) || price < 0) return setError(f.pricing === "package" ? "Indiquez le prix de l'étude par chien (un nombre, par exemple 100)." : "Indiquez le prix d'une séance (un nombre, par exemple 60).");
           if (Number.isNaN(commission) || commission < 0 || commission > 100) return setError("La commission doit être un nombre entre 0 et 100.");
           if (!contract && recurring && (!Number.isInteger(count) || count < 2 || count > 52)) return setError("Le nombre de séances doit être un entier entre 2 et 52.");
           setError("");
@@ -176,8 +176,8 @@ export default function ContractForm({
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
-            label={f.pricing === "package" ? "Prix de l'étude (€)" : "Prix d'une séance (€)"}
-            hint={f.pricing === "package" ? "Tarif de l'étude de comportement, facturé en une seule fois. Le pack est choisi ensuite." : "Facturé au fil des séances réalisées."}
+            label={f.pricing === "package" ? "Prix de l'étude par chien (€)" : "Prix d'une séance (€)"}
+            hint={f.pricing === "package" ? "Tarif de l'étude de comportement pour un chien, facturé en une seule fois (× nombre de chiens). Le pack est choisi ensuite." : "Facturé au fil des séances réalisées."}
           >
             {(id) => <NumberInput id={id} required value={f.price} onValueChange={(v) => set("price", v)} />}
           </Field>
