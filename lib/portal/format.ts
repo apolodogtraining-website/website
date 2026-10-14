@@ -1,5 +1,5 @@
 import { packLabel } from "./packs";
-import type { Contract, Frequency, Invoice, InvoiceStatus, Payment, Session } from "./types";
+import type { Contract, Frequency, Invoice, InvoiceStatus, Pack, Payment, Session } from "./types";
 
 const eur = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
 export const money = (n: number) => eur.format(n);
@@ -88,8 +88,11 @@ export function invoiceLabel(inv: Pick<Invoice, "packId">, c: Contract | undefin
   return pack ? packLabel(pack.kind) : (c?.service ?? "—");
 }
 
-/** « 60,00 € / séance » ou « 300,00 € (forfait) ». */
-export const priceLabel = (c: Contract) => (isPackage(c) ? `${money(c.price)} (forfait)` : `${money(c.price)} / séance`);
+/** « 60,00 € / séance » ou « 100,00 € (étude) ». */
+export const priceLabel = (c: Contract) => (isPackage(c) ? `${money(c.price)} (étude)` : `${money(c.price)} / séance`);
+
+/** Commission du partenaire sur un pack : son taux propre, à défaut celui du contrat. */
+export const packCommissionRate = (p: Pick<Pack, "commissionRate">, c: Pick<Contract, "commissionRate">) => p.commissionRate ?? c.commissionRate;
 
 export function splitAmount(gross: number, rate: number) {
   const commission = round2((gross * rate) / 100);
@@ -140,7 +143,7 @@ export function contractBilling(c: Contract, invoices: Invoice[]) {
   if (late) return { tone: "red" as const, label: "Facture en retard" };
   if (toBill > 0 || packsDue > 0) {
     const parts = [
-      ...(toBill > 0 ? [isPackage(c) ? "Forfait" : `${toBill} séance${toBill > 1 ? "s" : ""}`] : []),
+      ...(toBill > 0 ? [isPackage(c) ? "Étude" : `${toBill} séance${toBill > 1 ? "s" : ""}`] : []),
       ...(packsDue > 0 ? [packsDue > 1 ? `${packsDue} packs` : "Pack"] : []),
     ];
     return { tone: "amber" as const, label: `${parts.join(" + ")} à facturer` };

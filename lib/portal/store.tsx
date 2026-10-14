@@ -44,7 +44,7 @@ export type ContractInput = {
 };
 
 /** Pack d'un client : prix convenu (modifiable) et date de l'accord. */
-export type PackInput = { kind: PackKind; price: number; orderedAt: string; notes: string };
+export type PackInput = { kind: PackKind; price: number; orderedAt: string; notes: string; commissionRate: number };
 
 /** Règlement reçu du client sur une facture. */
 export type PaymentInput = { amount: number; date: string; method: PaymentMethod; note: string };

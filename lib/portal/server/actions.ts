@@ -415,21 +415,31 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const price = round2(num(b.price, "Le prix", 0.01, 100000));
       const orderedAt = dateOnly(b.orderedAt, "La date de l'accord");
       const notes = text(b.notes, "Les notes", { max: 500, required: false });
+      // Commission du partenaire sur ce pack : aucune si la prestation est réalisée en direct (« Moi-même »).
+      const owner = await one(client, "SELECT partner_id FROM contracts WHERE id = ?", [contractId]);
+      const commissionRate = String(owner?.partner_id) === SELF_ID ? 0 : num(b.commissionRate, "La commission", 0, 100);
       const id = typeof b.id === "string" ? b.id : null;
       if (id) {
-        const cur = await one(client, "SELECT kind, price FROM packs WHERE id = ? AND contract_id = ?", [id, contractId]);
+        const cur = await one(client, "SELECT kind, price, commission_rate FROM packs WHERE id = ? AND contract_id = ?", [id, contractId]);
         if (!cur) throw new ActionError("Pack introuvable.", 404);
         const invoiced = Boolean(await one(client, "SELECT id FROM invoices WHERE pack_id = ? LIMIT 1", [id]));
         if (invoiced && (String(cur.kind) !== kind || Math.round(Number(cur.price) * 100) !== Math.round(price * 100))) {
           throw new ActionError("Ce pack est déjà facturé : son type et son prix ne peuvent plus changer.");
         }
-        await client.execute({ sql: "UPDATE packs SET kind=?, price=?, ordered_at=?, notes=? WHERE id=?", args: [kind, price, orderedAt, notes, id] });
+        // La commission est figée sur la facture à l'émission : plus modifiable ensuite.
+        if (invoiced && cur.commission_rate != null && Math.round(Number(cur.commission_rate) * 100) !== Math.round(commissionRate * 100)) {
+          throw new ActionError("Ce pack est déjà facturé : sa commission ne peut plus changer.");
+        }
+        await client.execute({
+          sql: "UPDATE packs SET kind=?, price=?, ordered_at=?, notes=?, commission_rate=CASE WHEN ? THEN commission_rate ELSE ? END WHERE id=?",
+          args: [kind, price, orderedAt, notes, invoiced ? 1 : 0, commissionRate, id],
+        });
         return { id };
       }
       const newId = uid("k");
       await client.execute({
-        sql: "INSERT INTO packs (id, contract_id, kind, price, ordered_at, closed_at, notes) VALUES (?,?,?,?,?,?,?)",
-        args: [newId, contractId, kind, price, orderedAt, null, notes],
+        sql: "INSERT INTO packs (id, contract_id, kind, price, ordered_at, closed_at, notes, commission_rate) VALUES (?,?,?,?,?,?,?,?)",
+        args: [newId, contractId, kind, price, orderedAt, null, notes, commissionRate],
       });
       return { id: newId };
     }
@@ -454,16 +464,18 @@ export async function runAction(client: Client, session: PortalSession, type: st
       const contract = await loadContract(client, text(b.contractId, "Le contrat", { max: 80 }));
       const existing = (await client.execute({ sql: "SELECT id, contract_id, pack_id FROM invoices WHERE contract_id = ?", args: [contract.id] })).rows;
       const todo = billingTodo(contract, existing.map((r) => ({ contractId: String(r.contract_id), packId: r.pack_id == null ? null : String(r.pack_id) })));
-      if (todo.units === 0) throw new ActionError(contract.pricing === "package" ? "Le forfait est déjà facturé (ou n'a aucune séance)." : "Aucune séance réalisée à facturer.");
+      if (todo.units === 0) throw new ActionError(contract.pricing === "package" ? "L'étude de comportement est déjà facturée (ou n'a aucune séance)." : "Aucune séance réalisée à facturer.");
       return { id: await createInvoice(client, { id: contract.id, partnerId: contract.partnerId, commissionRate: contract.commissionRate }, todo.amount, todo.sessionIds, null) };
     }
     case "invoicePack": {
-      const pack = await one(client, "SELECT id, contract_id, price FROM packs WHERE id = ?", [text(b.id, "Le pack", { max: 80 })]);
+      const pack = await one(client, "SELECT id, contract_id, price, commission_rate FROM packs WHERE id = ?", [text(b.id, "Le pack", { max: 80 })]);
       if (!pack) throw new ActionError("Pack introuvable.", 404);
       if (await one(client, "SELECT id FROM invoices WHERE pack_id = ? LIMIT 1", [String(pack.id)])) throw new ActionError("Ce pack est déjà facturé.");
       const contract = await one(client, "SELECT id, partner_id, commission_rate FROM contracts WHERE id = ?", [String(pack.contract_id)]);
       if (!contract) throw new ActionError("Contrat introuvable.", 404);
-      const c = { id: String(contract.id), partnerId: String(contract.partner_id), commissionRate: Number(contract.commission_rate) };
+      // Taux propre au pack, à défaut celui du contrat ; jamais de commission sur « Moi-même ».
+      const rate = String(contract.partner_id) === SELF_ID ? 0 : pack.commission_rate == null ? Number(contract.commission_rate) : Number(pack.commission_rate);
+      const c = { id: String(contract.id), partnerId: String(contract.partner_id), commissionRate: rate };
       return { id: await createInvoice(client, c, Number(pack.price), [], String(pack.id)) };
     }
     case "recordPayment": {

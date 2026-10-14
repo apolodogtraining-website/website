@@ -117,7 +117,7 @@ export default function AdminHome() {
               <li className="flex flex-wrap items-center gap-2">
                 <Badge tone="amber">À facturer</Badge>
                 <Link href="/portail/admin/facturation" className="font-semibold text-brand-dark hover:underline">
-                  {total.toInvoiceCount} facture{total.toInvoiceCount > 1 ? "s" : ""} à établir (séances réalisées ou forfaits)
+                  {total.toInvoiceCount} facture{total.toInvoiceCount > 1 ? "s" : ""} à établir (séances réalisées, études ou packs)
                 </Link>
                 <Link href="/portail/admin/facturation" className={`${btn.secondary} !px-3 !py-1`}>
                   <Receipt className="h-3.5 w-3.5" /> Facturer

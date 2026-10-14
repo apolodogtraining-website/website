@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Receipt } from "lucide-react";
-import { fmtDate, money, paidAmount, parseDecimal, todayISO } from "@/lib/portal/format";
+import { fmtDate, money, packCommissionRate, paidAmount, parseDecimal, splitAmount, todayISO } from "@/lib/portal/format";
 import { PACKS, packFrom, packLabel, type PackKind } from "@/lib/portal/packs";
 import { usePortal } from "@/lib/portal/store";
 import type { Contract, Invoice, Pack } from "@/lib/portal/types";
@@ -12,15 +12,17 @@ import { Badge, btn, Card, ConfirmModal, Empty, Field, inputCls, Modal, NumberIn
 
 const asInput = (n: number) => String(n).replace(".", ",");
 
-type Preset = { kind: PackKind; price: number };
+type Preset = { kind: PackKind; price: number; commissionRate: number };
 
 /** Ajout, modification ou renouvellement d'un pack : choix d'une des 3 formules, prix convenu modifiable. */
-function PackForm({ contractId, pack, preset, invoiced, onClose }: { contractId: string; pack?: Pack; preset?: Preset; invoiced?: boolean; onClose: () => void }) {
+function PackForm({ contract, self, pack, preset, invoiced, onClose }: { contract: Contract; self: boolean; pack?: Pack; preset?: Preset; invoiced?: boolean; onClose: () => void }) {
   const { savePack } = usePortal();
   const [kind, setKind] = useState<PackKind>(pack?.kind ?? preset?.kind ?? "initial");
   const [price, setPrice] = useState(asInput(pack?.price ?? preset?.price ?? packFrom(kind)));
   // Tant que le prix n'a pas été modifié à la main, il suit le tarif de référence de la formule choisie.
   const [priceEdited, setPriceEdited] = useState(Boolean(pack || preset));
+  // Commission du partenaire sur ce pack : celle du contrat par défaut, modifiable pour chaque pack.
+  const [commission, setCommission] = useState(asInput(self ? 0 : (pack?.commissionRate ?? preset?.commissionRate ?? contract.commissionRate)));
   const [orderedAt, setOrderedAt] = useState(pack?.orderedAt ?? todayISO());
   const [notes, setNotes] = useState(pack?.notes ?? "");
   const [error, setError] = useState("");
@@ -36,9 +38,11 @@ function PackForm({ contractId, pack, preset, invoiced, onClose }: { contractId:
           if (busy) return;
           const value = parseDecimal(price);
           if (Number.isNaN(value) || value <= 0) return setError("Indiquez le prix convenu (un nombre, par exemple 899).");
+          const rate = self ? 0 : parseDecimal(commission);
+          if (Number.isNaN(rate) || rate < 0 || rate > 100) return setError("La commission doit être un nombre entre 0 et 100.");
           setError("");
           setBusy(true);
-          const id = await savePack(contractId, { kind, price: value, orderedAt, notes }, pack?.id);
+          const id = await savePack(contract.id, { kind, price: value, orderedAt, notes, commissionRate: rate }, pack?.id);
           setBusy(false);
           if (id) onClose();
         }}
@@ -83,6 +87,12 @@ function PackForm({ contractId, pack, preset, invoiced, onClose }: { contractId:
             {(id) => <input id={id} type="date" required className={inputCls} value={orderedAt} onChange={(e) => setOrderedAt(e.target.value)} />}
           </Field>
         </div>
+        <Field
+          label="Commission du partenaire (%)"
+          hint={self ? "Aucune : vous réalisez la prestation." : invoiced ? "Figée : le pack est déjà facturé." : "Propre à ce pack. Reprise du contrat par défaut."}
+        >
+          {(id) => <NumberInput id={id} required readOnly={self || invoiced} value={self ? "0" : commission} onValueChange={setCommission} />}
+        </Field>
         <Field label="Notes" hint="Facultatif : contenu convenu, particularités…">
           {(id) => <textarea id={id} rows={2} maxLength={500} className={inputCls} value={notes} onChange={(e) => setNotes(e.target.value)} />}
         </Field>
@@ -108,7 +118,7 @@ function PackForm({ contractId, pack, preset, invoiced, onClose }: { contractId:
  * Packs commandés par un client. Le client choisit son pack après l'étude de comportement : on l'enregistre ici
  * avec le prix convenu, puis on le facture. Un client peut enchaîner plusieurs packs (renouvellement).
  */
-export default function PacksPanel({ contract, invoices }: { contract: Contract; invoices: Invoice[] }) {
+export default function PacksPanel({ contract, self, invoices }: { contract: Contract; self: boolean; invoices: Invoice[] }) {
   const router = useRouter();
   const { setPackClosed, deletePack, invoicePack } = usePortal();
   const [form, setForm] = useState<{ pack?: Pack; preset?: Preset } | null>(null);
@@ -141,7 +151,10 @@ export default function PacksPanel({ contract, invoices }: { contract: Contract;
                       {packLabel(p.kind)} · {money(p.price)}{" "}
                       {p.closedAt ? <Badge tone="gray">Terminé le {fmtDate(p.closedAt)}</Badge> : <Badge tone="green">En cours</Badge>}
                     </p>
-                    <p className="mt-0.5 text-xs text-ink-soft">Convenu le {fmtDate(p.orderedAt)}</p>
+                    <p className="mt-0.5 text-xs text-ink-soft">
+                      Convenu le {fmtDate(p.orderedAt)}
+                      {!self && ` · commission ${packCommissionRate(p, contract)} % (net partenaire ${money(splitAmount(p.price, packCommissionRate(p, contract)).net)})`}
+                    </p>
                     {p.notes && <p className="mt-1 text-sm text-ink-soft">{p.notes}</p>}
                     <p className="mt-1 text-sm">
                       {inv ? (
@@ -176,7 +189,7 @@ export default function PacksPanel({ contract, invoices }: { contract: Contract;
                     </button>
                     {p.closedAt ? (
                       <>
-                        <button type="button" className={btn.secondary} onClick={() => setForm({ preset: { kind: p.kind, price: p.price } })}>
+                        <button type="button" className={btn.secondary} onClick={() => setForm({ preset: { kind: p.kind, price: p.price, commissionRate: packCommissionRate(p, contract) } })}>
                           Renouveler
                         </button>
                         <button type="button" className={btn.secondary} onClick={() => setPackClosed(p.id, false)}>
@@ -201,7 +214,7 @@ export default function PacksPanel({ contract, invoices }: { contract: Contract;
         </ul>
       )}
 
-      {form && <PackForm contractId={contract.id} pack={form.pack} preset={form.preset} invoiced={form.pack ? Boolean(invoiceOf(form.pack)) : false} onClose={() => setForm(null)} />}
+      {form && <PackForm contract={contract} self={self} pack={form.pack} preset={form.preset} invoiced={form.pack ? Boolean(invoiceOf(form.pack)) : false} onClose={() => setForm(null)} />}
       {deleting && (
         <ConfirmModal
           title="Supprimer ce pack ?"

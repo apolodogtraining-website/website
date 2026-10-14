@@ -40,6 +40,7 @@ const toPack = (r: Row): Pack => ({
   orderedAt: s(r.ordered_at),
   closedAt: sn(r.closed_at),
   notes: s(r.notes),
+  commissionRate: r.commission_rate == null ? null : Number(r.commission_rate),
 });
 
 const toPayment = (r: Row): Payment => ({
