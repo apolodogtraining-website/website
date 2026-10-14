@@ -119,6 +119,8 @@ export type Invoice = {
   payoutAt: string | null;
   /** Date de la dernière relance de paiement envoyée au client par e-mail. */
   lastReminderAt?: string | null;
+  /** Date du dernier envoi de la facture au client par e-mail. */
+  sentAt?: string | null;
   /** Pack facturé (null = facture du contrat : séances ou forfait). */
   packId?: string | null;
   /** Règlements reçus du client (acomptes, solde). Absent sur une facture soldée avant leur suivi. */

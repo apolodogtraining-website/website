@@ -66,6 +66,7 @@ const toInvoice = (r: Row, sessionIds: string[], payments: Payment[]): Invoice =
   clientPaidAt: sn(r.client_paid_at),
   payoutAt: sn(r.payout_at),
   lastReminderAt: sn(r.last_reminder_at),
+  sentAt: sn(r.sent_at),
   packId: sn(r.pack_id),
   payments,
 });
