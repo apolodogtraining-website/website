@@ -50,6 +50,20 @@ export function sessionReminderEmail(r: Reminder) {
   return { subject: "Rappel : votre séance demain — Apolo Dog Training", html, text };
 }
 
+/** Envoi d'une facture au client : message court ; la facture complète est en PDF joint. */
+export function invoiceSentEmail(o: { firstName: string; number: string; gross: number; due: number; dueAt: string }) {
+  const { html, text } = wrap(
+    `Votre facture ${o.number}`,
+    o.firstName,
+    [
+      "Veuillez trouver ci-joint votre facture au format PDF.",
+      o.due > 0.004 ? "Vous pouvez la régler par virement, chèque ou espèces. N'hésitez pas à nous contacter pour toute question." : "Elle est déjà réglée : ce document est envoyé pour votre information. Merci de votre confiance.",
+    ],
+    [`Facture : ${o.number}`, `Montant : ${eur.format(o.gross)}`, ...(o.due > 0.004 && o.due < o.gross - 0.004 ? [`Reste à payer : ${eur.format(o.due)}`] : []), ...(o.due > 0.004 ? [`Échéance : ${day(o.dueAt)}`] : [])],
+  );
+  return { subject: `Votre facture ${o.number} — Apolo Dog Training`, html, text };
+}
+
 /** `amount` : reste à payer ; `total` : montant de la facture (affiché seulement s'il y a déjà eu un règlement partiel). */
 type Overdue = { firstName: string; number: string; amount: number; total?: number; issuedAt: string; dueAt: string };
 
