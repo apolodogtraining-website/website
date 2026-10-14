@@ -11,7 +11,8 @@ import DogsPanel from "@/components/portal/DogsPanel";
 import PacksPanel from "@/components/portal/PacksPanel";
 import SessionList from "@/components/portal/SessionList";
 import { Badge, btn, Card, ConfirmModal, Field, inputCls, PageHeader } from "@/components/portal/ui";
-import { billingTodo, fmtDateTime, isPackage, fmtPhone, frequencyLabel, money, splitAmount, toLocalInput } from "@/lib/portal/format";
+import { billingTodo, fmtDateTime, isPackage, fmtPhone, frequencyLabel, money, packCommissionRate, splitAmount, studyDogs, toLocalInput } from "@/lib/portal/format";
+import { packLabel } from "@/lib/portal/packs";
 import { usePortal } from "@/lib/portal/store";
 
 export default function AdminContractDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -38,6 +39,8 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
   const todo = billingTodo(contract, invoices);
   const preview = splitAmount(todo.amount, contract.commissionRate);
   const pack = isPackage(contract);
+  const self = Boolean(partner?.isSelf);
+  const currentPacks = (contract.packs ?? []).filter((p) => !p.closedAt).sort((a, b) => b.orderedAt.localeCompare(a.orderedAt));
 
   return (
     <PortalShell role="admin">
@@ -85,17 +88,41 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
                 "—"
               )}
             </Row>
-            <Row k="Tarification">{pack ? "Forfait global" : "Prix par séance"}</Row>
-            <Row k={pack ? "Prix du forfait" : "Prix / séance"}>{money(contract.price)}</Row>
-            <Row k="Commission">{contract.commissionRate} %</Row>
-            <Row k={pack ? "Net partenaire (forfait)" : "Net partenaire / séance"}>{money(splitAmount(contract.price, contract.commissionRate).net)}</Row>
+            <Row k="Tarification">{pack ? "Étude de comportement" : "Prix par séance"}</Row>
+            <Row k={pack ? "Prix de l'étude / chien" : "Prix / séance"}>{money(contract.price)}</Row>
+            {pack && studyDogs(contract) > 1 && (
+              <Row k="Étude, tous chiens">
+                {studyDogs(contract)} chiens · {money(contract.price * studyDogs(contract))}
+              </Row>
+            )}
+            {!self && <Row k="Commission">{contract.commissionRate} %</Row>}
+            {!self && <Row k={pack ? "Net partenaire / chien" : "Net partenaire / séance"}>{money(splitAmount(contract.price, contract.commissionRate).net)}</Row>}
+            {currentPacks.length === 0 ? (
+              <Row k="Pack en cours">
+                <span className="text-ink-soft">Aucun</span>
+              </Row>
+            ) : (
+              currentPacks.map((p) => (
+                <Row key={p.id} k="Pack en cours">
+                  <span className="font-semibold">
+                    {packLabel(p.kind)} · {money(p.price)}
+                  </span>
+                  {!self && (
+                    <span className="block text-xs text-ink-soft">
+                      Commission {packCommissionRate(p, contract)} % · net partenaire {money(splitAmount(p.price, packCommissionRate(p, contract)).net)}
+                    </span>
+                  )}
+                </Row>
+              ))
+            )}
           </dl>
           <div className="mt-4 border-t border-brand-light/60 pt-4">
             {todo.units > 0 ? (
               <>
                 <p className="text-sm text-ink-soft">
-                  {pack ? "Forfait à facturer" : `${todo.units} séance${todo.units > 1 ? "s" : ""} réalisée${todo.units > 1 ? "s" : ""} à facturer`} :{" "}
-                  <strong className="text-ink">{money(preview.gross)}</strong> dont {money(preview.commission)} de commission.
+                  {pack ? `Étude à facturer${studyDogs(contract) > 1 ? ` (${studyDogs(contract)} chiens)` : ""}` : `${todo.units} séance${todo.units > 1 ? "s" : ""} réalisée${todo.units > 1 ? "s" : ""} à facturer`} :{" "}
+                  <strong className="text-ink">{money(preview.gross)}</strong>
+                  {!self && <> dont {money(preview.commission)} de commission</>}.
                 </p>
                 <button
                   type="button"
@@ -109,13 +136,13 @@ export default function AdminContractDetail({ params }: { params: Promise<{ id: 
                 </button>
               </>
             ) : (
-              <p className="text-sm text-ink-soft">{pack ? "Le forfait est facturé, ou n'a pas encore de séance." : "Aucune séance réalisée en attente de facturation."}</p>
+              <p className="text-sm text-ink-soft">{pack ? "L'étude est facturée, ou n'a pas encore de séance." : "Aucune séance réalisée en attente de facturation."}</p>
             )}
           </div>
         </Card>
       </div>
 
-      <PacksPanel contract={contract} invoices={invoices.filter((i) => i.contractId === contract.id)} />
+      <PacksPanel contract={contract} self={self} invoices={invoices.filter((i) => i.contractId === contract.id)} />
 
       <DogsPanel contract={contract} area="admin" />
 

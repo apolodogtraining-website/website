@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { frequencyLabel, onlyDigits, parseDecimal, toLocalInput } from "@/lib/portal/format";
+import { STUDY } from "@/lib/portal/packs";
 import { type ContractInput, usePortal } from "@/lib/portal/store";
 import type { ClientRequest, Contract, Frequency } from "@/lib/portal/types";
 import { btn, Field, inputCls, Modal, NumberInput, PhoneInput } from "./ui";
@@ -49,9 +50,9 @@ export default function ContractForm({
     clientPhone: onlyDigits(contract?.clientPhone ?? request?.phone ?? ""),
     address: contract?.address ?? request?.address ?? "",
     service: contract?.service ?? request?.service ?? "",
-    // « Moi-même » travaille au forfait ; les partenaires, au prix par séance (modifiable dans les deux cas).
-    pricing: contract?.pricing ?? (partners.find((p) => p.id === initialPartner)?.isSelf ? "package" : "session"),
-    price: String(contract?.price ?? 60),
+    // Par défaut : l'étude de comportement (obligatoire, prix global) ; le prix par séance reste possible.
+    pricing: contract?.pricing ?? "package",
+    price: String(contract?.price ?? STUDY.from),
     commissionRate: String(contract?.commissionRate ?? partners.find((p) => p.id === initialPartner)?.commissionRate ?? 15),
     frequency: contract?.frequency ?? "weekly",
     notes: contract?.notes ?? (request ? [request.notes].filter(Boolean).join(" — ") : ""),
@@ -79,7 +80,7 @@ export default function ContractForm({
           const price = parseDecimal(f.price);
           const commission = self ? 0 : parseDecimal(f.commissionRate);
           const count = parseDecimal(f.count);
-          if (Number.isNaN(price) || price < 0) return setError(f.pricing === "package" ? "Indiquez le prix du forfait (un nombre, par exemple 300)." : "Indiquez le prix d'une séance (un nombre, par exemple 60).");
+          if (Number.isNaN(price) || price < 0) return setError(f.pricing === "package" ? "Indiquez le prix de l'étude par chien (un nombre, par exemple 100)." : "Indiquez le prix d'une séance (un nombre, par exemple 60).");
           if (Number.isNaN(commission) || commission < 0 || commission > 100) return setError("La commission doit être un nombre entre 0 et 100.");
           if (!contract && recurring && (!Number.isInteger(count) || count < 2 || count > 52)) return setError("Le nombre de séances doit être un entier entre 2 et 52.");
           setError("");
@@ -111,8 +112,6 @@ export default function ContractForm({
                   set("partnerId", e.target.value);
                   // Le taux proposé suit le partenaire choisi (modifiable ensuite).
                   const chosen = partners.find((p) => p.id === e.target.value);
-                  // Nouveau contrat : le mode de tarification suit aussi le partenaire (forfait pour « Moi-même »).
-                  if (!contract) set("pricing", chosen?.isSelf ? "package" : "session");
                   if (!contract || chosen?.isSelf) set("commissionRate", String(chosen?.commissionRate ?? 15));
                 }}
               >
@@ -156,15 +155,19 @@ export default function ContractForm({
         <div role="group" aria-label="Mode de tarification" className="flex border border-brand-light">
           {(
             [
+              ["package", "Étude de comportement"],
               ["session", "Prix par séance"],
-              ["package", "Forfait global"],
             ] as const
           ).map(([k, label]) => (
             <button
               key={k}
               type="button"
               aria-pressed={f.pricing === k}
-              onClick={() => set("pricing", k)}
+              onClick={() => {
+                // Le prix proposé suit le mode tant qu'il n'a pas été modifié à la main.
+                if (k !== f.pricing && !contract && f.price === String(f.pricing === "package" ? STUDY.from : 60)) set("price", String(k === "package" ? STUDY.from : 60));
+                set("pricing", k);
+              }}
               className={`flex-1 px-4 py-2 text-sm font-semibold transition ${f.pricing === k ? "bg-brand text-white" : "text-ink-soft hover:bg-brand-tint"}`}
             >
               {label}
@@ -173,8 +176,8 @@ export default function ContractForm({
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
-            label={f.pricing === "package" ? "Prix du forfait (€)" : "Prix d'une séance (€)"}
-            hint={f.pricing === "package" ? "Prix global de la prestation, facturé en une seule fois, quel que soit le nombre de séances." : "Facturé au fil des séances réalisées."}
+            label={f.pricing === "package" ? "Prix de l'étude par chien (€)" : "Prix d'une séance (€)"}
+            hint={f.pricing === "package" ? "Tarif de l'étude de comportement pour un chien, facturé en une seule fois (× nombre de chiens). Le pack est choisi ensuite." : "Facturé au fil des séances réalisées."}
           >
             {(id) => <NumberInput id={id} required value={f.price} onValueChange={(v) => set("price", v)} />}
           </Field>

@@ -10,8 +10,9 @@ export const CONTRACT_VERSION = "2026-06";
  * donc un ancien contrat doit continuer à restituer EXACTEMENT ce que le client a signé.
  * 2026-10    : prix « communiqué avant la première intervention », sans tarifs dans le contrat.
  * 2026-10-14 : tarifs « à partir de » de l'étude de comportement (obligatoire) puis des formules (article 5).
+ * 2026-10-15 : le tarif de l'étude s'applique à chaque chien.
  */
-export const CLIENT_CONTRACT_VERSION = "2026-10-14";
+export const CLIENT_CONTRACT_VERSION = "2026-10-15";
 
 /** Un article de contrat. `items` + `note` : liste de tarifs puis explication de l'astérisque. */
 export type ContractArticle = {
@@ -25,8 +26,8 @@ export type ContractArticle = {
  * Tarifs « à partir de » affichés dans le contrat client. Source unique : pas de prix écrits en dur
  * ailleurs dans le contrat. Espaces insécables ( ) pour qu'un prix ne se coupe pas en fin de ligne.
  */
-export const CLIENT_PRICES = [
-  { label: `${STUDY.label} (obligatoire)`, price: fromPriceLabel(STUDY.from) },
+const clientPrices = (perDog: boolean) => [
+  { label: `${STUDY.label} (obligatoire${perDog ? ", par chien" : ""})`, price: fromPriceLabel(STUDY.from) },
   ...PACKS.map((p) => ({ label: p.label, price: fromPriceLabel(p.from) })),
 ];
 
@@ -91,7 +92,9 @@ export function clientContractArticles(
   version: string = CLIENT_CONTRACT_VERSION,
 ): ContractArticle[] {
   // Un exemplaire signé avant l'ajout des tarifs garde l'article 5 qu'il a réellement signé.
-  const withPrices = version === CLIENT_CONTRACT_VERSION;
+  const withPrices = version >= "2026-10-14";
+  // Depuis 2026-10-15, le tarif de l'étude est précisé « par chien ».
+  const perDog = version >= "2026-10-15";
   return [
     {
       title: "Article 1 — Objet",
@@ -112,8 +115,8 @@ export function clientContractArticles(
     withPrices
       ? {
           title: "Article 5 — Prix et paiement",
-          body: "Les séances sont facturées par le Prestataire, quel que soit le partenaire intervenant. Le paiement peut se faire en une ou plusieurs fois, avec acompte le cas échéant, selon l'article 6 des CGV. L'étude de comportement est obligatoire et préalable : son tarif ne concerne qu'elle. À l'issue de l'étude, une formule d'accompagnement (Pack Initial, Complice ou Expert) est proposée au Client selon les résultats de l'étude et ses besoins ; son tarif est distinct de celui de l'étude. Les tarifs de référence sont les suivants :",
-          items: CLIENT_PRICES,
+          body: `Les séances sont facturées par le Prestataire, quel que soit le partenaire intervenant. Le paiement peut se faire en une ou plusieurs fois, avec acompte le cas échéant, selon l'article 6 des CGV. L'étude de comportement est obligatoire et préalable : son tarif ne concerne qu'elle${perDog ? " et s'applique à chaque chien étudié" : ""}. À l'issue de l'étude, une formule d'accompagnement (Pack Initial, Complice ou Expert) est proposée au Client selon les résultats de l'étude et ses besoins ; son tarif est distinct de celui de l'étude. Les tarifs de référence sont les suivants :`,
+          items: clientPrices(perDog),
           note: "* Tarifs « à partir de », en euros, TVA non applicable (article 293 B du CGI). Il ne s'agit pas de prix définitifs : le prix final peut varier selon le chien et l'environnement d'intervention et, pour un lieu situé hors de la zone d'intervention du Prestataire, selon la distance de déplacement. Le prix définitif est communiqué au Client avant la première intervention (fiche tarifs ou devis).",
         }
       : {

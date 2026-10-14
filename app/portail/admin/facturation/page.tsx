@@ -66,7 +66,7 @@ export default function AdminBilling() {
       </div>
 
       <Card className="mt-6">
-        <h2 className="mb-3 text-base font-bold text-ink">À facturer (séances réalisées, forfaits et packs)</h2>
+        <h2 className="mb-3 text-base font-bold text-ink">À facturer (séances réalisées, études et packs)</h2>
         {pending.length === 0 && packsPending.length === 0 ? (
           <Empty>Tout est facturé.</Empty>
         ) : (
@@ -78,7 +78,7 @@ export default function AdminBilling() {
                 <tr key={c.id}>
                   <td className="font-semibold">{c.clientName}</td>
                   <td>{partners.find((p) => p.id === c.partnerId)?.company}</td>
-                  <td>{isPackage(c) ? "Forfait" : todo.units}</td>
+                  <td>{isPackage(c) ? "Étude" : todo.units}</td>
                   <td className="whitespace-nowrap">{money(amount.gross)}</td>
                   <td className="whitespace-nowrap text-ink-soft">{money(amount.commission)}</td>
                   <td className="text-right">

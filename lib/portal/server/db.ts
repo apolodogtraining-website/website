@@ -177,6 +177,7 @@ export function db(): Promise<Client> {
         "ALTER TABLE requests ADD COLUMN last_name TEXT",
         "ALTER TABLE invoices ADD COLUMN pack_id TEXT", // facture d'un pack (NULL = facture du contrat)
         "ALTER TABLE payments ADD COLUMN method TEXT NOT NULL DEFAULT ''", // mode de règlement (chèque, virement…)
+        "ALTER TABLE packs ADD COLUMN commission_rate REAL", // commission du partenaire sur ce pack (NULL = celle du contrat)
       ]) {
         await client.execute(ddl).catch((e: Error) => {
           if (!/duplicate column/i.test(e.message)) throw e;
