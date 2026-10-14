@@ -162,6 +162,17 @@ export default function ClientSignup() {
                   <div key={a.title}>
                     <h2 className="font-bold text-ink">{a.title}</h2>
                     <p className="mt-1 text-ink-soft">{a.body}</p>
+                    {a.items && (
+                      <ul className="mt-2 border-t border-brand-light">
+                        {a.items.map((i) => (
+                          <li key={i.label} className="flex items-baseline justify-between gap-4 border-b border-brand-light py-2">
+                            <span className="text-ink-soft">{i.label}</span>
+                            <span className="shrink-0 whitespace-nowrap font-bold text-ink">{i.price}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {a.note && <p className="mt-2 text-xs text-ink-soft">{a.note}</p>}
                   </div>
                 ))}
               </div>

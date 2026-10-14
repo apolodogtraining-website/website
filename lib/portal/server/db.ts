@@ -103,6 +103,27 @@ const SCHEMA = [
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
   )`,
+  // Packs commandés par un client après l'étude de comportement : plusieurs possibles par client (renouvellements).
+  `CREATE TABLE IF NOT EXISTS packs (
+    id TEXT PRIMARY KEY,
+    contract_id TEXT NOT NULL REFERENCES contracts(id),
+    kind TEXT NOT NULL,
+    price REAL NOT NULL,
+    ordered_at TEXT NOT NULL,
+    closed_at TEXT,
+    notes TEXT NOT NULL DEFAULT ''
+  )`,
+  // Règlements reçus du client sur une facture : acomptes puis solde. La facture n'est « payée » (client_paid_at)
+  // que lorsque leur total atteint son montant.
+  `CREATE TABLE IF NOT EXISTS payments (
+    id TEXT PRIMARY KEY,
+    invoice_id TEXT NOT NULL REFERENCES invoices(id),
+    amount REAL NOT NULL,
+    paid_at TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT ''
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_packs_contract ON packs(contract_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_payments_invoice ON payments(invoice_id)`,
   `CREATE INDEX IF NOT EXISTS idx_dogs_contract ON dogs(contract_id)`,
   `CREATE INDEX IF NOT EXISTS idx_contracts_partner ON contracts(partner_id)`,
   `CREATE INDEX IF NOT EXISTS idx_sessions_contract ON sessions(contract_id)`,
@@ -153,6 +174,7 @@ export function db(): Promise<Client> {
         "ALTER TABLE requests ADD COLUMN dogs_json TEXT", // tous les chiens déclarés à l'inscription
         "ALTER TABLE contracts ADD COLUMN client_last_name TEXT",
         "ALTER TABLE requests ADD COLUMN last_name TEXT",
+        "ALTER TABLE invoices ADD COLUMN pack_id TEXT", // facture d'un pack (NULL = facture du contrat)
       ]) {
         await client.execute(ddl).catch((e: Error) => {
           if (!/duplicate column/i.test(e.message)) throw e;
