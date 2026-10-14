@@ -35,7 +35,7 @@ export default async function Home() {
     telephone: site.phoneIntl,
     image: `${site.url}/photos/hero.jpg`,
     logo: `${site.url}/logo/logo-full.png`,
-    priceRange: "120€ – 699€",
+    priceRange: "100€ – 1299€",
     currenciesAccepted: "EUR",
     knowsLanguage: ["fr", "es"],
     founder: {
