@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Printer } from "lucide-react";
 import { Badge, btn, ConfirmModal } from "@/components/portal/ui";
 import PaymentModal from "@/components/portal/PaymentModal";
+import SendInvoiceButton from "@/components/portal/SendInvoiceButton";
 import { statusTone } from "@/components/portal/InvoiceTable";
-import { balanceDue, fmtDate, fmtDateTime, invoiceLabel, invoicePayments, invoiceStatus, invoiceStatusLabel, money } from "@/lib/portal/format";
+import { balanceDue, fmtDate, invoiceLines, invoicePayments, invoiceStatus, invoiceStatusLabel, money } from "@/lib/portal/format";
 import { methodLabel } from "@/lib/portal/payments";
 import { usePortal } from "@/lib/portal/store";
 import { site } from "@/lib/site";
@@ -42,13 +43,11 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
 
   const contract = contracts.find((c) => c.id === inv.contractId);
   const partner = partners.find((p) => p.id === inv.partnerId);
-  const sessions = contract?.sessions.filter((s) => inv.sessionIds.includes(s.id)) ?? [];
   const st = invoiceStatus(inv);
   const isPartner = session.role === "partner";
   const payments = invoicePayments(inv);
   const due = balanceDue(inv);
-  // Étude facturée par chien : nombre de chiens déduit du montant (le contrat peut avoir changé depuis).
-  const studyCount = contract && contract.price > 0 && Math.abs(Math.round(inv.gross / contract.price) * contract.price - inv.gross) < 0.005 ? Math.round(inv.gross / contract.price) : 1;
+  const lines = invoiceLines(inv, contract);
 
   return (
     <div className="min-h-screen-mobile bg-brand-tint px-4 py-6 print:bg-white print:p-0">
@@ -56,9 +55,12 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
         <Link href={back} className={btn.ghost}>
           <ArrowLeft className="h-4 w-4" /> Facturation
         </Link>
-        <button type="button" className={btn.primary} onClick={() => window.print()}>
-          <Printer className="h-4 w-4" /> Imprimer / PDF
-        </button>
+        <div className="flex flex-wrap justify-end gap-2">
+          {!isPartner && <SendInvoiceButton invoice={inv} />}
+          <button type="button" className={btn.primary} onClick={() => window.print()}>
+            <Printer className="h-4 w-4" /> Imprimer / PDF
+          </button>
+        </div>
       </div>
 
       <article className="mx-auto max-w-3xl rounded-sm bg-white p-6 shadow-soft sm:p-10 print:rounded-none print:shadow-none">
@@ -106,30 +108,13 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
             </tr>
           </thead>
           <tbody className="divide-y divide-brand-light/60">
-            {inv.packId ? (
-              <tr>
-                <td className="py-2.5">{invoiceLabel(inv, contract)}</td>
-                <td className="py-2.5 text-ink-soft">Pack d&apos;accompagnement</td>
-                <td className="py-2.5 text-right">{money(inv.gross)}</td>
+            {lines.map((l, i) => (
+              <tr key={i}>
+                <td className="py-2.5">{l.label}</td>
+                <td className="py-2.5 text-ink-soft">{l.detail}</td>
+                <td className="py-2.5 text-right">{money(l.amount)}</td>
               </tr>
-            ) : contract?.pricing === "package" ? (
-              <tr>
-                <td className="py-2.5">{contract.service}</td>
-                <td className="py-2.5 text-ink-soft">
-                  Étude de comportement
-                  {studyCount > 1 ? ` · ${studyCount} chiens × ${money(contract.price)}` : ""}
-                </td>
-                <td className="py-2.5 text-right">{money(inv.gross)}</td>
-              </tr>
-            ) : (
-              sessions.map((s) => (
-                <tr key={s.id}>
-                  <td className="py-2.5">{contract?.service}</td>
-                  <td className="py-2.5 text-ink-soft">{fmtDateTime(s.date)}</td>
-                  <td className="py-2.5 text-right">{money(contract?.price ?? 0)}</td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
           <tfoot>
             <tr className="border-t border-brand-light">

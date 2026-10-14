@@ -1,6 +1,6 @@
 import type { Client, InStatement } from "@libsql/client";
 import { CONTRACT_VERSION } from "../contract-text";
-import { addDaysISO, billingTodo, composeName, generateSessions, round2, splitAmount, todayISO, toLocalInput, uid } from "../format";
+import { addDaysISO, balanceDue, billingTodo, composeName, generateSessions, round2, splitAmount, todayISO, toLocalInput, uid } from "../format";
 import { PACK_KINDS } from "../packs";
 import { PAYMENT_METHOD_VALUES } from "../payments";
 import type { Contract, Frequency, PortalSession } from "../types";
@@ -13,7 +13,8 @@ import { SELF_ID } from "./db";
 import { snapshot } from "./repo";
 import { saveSettings } from "./settings";
 import { sendMail } from "./mailer";
-import { invoiceReminderEmail } from "../mails";
+import { invoiceReminderEmail, invoiceSentEmail } from "../mails";
+import { invoiceDocumentHtml } from "../invoice-html";
 
 export class ActionError extends Error {
   constructor(
@@ -159,6 +160,7 @@ const ADMIN_ONLY = new Set([
   "deleteDog",
   "saveSettings",
   "remindInvoice",
+  "sendInvoice",
 ]);
 
 /**
@@ -560,6 +562,27 @@ export async function runAction(client: Client, session: PortalSession, type: st
     }
     case "saveSettings": {
       await saveSettings(client, b);
+      return null;
+    }
+    case "sendInvoice": {
+      const id = text(b.id, "La facture", { max: 80 });
+      const data = await snapshot(client, { role: "admin" });
+      const inv = data.invoices.find((i) => i.id === id);
+      if (!inv) throw new ActionError("Facture introuvable.", 404);
+      const contract = data.contracts.find((c) => c.id === inv.contractId);
+      if (!contract) throw new ActionError("Contrat introuvable.", 404);
+      const email = contract.clientEmail ?? "";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ActionError("Le client n'a pas d'adresse e-mail valide : ajoutez-la sur son contrat.");
+      const due = balanceDue(inv);
+      const mail = invoiceSentEmail({ firstName: contract.clientFirstName || contract.clientName, number: inv.number, gross: inv.gross, due, dueAt: inv.dueAt });
+      const res = await sendMail({
+        to: email,
+        ...mail,
+        pdfHtml: invoiceDocumentHtml(inv, contract, data.partners.find((p) => p.id === inv.partnerId)),
+        pdfName: `Facture-${inv.number}.pdf`,
+      });
+      if (!res.ok) throw new ActionError(`Envoi impossible : ${res.reason}`, 502);
+      await client.execute({ sql: "UPDATE invoices SET sent_at = ? WHERE id = ?", args: [toLocalInput(new Date()), id] });
       return null;
     }
     case "remindInvoice": {

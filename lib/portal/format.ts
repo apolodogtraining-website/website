@@ -179,3 +179,22 @@ export const composeName = (firstName: string, lastName: string) =>
 
 /** Nombre saisi dans un champ texte (virgule ou point) ; NaN si vide ou invalide. */
 export const parseDecimal = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));
+
+/** Nombre de chiens facturés sur une facture d'étude (déduit du montant : le contrat peut avoir changé depuis). */
+export function studyCountOf(inv: Pick<Invoice, "gross">, c: Pick<Contract, "price"> | undefined) {
+  if (!c || c.price <= 0) return 1;
+  const n = Math.round(inv.gross / c.price);
+  return n >= 1 && Math.abs(n * c.price - inv.gross) < 0.005 ? n : 1;
+}
+
+export type InvoiceLine = { label: string; detail: string; amount: number };
+
+/** Lignes d'une facture : pack, étude de comportement (par chien) ou séances. Source unique de la page et de l'e-mail. */
+export function invoiceLines(inv: Invoice, c: Contract | undefined): InvoiceLine[] {
+  if (inv.packId) return [{ label: invoiceLabel(inv, c), detail: "Pack d'accompagnement", amount: inv.gross }];
+  if (c?.pricing === "package") {
+    const n = studyCountOf(inv, c);
+    return [{ label: c.service, detail: `Étude de comportement${n > 1 ? ` · ${n} chiens × ${money(c.price)}` : ""}`, amount: inv.gross }];
+  }
+  return (c?.sessions ?? []).filter((x) => inv.sessionIds.includes(x.id)).map((x) => ({ label: c?.service ?? "", detail: fmtDateTime(x.date), amount: c?.price ?? 0 }));
+}

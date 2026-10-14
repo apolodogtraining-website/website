@@ -6,6 +6,7 @@ import { balanceDue, fmtDate, invoiceLabel, invoiceStatus, invoiceStatusLabel, m
 import { usePortal } from "@/lib/portal/store";
 import type { Invoice, InvoiceStatus } from "@/lib/portal/types";
 import PaymentModal from "./PaymentModal";
+import SendInvoiceButton from "./SendInvoiceButton";
 import { Badge, btn, ConfirmModal, Empty, type Tone, Table } from "./ui";
 
 export const statusTone: Record<InvoiceStatus, Tone> = { sent: "blue", partial: "blue", late: "red", paid: "amber", settled: "green" };
@@ -61,9 +62,11 @@ export default function InvoiceTable({ invoices, admin }: { invoices: Invoice[];
                   payé {money(paid)} sur {money(inv.gross)}
                 </div>
               )}
+              {admin && inv.sentAt && <div className="text-xs text-ink-soft">envoyée au client le {fmtDate(inv.sentAt)}</div>}
               {admin && inv.lastReminderAt && !inv.clientPaidAt && <div className="text-xs text-ink-soft">relancée le {fmtDate(inv.lastReminderAt)}</div>}
             </td>
             <td className="whitespace-nowrap text-right">
+              {admin && <SendInvoiceButton invoice={inv} className={`${btn.secondary} mr-2`} />}
               {admin && st === "late" && (
                 <>
                   <button type="button" className={`${btn.secondary} mr-2`} onClick={() => setReminding(inv)}>

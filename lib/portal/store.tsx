@@ -100,6 +100,8 @@ type Store = PortalData & {
   saveSettings: (input: Partial<PortalSettings>) => Promise<void>;
   /** Relance de paiement par e-mail ; renvoie true si elle est partie. */
   remindInvoice: (id: string) => Promise<boolean>;
+  /** Envoie la facture (e-mail + PDF) au client ; renvoie true si elle est partie. */
+  sendInvoice: (id: string) => Promise<boolean>;
   saveDog: (contractId: string, input: DogInput, id?: string) => Promise<string | undefined>;
   deleteDog: (id: string) => Promise<void>;
   /** Recharge les données depuis le serveur (après une action hors du store, ex. une fiche). */
@@ -244,6 +246,7 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       syncCalendar: async () => (await call<{ events: number }>("syncCalendar"))?.events,
       saveSettings: async (input) => void (await call("saveSettings", input)),
       remindInvoice: async (id) => (await call("remindInvoice", { id })) !== undefined,
+      sendInvoice: async (id) => (await call("sendInvoice", { id })) !== undefined,
     }),
     [data, ready, session, error, call],
   );
