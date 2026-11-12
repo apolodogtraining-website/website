@@ -550,13 +550,17 @@ export const nav = [
   { label: "Contact", href: "/contact" },
 ];
 
-/** Menu du header : identique à `nav`, sans FAQ ni Contact (gardés dans le footer). */
+/** Menu du header : identique à `nav`, sans FAQ, Contact ni Partenaires (gardés dans le footer). */
 export const headerNav = nav.filter(
-  (item) => item.href !== "/faq" && item.href !== "/contact"
+  (item) => item.href !== "/faq" && item.href !== "/contact" && item.href !== "/partenaires"
 );
 
 /** Menu du footer : `nav` complet + Zone d'intervention (pas dans le header). */
-export const footerNav = [...nav, { label: "Zone d'intervention", href: "/zone-intervention" }];
+export const footerNav = [
+  ...nav,
+  { label: "Zone d'intervention", href: "/zone-intervention" },
+  { label: "Accessoires recommandés", href: "/accessoires" },
+];
 
 /** Pages légales : hors menu principal, mais liées depuis le footer et présentes dans le sitemap. */
 export const legalNav = [
