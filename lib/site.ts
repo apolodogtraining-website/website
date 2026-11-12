@@ -622,6 +622,7 @@ export const partners: Partner[] = [
     description:
       "Ostéopathe animalier à domicile pour les chiens, les chats, les chevaux et les animaux de ferme. Consultations à Bordeaux Métropole et partout en Gironde, adaptées à chaque motif de consultation et à tous les âges.",
     url: "https://www.osteopathie-animale-bordeaux-33.fr",
+    logo: "/partners/mathilde-blanc.png",
   },
   {
     name: "Mathilde Bouchet — Ostéopathe animalier",
@@ -630,5 +631,6 @@ export const partners: Partner[] = [
     description:
       "Ostéopathe animalier à Pessac, pour les chiens, les chats, les NAC, les chevaux et les animaux de ferme. Consultations à domicile, en écurie ou à la ferme, principalement sur Bordeaux rive gauche.",
     url: "https://mathildebouchet-oa.netlify.app/",
+    logo: "/partners/mathilde-bouchet.png",
   },
 ];
