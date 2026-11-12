@@ -13,6 +13,7 @@ const DEFAULT_LAST_MODIFIED = "2026-09-14";
 
 const LAST_MODIFIED: Record<string, string> = {
   // "/": "2026-09-14",
+  "/accessoires": "2026-11-09",
   // "/services/mantrailing-bordeaux": "2026-10-02",
 };
 

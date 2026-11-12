@@ -198,3 +198,64 @@ export function ArrowIcon(p: IconProps) {
     </svg>
   );
 }
+
+/* Accessoires recommandés (page /accessoires) */
+
+export function LeashIcon(p: IconProps) {
+  return (
+    <svg {...base} {...p}>
+      <circle cx="6.5" cy="6.5" r="3" />
+      <path d="M8.7 8.7l6.8 6.8" />
+      <rect x="15.5" y="15.5" width="5" height="5" rx="1.2" />
+    </svg>
+  );
+}
+
+export function TugIcon(p: IconProps) {
+  return (
+    <svg {...base} {...p}>
+      <circle cx="5.5" cy="18.5" r="2.5" />
+      <circle cx="18.5" cy="5.5" r="2.5" />
+      <path d="M7.3 16.7l9.4-9.4" />
+      <path d="M9.5 14.5l2 2M12.5 11.5l2 2" />
+    </svg>
+  );
+}
+
+export function BallIcon(p: IconProps) {
+  return (
+    <svg {...base} {...p}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M5.2 6.2c3 1.4 4.6 3.7 4.6 5.8s-1.6 4.4-4.6 5.8M18.8 6.2c-3 1.4-4.6 3.7-4.6 5.8s1.6 4.4 4.6 5.8" />
+    </svg>
+  );
+}
+
+export function CalmIcon(p: IconProps) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0Z" />
+      <path d="M8.5 20.5h7" />
+      <path d="M9 3.5c1 1 1 2.3 0 3.3M13 3.5c1 1 1 2.3 0 3.3" />
+    </svg>
+  );
+}
+
+export function CareIcon(p: IconProps) {
+  return (
+    <svg {...base} {...p}>
+      <rect x="3" y="4" width="18" height="7" rx="2" />
+      <path d="M6.5 11v3.5M10 11v3.5M14 11v3.5M17.5 11v3.5" />
+      <path d="M12 14.5V21" />
+    </svg>
+  );
+}
+
+export function BookIcon(p: IconProps) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M12 6.5C10.5 5 8 4.5 4 4.5v14c4 0 6.5.5 8 2 1.5-1.5 4-2 8-2v-14c-4 0-6.5.5-8 2Z" />
+      <path d="M12 6.5v14" />
+    </svg>
+  );
+}
