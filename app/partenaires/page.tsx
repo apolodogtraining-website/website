@@ -44,7 +44,7 @@ export default function PartenairesPage() {
         </section>
 
         <section className="bg-white pb-16 pt-8 md:pb-24 md:pt-10">
-          <div className="mx-auto grid max-w-7xl gap-6 px-5 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mx-auto grid max-w-7xl gap-6 px-5 sm:grid-cols-2 lg:grid-cols-3">
             {partners.map((partner, i) => (
               <Reveal key={partner.name} delay={(i % 4) * 80} variant="scale" className="h-full">
                 <TiltCard
