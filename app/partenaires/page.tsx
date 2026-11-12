@@ -13,7 +13,7 @@ import { breadcrumb, graph, jsonLdScript } from "@/lib/jsonld";
 export const metadata: Metadata = {
   title: "Mes partenaires",
   description:
-    "Le réseau de professionnels que Frédéric recommande pour tout besoin hors de ses compétences : formation, agility, nutrition, animalerie.",
+    "Le réseau de professionnels que Frédéric recommande pour tout besoin hors de ses compétences : formation, agility, nutrition, ostéopathie animale, animalerie.",
   alternates: { canonical: "/partenaires" },
 };
 
